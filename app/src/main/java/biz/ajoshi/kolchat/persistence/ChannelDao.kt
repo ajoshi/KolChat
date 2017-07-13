@@ -1,24 +1,22 @@
 package biz.ajoshi.kolchat.persistence
 
-import android.arch.persistence.room.Dao
-import android.arch.persistence.room.Delete
-import android.arch.persistence.room.Insert
-import android.arch.persistence.room.Query
-
-import biz.ajoshi.kolchat.persistence.PersistenceModels.Channel;
+import android.arch.persistence.room.*
+import io.reactivex.Flowable
 
 /**
  * Created by ajoshi on 7/8/2017.
  */
 @Dao
 interface ChannelDao {
-    @Query("SELECT * FROM channel")
-    fun getAllChannels () : List <Channel>
-//    fun getChannels () : Flowable <List <Channel>> when using rxjava
+    @Query("SELECT * FROM channel ORDER BY last_message_time DESC")
+    fun getAllChannels () : Flowable<List <Channel>>
 
     @Insert
-    fun insert(channelServer: Channel)
+    fun insert(channel: Channel)
+
+    @Update(onConflict = OnConflictStrategy.REPLACE)
+    fun updateLastMessage(channel : Channel)
 
     @Delete
-    fun delete(channelServer: Channel)
+    fun delete(channel: Channel)
 }

@@ -24,7 +24,7 @@ data class ServerChatChannel(val name: String,
 data class ServerChatMessage(val author: User,
                              val htmlText: String,
                              val channelNameServer: ServerChatChannel,
-                             val time: Date)
+                             val time: Long)
 
 /**
  * A user seen in chat (or who or profile view)

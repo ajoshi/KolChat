@@ -60,7 +60,7 @@ class ChatkitMessage (val chatmessage: ServerChatMessage): IMessage{
      * @return the message creation date
      */
     override fun getCreatedAt(): Date {
-        return chatmessage.time
+        return Date(chatmessage.time)
     }
 
     /**

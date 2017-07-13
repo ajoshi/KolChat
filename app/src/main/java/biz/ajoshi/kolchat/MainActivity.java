@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 
+
 public class MainActivity extends AppCompatActivity {
     public static Network network;
     @Override

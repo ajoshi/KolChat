@@ -75,7 +75,6 @@ class ChatManagerKotlin(val network: Network) {
                     val nullableTimestamp = lastSeenRegexMatches[1]?.value?.toLong()
                     if (nullableTimestamp != null) {
                         lastSeen = nullableTimestamp
-                        timeStamp = Date(lastSeen)
                     }
                 }
                 //   }
@@ -137,7 +136,7 @@ class ChatManagerKotlin(val network: Network) {
             val chatObject = ServerChatMessage(author = User(id = userId, name = username),
                     htmlText = chatText,
                     channelNameServer = channelServer ?: ServerChatChannel(name = channelName, id = channelName, isPrivate = false),
-                    time = timeStamp)
+                    time = lastSeen)
             returnList.add(chatObject)
         }
         return returnList
