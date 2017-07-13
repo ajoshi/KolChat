@@ -54,14 +54,14 @@ public void getMessages() {
 //    ChatEndpoint service = retrofit.create(ChatEndpoint.class);
 //
 //
-//    service.getMessages(System.currentTimeMillis()+"").enqueue(new Callback<List<ChatMessage>>() {
+//    service.getMessages(System.currentTimeMillis()+"").enqueue(new Callback<List<ServerChatMessage>>() {
 //        @Override
-//        public void onResponse(Call<List<ChatMessage>> call, Response<List<ChatMessage>> response) {
+//        public void onResponse(Call<List<ServerChatMessage>> call, Response<List<ServerChatMessage>> response) {
 //            Log.e("ajoshi", "retorfit sucks");
 //        }
 //
 //        @Override
-//        public void onFailure(Call<List<ChatMessage>> call, Throwable t) {
+//        public void onFailure(Call<List<ServerChatMessage>> call, Throwable t) {
 //            Log.e("ajoshi", "retorfit still sucks");
 //        }
 //    });

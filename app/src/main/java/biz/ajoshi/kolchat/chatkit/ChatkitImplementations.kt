@@ -1,6 +1,6 @@
 package biz.ajoshi.kolchat.chatkit
 
-import biz.ajoshi.kolchat.model.ChatMessage
+import biz.ajoshi.kolchat.model.ServerChatMessage
 import biz.ajoshi.kolchat.model.User
 import com.stfalcon.chatkit.commons.models.IMessage
 import com.stfalcon.chatkit.commons.models.IUser
@@ -43,7 +43,7 @@ class ChatkitUser (val user: User): IUser {
 
 }
 
-class ChatkitMessage (val chatmessage: ChatMessage): IMessage{
+class ChatkitMessage (val chatmessage: ServerChatMessage): IMessage{
     /**
      * Returns message identifier
 

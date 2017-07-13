@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-import biz.ajoshi.kolchat.model.ChatMessage;
+import biz.ajoshi.kolchat.model.ServerChatMessage;
 import biz.ajoshi.kolchat.util.StringUtil;
 
 /**
@@ -30,8 +30,8 @@ public class ChatManager {
         // now we're logged in
         read();
 
-        List<ChatMessage> chatList = read();
-        for (ChatMessage a : chatList) {
+        List<ServerChatMessage> chatList = read();
+        for (ServerChatMessage a : chatList) {
             Log.e("ajoshi", a.toString());
         }
                 /*
@@ -53,7 +53,7 @@ public class ChatManager {
 
     }
 
-    public List<ChatMessage> read() throws IOException {
+    public List<ServerChatMessage> read() throws IOException {
         String chatResponse = network.readChat(lastSeen);
 //        String commentText = xmlPullParser.getText();
 //        if (commentText.startsWith("lastseen:")) {
@@ -62,7 +62,7 @@ public class ChatManager {
 //        }
         // kol returns each line delimimted by a <br>. So each <br> denotes a chat
         String[] chats = chatResponse.split("<br>");
-        LinkedList<ChatMessage> chatList = new LinkedList<>();
+        LinkedList<ServerChatMessage> chatList = new LinkedList<>();
         for (String chat : chats) {
             if (chat.charAt(1) == '!') {
                 if (chat.startsWith("<!--lastseen:")) {
@@ -76,7 +76,7 @@ public class ChatManager {
             // low budget parsing
             String channel = null;
             int channelNameBeingIndex = chat.indexOf('[');
-            if (channelNameBeingIndex < 20) { // else it's too late to be channel name
+            if (channelNameBeingIndex < 20) { // else it's too late to be channelServer name
                 channel = StringUtil.getBetweenTwoStrings(chat, "[", "]");
             }
             int indexOfIdstart = chat.indexOf("showplayer.php?who=");
@@ -119,7 +119,7 @@ public class ChatManager {
                  text = smallerChat.substring(colonIndex+1);
             }
 
-//            ChatMessage chatMessage = new ChatMessage(new User(userId, userName), new Channel(channel, channel), text);
+//            ServerChatMessage chatMessage = new ServerChatMessage(new User(userId, userName), new Channel(channelServer, channelServer), text);
 //            chatList.add(chatMessage);
         }
         return chatList;

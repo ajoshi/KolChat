@@ -1,7 +1,7 @@
 package biz.ajoshi.kolchat
 
-import biz.ajoshi.kolchat.model.ChatChannel
-import biz.ajoshi.kolchat.model.ChatMessage
+import biz.ajoshi.kolchat.model.ServerChatChannel
+import biz.ajoshi.kolchat.model.ServerChatMessage
 import biz.ajoshi.kolchat.model.User
 import java.io.IOException
 import java.util.*
@@ -24,7 +24,7 @@ class ChatManagerKotlin(val network: Network) {
     private val timeStampPrefix = "<!--lastseen:"
     // timestamp comes in a comment
     private val timeStampRegex = Regex("<!--lastseen:(\\d+)-->")
-    // channel name regex. Channels might have numbers in them (talkie?)
+    // channelServer name regex. Channels might have numbers in them (talkie?)
     private val channelNameRegex = Regex("\\[(\\S+)\\]")
     private val userIdRegex = Regex("showplayer\\.php\\?who=(\\d+)['\"]")
 
@@ -42,7 +42,7 @@ class ChatManagerKotlin(val network: Network) {
     /**
      * Makes a post and also retrieves any unread chat messages
      */
-    fun post(message: String): List<ChatMessage> {
+    fun post(message: String): List<ServerChatMessage> {
         val chatResponse = network.postChat(message)
         return parseChats(chatResponse.split("<br>"))
     }
@@ -51,7 +51,7 @@ class ChatManagerKotlin(val network: Network) {
     /**
      * Fetches unread chat messages from the server
      */
-    fun readChat():List<ChatMessage> {
+    fun readChat():List<ServerChatMessage> {
         // The responsebody we get from the server
         val chatResponse = network.readChat(lastSeen)
         // this will be the list of chats we return. We'll add chats to this list
@@ -60,12 +60,12 @@ class ChatManagerKotlin(val network: Network) {
     }
 
     /**
-     * Converts a list of raw chat messages into ChatMessage objects
+     * Converts a list of raw chat messages into ServerChatMessage objects
      */
-    fun parseChats(chats: List<String>): List<ChatMessage> {
-        val returnList = mutableListOf<ChatMessage>()
+    fun parseChats(chats: List<String>): List<ServerChatMessage> {
+        val returnList = mutableListOf<ServerChatMessage>()
         var timeStamp = Date()
-        var channel : ChatChannel? = null
+        var channelServer: ServerChatChannel? = null
         for (chat in chats) {
             if (chat.get(1) == '!') {
                 // it's a comment of some sort (hopefully timestamp)
@@ -84,15 +84,15 @@ class ChatManagerKotlin(val network: Network) {
             }
 
             // iterate through each chat message and create a ChatObject
-            // by default the channel is the one we logged in to. If something went wrong, it is empty
+            // by default the channelServer is the one we logged in to. If something went wrong, it is empty
             var channelName  = network.currentUser.mainChannel ?: ""
             val channelNameStartIndex = chat.indexOf('[')
-            // if [ is too late, then it's likely not a channel name
+            // if [ is too late, then it's likely not a channelServer name
             if (channelNameStartIndex < 25) {
                 channelName = getStringUsingRegex(regex = channelNameRegex, sourceString = chat) ?: channelName
 //                val channelNameRegexMatches = channelNameRegex.find(chat)?.groups
 //                if (channelNameRegexMatches != null && channelNameRegexMatches.size > 1) {
-//                    channel = channelNameRegexMatches[1]?.value ?: "defaultChannel"
+//                    channelServer = channelNameRegexMatches[1]?.value ?: "defaultChannel"
 //                }
             }
             val userId = getStringUsingRegex(regex = userIdRegex, sourceString = chat) ?: ""
@@ -108,8 +108,8 @@ class ChatManagerKotlin(val network: Network) {
 
             if (tempUserName.contains("(private):")) {
                 tempUserName.replace(oldValue = " (private):", newValue = "")
-                // it's a pm so the channel name is the username
-                channel = ChatChannel(name = tempUserName, id = userId, isPrivate = true)
+                // it's a pm so the channelServer name is the username
+                channelServer = ServerChatChannel(name = tempUserName, id = userId, isPrivate = true)
                 channelName = tempUserName
             }
             val username = tempUserName
@@ -134,9 +134,9 @@ class ChatManagerKotlin(val network: Network) {
             }
 
             //TODO clean up username
-            val chatObject = ChatMessage(author = User(id = userId, name = username),
+            val chatObject = ServerChatMessage(author = User(id = userId, name = username),
                     htmlText = chatText,
-                    channelName = channel ?: ChatChannel(name = channelName, id = channelName, isPrivate = false),
+                    channelNameServer = channelServer ?: ServerChatChannel(name = channelName, id = channelName, isPrivate = false),
                     time = timeStamp)
             returnList.add(chatObject)
         }

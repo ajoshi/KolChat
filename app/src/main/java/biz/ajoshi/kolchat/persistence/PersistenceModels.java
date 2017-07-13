@@ -18,7 +18,7 @@ public class PersistenceModels {
 
     @Entity
     public static class Message {
-        @PrimaryKey
+        @PrimaryKey(autoGenerate = true)
         String userId;
         String userName;
         String text;

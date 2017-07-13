@@ -1,13 +1,13 @@
 package biz.ajoshi.kolchat.chatkit
 
-import biz.ajoshi.kolchat.model.ChatChannel
+import biz.ajoshi.kolchat.model.ServerChatChannel
 import com.stfalcon.chatkit.commons.models.IDialog
 import com.stfalcon.chatkit.commons.models.IUser
 
 /**
  * Created by ajoshi on 7/4/2017.
  */
-class DefaultDialog(public val channel: ChatChannel, private var lastMessageInternal: ChatkitMessage): IDialog<ChatkitMessage> {
+class DefaultDialog(public val channelServer: ServerChatChannel, private var lastMessageInternal: ChatkitMessage): IDialog<ChatkitMessage> {
     override fun setLastMessage(message: ChatkitMessage?) {
         if (message != null) {
             lastMessageInternal = message
@@ -25,7 +25,7 @@ class DefaultDialog(public val channel: ChatChannel, private var lastMessageInte
     }
 
     override fun getId(): String {
-        return channel.id
+        return channelServer.id
     }
 
     override fun getUsers(): MutableList<out IUser> {
@@ -38,7 +38,7 @@ class DefaultDialog(public val channel: ChatChannel, private var lastMessageInte
     }
 
     override fun getDialogName(): String {
-        return channel.name
+        return channelServer.name
     }
 
 }
