@@ -4,7 +4,7 @@ import android.arch.persistence.room.*
 import io.reactivex.Flowable
 
 /**
- * Created by ajoshi on 7/8/2017.
+ * Created by ajoshi on 7/8/2017
  */
 @Dao
 interface ChannelDao {
