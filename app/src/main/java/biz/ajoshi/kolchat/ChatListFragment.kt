@@ -1,5 +1,10 @@
 package biz.ajoshi.kolchat
 
+import android.app.job.JobInfo
+import android.app.job.JobScheduler
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
@@ -29,6 +34,9 @@ class ChatListFragment() : Fragment() { // empty constructor
         val dialogsList: DialogsList = activity?.findViewById(R.id.dialogsList) as DialogsList
         dialogsListAdapter = DialogsListAdapter(null)//ImagelessDialogsListAdapter()
         dialogsList.setAdapter(dialogsListAdapter)
+
+        val serviceIntent = Intent(activity, ChatService::class.java)
+        activity.startService(serviceIntent)
 
         val dd = DefaultDialog(ServerChatChannel("games", "games", false), ChatkitMessage(ServerChatMessage(User("corman", "bbb"), "omg AR", ServerChatChannel("games", "games", false), (System.currentTimeMillis() - 30000))))
         val aa = DefaultDialog(ServerChatChannel("trade", "trade", false), ChatkitMessage(ServerChatMessage(User("aeshma", "bbcccb"), "selling some shit", ServerChatChannel("trade", "trade", false), 0)))

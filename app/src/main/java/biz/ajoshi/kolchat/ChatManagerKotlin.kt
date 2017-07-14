@@ -67,6 +67,10 @@ class ChatManagerKotlin(val network: Network) {
         var timeStamp = Date()
         var channelServer: ServerChatChannel? = null
         for (chat in chats) {
+            if (chat.isEmpty()) {
+                // login error/general failure to get chat
+                continue
+            }
             if (chat.get(1) == '!') {
                 // it's a comment of some sort (hopefully timestamp)
                 //    if (chat.startsWith(timeStampPrefix)) {

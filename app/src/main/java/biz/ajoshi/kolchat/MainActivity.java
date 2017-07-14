@@ -1,5 +1,7 @@
 package biz.ajoshi.kolchat;
 
+import android.app.job.JobScheduler;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -22,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
 
                 try {
                     if (network == null) {
-                        network = new Network("corman", "cartoonskol1", true);
+                        network = new Network("a", "b", true);
                     }
 
                     ChatManagerKotlin chatMgr = new ChatManagerKotlin(network);
@@ -45,6 +47,14 @@ public class MainActivity extends AppCompatActivity {
         };
     getSupportFragmentManager().beginTransaction().add(R.id.llist, new ChatListFragment(), "list frag").commit();
   //      fml.execute();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Intent stopService = new Intent (this, ChatService.class);
+        stopService.putExtra("STOP", 2); // TODO no no, use consts
+        startService(stopService);
     }
 
 public void getMessages() {
