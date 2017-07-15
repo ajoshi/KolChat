@@ -1,0 +1,31 @@
+package biz.ajoshi.kolchat.persistence;
+
+import java.util.List;
+
+import io.reactivex.Flowable;
+
+import android.arch.persistence.room.Dao;
+import android.arch.persistence.room.Delete;
+import android.arch.persistence.room.Insert;
+import android.arch.persistence.room.Query;
+
+/**
+ * Created by ajoshi on 7/14/17.
+ */
+@Dao
+public interface MessageDao {
+    @Query("SELECT * FROM chatmessage")
+    List<ChatMessage> getMessages();
+
+    @Query("SELECT * FROM chatmessage WHERE channelId = :channel_id ORDER BY timeStamp DESC")
+    Flowable<List<ChatMessage>> getMessagesForChannel (String channel_id);
+
+    @Query("SELECT * FROM chatmessage WHERE channelId = :channel_id ORDER BY timeStamp DESC LIMIT 1")
+    ChatMessage getLastMessageForChannel(String channel_id);
+
+    @Insert
+    void insert(ChatMessage message);
+
+    @Delete
+    void delete(ChatMessage message);
+}
