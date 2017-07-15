@@ -45,14 +45,6 @@ class ChatListFragment() : Fragment() { // empty constructor
                     dialogs ->
                     dialogsListAdapter!!.setItems(dialogs)
                 }
-//        val dd = DefaultDialog(ServerChatChannel("games", "games", false), ChatkitMessage(ServerChatMessage(User("corman", "bbb"), "omg AR", ServerChatChannel("games", "games", false), (System.currentTimeMillis() - 30000))))
-//        val aa = DefaultDialog(ServerChatChannel("trade", "trade", false), ChatkitMessage(ServerChatMessage(User("aeshma", "bbcccb"), "selling some shit", ServerChatChannel("trade", "trade", false), 0)))
-//        val bbd = DefaultDialog(ServerChatChannel("ajoshi", "butts", true), ChatkitMessage(ServerChatMessage(User("ajoshi", "butts"), "something funny and smart", ServerChatChannel("ajoshi", "butts", true), 0)))
-//        dialogsListAdapter?.addItem(dd)
-//        dialogsListAdapter?.addItem(aa)
-//        dialogsListAdapter?.addItem(bbd)
-
-
         super.onActivityCreated(savedInstanceState)
     }
 
