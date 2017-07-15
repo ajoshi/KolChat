@@ -110,7 +110,7 @@ class ChatManagerKotlin(val network: Network) {
             var tempUserName = chat.substring(userIdTagEndPosition, chat.indexOf("</a>", userIdTagEndPosition))
 
             if (tempUserName.contains("(private):")) {
-                tempUserName.replace(oldValue = " (private):", newValue = "")
+                tempUserName = tempUserName.replace(oldValue = " (private):", newValue = "")
                 // it's a pm so the channelServer name is the username
                 channelServer = ServerChatChannel(name = tempUserName, id = userId, isPrivate = true)
                 channelName = tempUserName
