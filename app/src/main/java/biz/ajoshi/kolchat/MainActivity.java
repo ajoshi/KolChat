@@ -1,52 +1,41 @@
 package biz.ajoshi.kolchat;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.security.NoSuchAlgorithmException;
+import java.util.concurrent.Callable;
 
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+
+import android.app.Activity;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
 
 public class MainActivity extends AppCompatActivity {
-    public static Network network;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        AsyncTask<Void, Void, Void> fml = new AsyncTask<Void, Void, Void>() {
+        Observable.fromCallable(new Callable<Boolean>() {
             @Override
-            protected Void doInBackground(Void... voids) {
-
-                try {
-                    if (network == null) {
-                        network = new Network("a", "b", true);
-                    }
-
-                    ChatManagerKotlin chatMgr = new ChatManagerKotlin(network);
-                    chatMgr.readChat();
-                    if (network.isLoggedIn()) {
-                        chatMgr.post("/clan hey");
-                    } else {
-                        if (network.login()) {
-                            chatMgr.post("/clan hey");
-                        }
-                    }
-                    // network.postChat("/clan hey");
-                } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                return null;
+            public Boolean call() throws Exception {
+                return ChatSingleton.INSTANCE.loginIfNeeded("a", "b", true);
             }
-        };
+        }).subscribeOn(Schedulers.io())
+                  .observeOn(AndroidSchedulers.mainThread())
+                  .subscribe(new Consumer<Boolean>() {
+                      @Override
+                      public void accept(Boolean success) throws Exception {
+                          if (success) {
+                              Activity activity = MainActivity.this;
+                              Intent serviceIntent = new Intent(activity, ChatService.class);
+                              activity.startService(serviceIntent);
+                          }
+                      }
+                  });
         getSupportFragmentManager().beginTransaction().add(R.id.llist, new ChatListFragment(), "list frag").commit();
-        //      fml.execute();
     }
 
     @Override

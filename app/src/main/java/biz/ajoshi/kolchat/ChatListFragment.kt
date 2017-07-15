@@ -32,10 +32,6 @@ class ChatListFragment() : Fragment() { // empty constructor
         dialogsListAdapter = DialogsListAdapter(null)//ImagelessDialogsListAdapter()
         dialogsList.setAdapter(dialogsListAdapter)
 
-        val serviceIntent = Intent(activity, ChatService::class.java)
-        activity.startService(serviceIntent)
-
-
         KolChatApp.database
                 ?.ChannelDao()
                 ?.getAllChannels()

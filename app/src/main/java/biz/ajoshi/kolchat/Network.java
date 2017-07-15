@@ -31,7 +31,7 @@ public class Network {
     private String pwdHash;
     private String phpSessId;
     private String awsCookie;
-    private boolean isLoggedIn = false;
+    private boolean loggedIn = false;
     OkHttpClient client;
 
     private LoggedInUser currentUser;
@@ -123,10 +123,10 @@ public class Network {
             fetchPlayerData();
             if (pwdHash != null && playerid != null) {
                 // I guess we must have logged in!
-                isLoggedIn = true;
+                loggedIn = true;
             }
         }
-        return isLoggedIn;
+        return loggedIn;
     }
 
     /**
@@ -247,6 +247,6 @@ public class Network {
     }
 
     public boolean isLoggedIn() {
-        return isLoggedIn;
+        return loggedIn;
     }
 }
