@@ -1,7 +1,7 @@
 package biz.ajoshi.kolchat.chatkit
 
-import biz.ajoshi.kolchat.model.ServerChatMessage
 import biz.ajoshi.kolchat.model.User
+import biz.ajoshi.kolchat.persistence.ChatMessage
 import com.stfalcon.chatkit.commons.models.IMessage
 import com.stfalcon.chatkit.commons.models.IUser
 import java.util.*
@@ -9,7 +9,7 @@ import java.util.*
 /**
  * Created by ajoshi on 7/4/2017.
  */
-class ChatkitUser (val user: User): IUser {
+class ChatkitUser(val user: User) : IUser {
     /**
      * Returns the user's name
 
@@ -43,15 +43,14 @@ class ChatkitUser (val user: User): IUser {
 
 }
 
-class ChatkitMessage (val chatmessage: ServerChatMessage): IMessage{
+class ChatkitMessage(val chatmessage: ChatMessage) : IMessage {
     /**
      * Returns message identifier
 
      * @return the message id
      */
     override fun getId(): String {
-        // TODO maybe have chat have a fake id field as well? timestamp + index in list of received chats
-        return chatmessage.author.id + chatmessage.htmlText.hashCode()
+        return chatmessage.id.toString()
     }
 
     /**
@@ -60,7 +59,7 @@ class ChatkitMessage (val chatmessage: ServerChatMessage): IMessage{
      * @return the message creation date
      */
     override fun getCreatedAt(): Date {
-        return Date(chatmessage.time)
+        return Date(chatmessage.timeStamp)
     }
 
     /**
@@ -69,7 +68,7 @@ class ChatkitMessage (val chatmessage: ServerChatMessage): IMessage{
      * @return the message author
      */
     override fun getUser(): IUser {
-        return ChatkitUser(chatmessage.author)
+        return ChatkitUser(User(id = chatmessage.userId, name = chatmessage.userName))
     }
 
     /**
@@ -78,7 +77,7 @@ class ChatkitMessage (val chatmessage: ServerChatMessage): IMessage{
      * @return the message text
      */
     override fun getText(): String {
-        return chatmessage.htmlText
+        return chatmessage.text
     }
 
 }

@@ -5,7 +5,6 @@ import android.text.TextUtils;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Locale;
@@ -40,6 +39,7 @@ public class Network {
     public static final String ERROR = "error";
     public static final String BASE_URL = "https://www.kingdomofloathing.com";
     public static final String LOGIN_POSTFIX = "/login.php";
+    public static final String IS_QUIET_MODIFIER = "%s/q";
 
     /**
      * Creates a Network object for the given user
@@ -49,7 +49,6 @@ public class Network {
     public Network(String username, String password) throws NoSuchAlgorithmException, UnsupportedEncodingException {
         this.username = username;
         this.password = password;
-        MessageDigest md = MessageDigest.getInstance("MD5");
     }
 
     /**
@@ -58,7 +57,7 @@ public class Network {
      * @param password
      */
     public Network(String username, String password, boolean isQuiet) throws NoSuchAlgorithmException, UnsupportedEncodingException {
-        this(isQuiet ?  username + "/q": username, password);
+        this(isQuiet ?  String.format(IS_QUIET_MODIFIER, username): username, password);
     }
 
     /**

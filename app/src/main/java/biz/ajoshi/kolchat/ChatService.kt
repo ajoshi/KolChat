@@ -4,14 +4,19 @@ import android.app.Service
 import android.content.Intent
 import android.os.*
 import android.util.Log
+import biz.ajoshi.kolchat.persistence.RoomInserter
 
+
+const val EXTRA_POLL_INTERVAL_IN_MS = "biz.ajoshi.kolchat.ChatService.pollInterval";
 
 /**
- * Created by ajoshi on 7/13/17.
+ * Service that spins bg task to periodically poll for chat messages.
+ * Needs to be a service so we can get messages even when app isn't in foreground
  */
 class ChatService() : Service() {
-    val MESSAGE_LOOP = 1;
-    val MESSAGE_STOP_LOOPING = 2;
+    // normally we'll poll ever 5 seconds
+    val defaultPollInterval = 5000
+    var pollInterval: Long = defaultPollInterval.toLong();
 
     var serviceLooper: Looper? = null
     var serviceHandler: ServiceHandler? = null
@@ -21,34 +26,21 @@ class ChatService() : Service() {
     }
 
     inner class ServiceHandler(looper: Looper) : Handler(looper) {
-        var stopNow = false
         override fun handleMessage(msg: Message?) {
-            if (ChatManagerSingleton.chatManager == null) {
-/// log in
-                val network = Network("a", "b", true)
-                network.login()
-                ChatManagerSingleton.chatManager = ChatManagerKotlin(network)
+            if (ChatSingleton.chatManager == null) {
+                // not logged in so exit service. may be premature and a bad idea
+                stopSelf(msg?.arg1?: -1)
+                return
             }
-            if (!stopNow)
-                when (msg?.arg2) {
-                    MESSAGE_LOOP -> sendMessageDelayed(obtainLoopMessage(msg.arg1), 5000)
-                // after chat is read, kill the service regardless of what other commans were sent
-                    MESSAGE_STOP_LOOPING -> stop(msg?.arg1)
-                }
-            // if we can, read the chat (and at some point stick in in db)
-            val chatMessages = ChatManagerSingleton.chatManager?.readChat()
-            if (0 < chatMessages?.size as Int) {
-                Log.e("ajoshi", chatMessages[0].htmlText)
+            if (msg != null) {
+                sendMessageDelayed(obtainLoopMessage(msg.arg1), pollInterval)
             }
-        }
-
-        fun stop(id : Int) {
-            stopNow = true
-            stopSelf(id)
-            stopSelf(id)
+            // if we can, read the chat and stick in db
+            val chatMessages = ChatSingleton.chatManager!!.readChat()
+            val roomInserter = RoomInserter()
+            for (chatMessage in chatMessages)  roomInserter.insertMessage(chatMessage)
         }
     }
-
 
     override fun onCreate() {
         super.onCreate()
@@ -64,22 +56,23 @@ class ChatService() : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val msg = obtainLoopMessage(startId)
-        var action = intent?.extras?.getInt("STOP", MESSAGE_LOOP)
-        if (action == null) {
-            action = MESSAGE_LOOP
-        }
-        msg?.arg2 = action
-        if (serviceHandler != null) {
-            serviceHandler!!.sendMessage(msg)
-        }
+        val interval = intent?.extras?.getInt(EXTRA_POLL_INTERVAL_IN_MS, defaultPollInterval)
+        pollInterval = (interval?: defaultPollInterval).toLong()
+        serviceHandler?.sendMessage(msg)
         return START_STICKY;
     }
 
     fun obtainLoopMessage(id: Int): Message? {
         val msg = serviceHandler?.obtainMessage()
         msg?.arg1 = id
-        msg?.arg2 = MESSAGE_LOOP
+        msg?.arg2 = defaultPollInterval
         return msg
+    }
+
+
+    override fun onDestroy() {
+        // we got told to quit, so shut down the service looper
+        serviceLooper?.quit()
     }
 }
 

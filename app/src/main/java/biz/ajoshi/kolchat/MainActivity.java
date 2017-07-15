@@ -1,18 +1,18 @@
 package biz.ajoshi.kolchat;
 
-import android.app.job.JobScheduler;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
+
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.security.NoSuchAlgorithmException;
-
 
 public class MainActivity extends AppCompatActivity {
     public static Network network;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
                             chatMgr.post("/clan hey");
                         }
                     }
-                   // network.postChat("/clan hey");
+                    // network.postChat("/clan hey");
                 } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
                     e.printStackTrace();
                 } catch (IOException e) {
@@ -45,19 +45,18 @@ public class MainActivity extends AppCompatActivity {
                 return null;
             }
         };
-    getSupportFragmentManager().beginTransaction().add(R.id.llist, new ChatListFragment(), "list frag").commit();
-  //      fml.execute();
+        getSupportFragmentManager().beginTransaction().add(R.id.llist, new ChatListFragment(), "list frag").commit();
+        //      fml.execute();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        Intent stopService = new Intent (this, ChatService.class);
-        stopService.putExtra("STOP", 2); // TODO no no, use consts
-        startService(stopService);
+        Intent stopService = new Intent(this, ChatService.class);
+        stopService(stopService);
     }
 
-public void getMessages() {
+    public void getMessages() {
 //    Retrofit retrofit = new Retrofit.Builder()
 //            .addConverterFactory(JacksonConverterFactory.create())
 //            .baseUrl("https://www.kingdomofloathing.com/")
@@ -77,7 +76,7 @@ public void getMessages() {
 //        }
 //    });
 
-}
+    }
 }
 
 /*

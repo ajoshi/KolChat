@@ -5,7 +5,7 @@ import android.arch.persistence.room.Room
 import biz.ajoshi.kolchat.persistence.KolDB
 
 /**
- * Created by a.joshi on 7/14/17.
+ * Created by ajoshi on 7/14/17.
  */
 class KolChatApp : Application() {
     companion object {

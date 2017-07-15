@@ -64,11 +64,11 @@ class ChatManagerKotlin(val network: Network) {
      */
     fun parseChats(chats: List<String>): List<ServerChatMessage> {
         val returnList = mutableListOf<ServerChatMessage>()
-        var timeStamp = Date()
         var channelServer: ServerChatChannel? = null
         for (chat in chats) {
             if (chat.isEmpty()) {
                 // login error/general failure to get chat
+                // TODO send some sort of error back up so this failure can be identified and shown to the user/some ui
                 continue
             }
             if (chat.get(1) == '!') {
@@ -149,7 +149,7 @@ class ChatManagerKotlin(val network: Network) {
     private fun getStringUsingRegex(regex :Regex, sourceString: String) :String? {
         val potentialRegexMatches = regex.find(sourceString)?.groups
         if (potentialRegexMatches != null && potentialRegexMatches.size > 1) {
-            return potentialRegexMatches[1]?.value ?: null
+            return potentialRegexMatches[1]?.value
         }
         return null
     }
