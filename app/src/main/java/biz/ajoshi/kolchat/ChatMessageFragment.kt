@@ -10,6 +10,7 @@ import biz.ajoshi.kolchat.persistence.ChatMessage
 import com.stfalcon.chatkit.messages.MessageInput
 import com.stfalcon.chatkit.messages.MessagesList
 import com.stfalcon.chatkit.messages.MessagesListAdapter
+import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 
@@ -22,10 +23,10 @@ const val EXTRA_CHANNEL_IS_PRIVATE = "biz.ajoshi.kolchat.ExtraChannelPrivate"
 
 class ChatMessageFragment() : Fragment() {
 
-    var messagesListAdapter: MessagesListAdapter<ChatkitMessage>? = null
     var id = "newbie"
     var name = "newbie"
     var isPrivate = false
+
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater?.inflate(R.layout.chat_detail, container, false)
     }
@@ -41,18 +42,19 @@ class ChatMessageFragment() : Fragment() {
         val messagesListAdapter = MessagesListAdapter<ChatkitMessage>(id, null)
         messagesList.setAdapter(messagesListAdapter)
 
-        KolChatApp.database
-                ?.MessageDao()
-                ?.getMessagesForChannel(id)
-                ?.subscribeOn(Schedulers.io())
+        Observable.fromCallable {
+            KolChatApp.database
+                    ?.MessageDao()
+                    ?.getMessagesForChannel(id)
+        }?.subscribeOn(Schedulers.io())
                 ?.observeOn(AndroidSchedulers.mainThread())
                 ?.map {
-                    messageList ->
-                    makeDialogs(messageList)
+                    messages ->
+                    makeDialogs(messages)
                 }
-                ?.subscribe {
-                    dialogs ->
-                    messagesListAdapter.addToEnd(dialogs, false)
+                ?.subscribe { list ->
+                    messagesListAdapter.addToEnd(list, false)
+                    subscribeToChatupdates(messagesListAdapter, messagesList)
                 }
 
         val inputView = activity?.findViewById(R.id.input) as MessageInput
@@ -65,7 +67,7 @@ class ChatMessageFragment() : Fragment() {
             val groupChatFormat = "/{1} {2}"
             val privateChatFormat = "/w {1} {2}"
             when (isPrivate) {
-                // TODO make this call off the ui thread
+            // TODO make this call off the ui thread
                 true -> ChatSingleton.chatManager?.post(String.format(privateChatFormat, post))
                 false -> ChatSingleton.chatManager?.post(String.format(groupChatFormat, post))
             }
@@ -74,6 +76,31 @@ class ChatMessageFragment() : Fragment() {
         return true
     }
 
+    /**
+     * Subscribes to the 'get me the last message seen in this channel' query so it can insert items into the ui as they
+     * come in
+     */
+    fun subscribeToChatupdates(adapter: MessagesListAdapter<ChatkitMessage>, uiList: MessagesList) {
+        KolChatApp.database
+                ?.MessageDao()
+                ?.getLastMessageForChannel(id)
+                ?.subscribeOn(Schedulers.io())
+                ?.observeOn(AndroidSchedulers.mainThread())
+                ?.map {
+                    message ->
+                    ChatkitMessage(message)
+                }
+                ?.subscribe {
+                    dialog ->
+                    // can't tell if we have dupes, so this dupes the last message
+                    adapter.addToStart(dialog, false)
+                    uiList.scrollToPosition(adapter.itemCount)
+                }
+    }
+
+    /**
+     * Converts a list of ChatMessages to a list of ChatkitMessages
+     */
     fun makeDialogs(messages: List<ChatMessage>): List<ChatkitMessage> {
         val chatKitMessages = mutableListOf<ChatkitMessage>()
         for (message in messages) chatKitMessages.add(ChatkitMessage(message))

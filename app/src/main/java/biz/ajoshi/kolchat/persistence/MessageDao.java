@@ -18,10 +18,10 @@ public interface MessageDao {
     List<ChatMessage> getMessages();
 
     @Query("SELECT * FROM chatmessage WHERE channelId = :channel_id ORDER BY timeStamp DESC")
-    Flowable<List<ChatMessage>> getMessagesForChannel (String channel_id);
+    List<ChatMessage> getMessagesForChannel (String channel_id);
 
     @Query("SELECT * FROM chatmessage WHERE channelId = :channel_id ORDER BY timeStamp DESC LIMIT 1")
-    ChatMessage getLastMessageForChannel(String channel_id);
+    Flowable<ChatMessage> getLastMessageForChannel(String channel_id);
 
     @Insert
     void insert(ChatMessage message);
