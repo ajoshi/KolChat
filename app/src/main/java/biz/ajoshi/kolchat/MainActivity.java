@@ -35,7 +35,13 @@ public class MainActivity extends AppCompatActivity {
                           }
                       }
                   });
-        getSupportFragmentManager().beginTransaction().add(R.id.llist, new ChatListFragment(), "list frag").commit();
+        Bundle b = new Bundle();
+        b.putString(ChatMessageFragmentKt.EXTRA_CHANNEL_ID, "games");
+        b.putString(ChatMessageFragmentKt.EXTRA_CHANNEL_NAME, "games");
+        b.putBoolean(ChatMessageFragmentKt.EXTRA_CHANNEL_IS_PRIVATE, false);
+        Fragment chatDetailFrag = new ChatMessageFragment();
+        chatDetailFrag.setArguments(b);
+        getSupportFragmentManager().beginTransaction().add(R.id.llist, chatDetailFrag, "list frag").commit();
     }
 
     @Override

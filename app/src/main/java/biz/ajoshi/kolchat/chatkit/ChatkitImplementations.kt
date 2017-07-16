@@ -77,7 +77,8 @@ class ChatkitMessage(val chatmessage: ChatMessage) : IMessage {
      * @return the message text
      */
     override fun getText(): String {
-        return chatmessage.text
+        // TODO temporary hack while I build own ui
+        return chatmessage.userName + "\n" + chatmessage.text
     }
 
 }
