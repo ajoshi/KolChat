@@ -1,5 +1,7 @@
 package biz.ajoshi.kolchat
 
+import biz.ajoshi.kolchat.model.ServerChatMessage
+
 /**
  * Created by ajoshi on 7/13/17.
  */
@@ -21,5 +23,9 @@ object ChatSingleton {
             return login(username, password, silent)
         }
         return true
+    }
+
+    fun readChat(timeStamp: Long): List<ServerChatMessage>? {
+        return chatManager?.readChat(timeStamp)
     }
 }

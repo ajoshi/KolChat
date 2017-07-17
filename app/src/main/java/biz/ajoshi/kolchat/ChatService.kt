@@ -1,25 +1,31 @@
 package biz.ajoshi.kolchat
 
 import android.app.Service
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.*
 import android.util.Log
 import biz.ajoshi.kolchat.persistence.RoomInserter
 
 
 const val EXTRA_POLL_INTERVAL_IN_MS = "biz.ajoshi.kolchat.ChatService.pollInterval";
-
+// normally we'll poll ever 5 seconds
+const val DEFAULT_POLL_INTERVAL = 5000
+const val SHARED_PREF_NAME = "chat"
+const val SHARED_PREF_LAST_FETCH_TIME = "lastFetched"
 /**
  * Service that spins bg task to periodically poll for chat messages.
  * Needs to be a service so we can get messages even when app isn't in foreground
  */
 class ChatService() : Service() {
-    // normally we'll poll ever 5 seconds
-    val defaultPollInterval = 5000
-    var pollInterval: Long = defaultPollInterval.toLong();
+    var pollInterval: Long = DEFAULT_POLL_INTERVAL.toLong();
 
     var serviceLooper: Looper? = null
     var serviceHandler: ServiceHandler? = null
+
+    var sharedPref: SharedPreferences? = null
+    var lastFetchedTime: Long = 0
 
     override fun onBind(intent: Intent?): IBinder {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
@@ -35,10 +41,14 @@ class ChatService() : Service() {
             if (msg != null) {
                 sendMessageDelayed(obtainLoopMessage(msg.arg1), pollInterval)
             }
+
             // if we can, read the chat and stick in db
-            val chatMessages = ChatSingleton.chatManager!!.readChat()
+            val chatMessages = ChatSingleton.readChat(lastFetchedTime)
             val roomInserter = RoomInserter()
-            for (chatMessage in chatMessages)  roomInserter.insertMessage(chatMessage)
+            if (chatMessages != null) {
+                for (chatMessage in chatMessages) roomInserter.insertMessage(chatMessage)
+                lastFetchedTime = ChatSingleton.chatManager!!.lastSeen
+            }
         }
     }
 
@@ -52,12 +62,15 @@ class ChatService() : Service() {
         if (serviceLooper != null) {
             serviceHandler = ServiceHandler(serviceLooper!!)
         }
+
+        sharedPref = applicationContext.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE)
+        lastFetchedTime = sharedPref!!.getLong(SHARED_PREF_LAST_FETCH_TIME, 0)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val msg = obtainLoopMessage(startId)
-        val interval = intent?.extras?.getInt(EXTRA_POLL_INTERVAL_IN_MS, defaultPollInterval)
-        pollInterval = (interval?: defaultPollInterval).toLong()
+        val interval = intent?.extras?.getInt(EXTRA_POLL_INTERVAL_IN_MS, DEFAULT_POLL_INTERVAL)
+        pollInterval = (interval?: DEFAULT_POLL_INTERVAL).toLong()
         serviceHandler?.sendMessage(msg)
         return START_STICKY;
     }
@@ -65,7 +78,7 @@ class ChatService() : Service() {
     fun obtainLoopMessage(id: Int): Message? {
         val msg = serviceHandler?.obtainMessage()
         msg?.arg1 = id
-        msg?.arg2 = defaultPollInterval
+        msg?.arg2 = DEFAULT_POLL_INTERVAL
         return msg
     }
 
@@ -73,6 +86,8 @@ class ChatService() : Service() {
     override fun onDestroy() {
         // we got told to quit, so shut down the service looper
         serviceLooper?.quit()
+        // todo is this safe?
+        sharedPref?.edit()?.putLong(SHARED_PREF_LAST_FETCH_TIME, lastFetchedTime)?.apply()
     }
 }
 

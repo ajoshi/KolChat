@@ -1,5 +1,6 @@
 package biz.ajoshi.kolchat
 
+import android.util.Log
 import biz.ajoshi.kolchat.model.ServerChatChannel
 import biz.ajoshi.kolchat.model.ServerChatMessage
 import biz.ajoshi.kolchat.model.User
@@ -18,7 +19,7 @@ import java.util.*
 // https://github.com/Slyce-Inc/SlyceMessaging
 class ChatManagerKotlin(val network: Network) {
     // when the last chat message was seen
-    private var lastSeen: Long = 0
+    var lastSeen: Long = 0
 
     // Each chat response contains this followed by the timestamp
     private val timeStampPrefix = "<!--lastseen:"
@@ -44,7 +45,7 @@ class ChatManagerKotlin(val network: Network) {
      */
     fun post(message: String): List<ServerChatMessage> {
         val chatResponse = network.postChat(message)
-        return parseChats(chatResponse.split("<br>"))
+        return parseChats(chatResponse)
     }
 
 
@@ -52,17 +53,25 @@ class ChatManagerKotlin(val network: Network) {
      * Fetches unread chat messages from the server
      */
     fun readChat():List<ServerChatMessage> {
+        return readChat(lastSeen)
+    }
+
+    /**
+     * Fetches unread chat messages from the server since the given timestamp
+     */
+    fun readChat(lastSeenTime: Long):List<ServerChatMessage> {
         // The responsebody we get from the server
-        val chatResponse = network.readChat(lastSeen)
+        val chatResponse = network.readChat(lastSeenTime)
         // this will be the list of chats we return. We'll add chats to this list
         // break up the response by the br tag. It's what kol uses to delimit messages
-        return parseChats(chatResponse.split("<br>"))
+        return parseChats(chatResponse)
     }
 
     /**
      * Converts a list of raw chat messages into ServerChatMessage objects
      */
-    fun parseChats(chats: List<String>): List<ServerChatMessage> {
+    fun parseChats(chatString: String): List<ServerChatMessage> {
+        val chats = chatString.split("<br>")
         val returnList = mutableListOf<ServerChatMessage>()
         var channelServer: ServerChatChannel? = null
         for (chat in chats) {
@@ -107,7 +116,17 @@ class ChatManagerKotlin(val network: Network) {
 
             val userIdTagEndPosition = chat.indexOf(">", userIdStartPosition) + 1
             // username is everything inside the <a> tag
-            var tempUserName = chat.substring(userIdTagEndPosition, chat.indexOf("</a>", userIdTagEndPosition))
+
+            //                          java.lang.StringIndexOutOfBoundsException: length=33; regionStart=7; regionLength=-8
+            // regionLength = endindex - beginindex
+            val indexOfATag = chat.indexOf("</a>", userIdTagEndPosition)
+            var tempUserName = "ERROR"
+            if (indexOfATag > -1) {
+                tempUserName =  chat.substring(userIdTagEndPosition, indexOfATag)
+            } else {
+                Log.e("ajoshi", "error parsing $chat");
+                Log.e("ajoshi", "error parsing $chatString");
+            }
 
             if (tempUserName.contains("(private):")) {
                 tempUserName = tempUserName.replace(oldValue = " (private):", newValue = "")
