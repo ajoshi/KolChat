@@ -29,7 +29,7 @@ class ChatMessageFragment() : Fragment() {
     var isPrivate = false
 
     var chatUpdateSubscriber: Disposable? = null
-
+    var initialChatLoadSubscriber: Disposable? = null
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater?.inflate(R.layout.chat_detail, container, false)
     }
@@ -45,7 +45,7 @@ class ChatMessageFragment() : Fragment() {
         val messagesListAdapter = MessagesListAdapter<ChatkitMessage>(id, null)
         messagesList.setAdapter(messagesListAdapter)
 
-        chatUpdateSubscriber = Observable.fromCallable {
+        initialChatLoadSubscriber = Observable.fromCallable {
             KolChatApp.database
                     ?.MessageDao()
                     ?.getMessagesForChannel(id)
@@ -92,7 +92,8 @@ class ChatMessageFragment() : Fragment() {
      * come in
      */
     fun subscribeToChatupdates(adapter: MessagesListAdapter<ChatkitMessage>, uiList: MessagesList) {
-        KolChatApp.database
+        initialChatLoadSubscriber?.dispose()
+        chatUpdateSubscriber = KolChatApp.database
                 ?.MessageDao()
                 ?.getLastMessageForChannel(id)
                 ?.subscribeOn(Schedulers.io())
