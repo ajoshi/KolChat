@@ -1,6 +1,5 @@
 package biz.ajoshi.kolchat
 
-import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
@@ -13,6 +12,7 @@ import biz.ajoshi.kolchat.persistence.ChatMessage
 import com.stfalcon.chatkit.dialogs.DialogsList
 import com.stfalcon.chatkit.dialogs.DialogsListAdapter
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 
 /**
@@ -22,6 +22,7 @@ import io.reactivex.schedulers.Schedulers
 class ChatListFragment() : Fragment() { // empty constructor
 
     var dialogsListAdapter: DialogsListAdapter<DefaultDialog>? = null
+    var channelUpdateSubscriber: Disposable? = null
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater?.inflate(R.layout.chat_list, container, false)
@@ -32,7 +33,7 @@ class ChatListFragment() : Fragment() { // empty constructor
         dialogsListAdapter = DialogsListAdapter(null)//ImagelessDialogsListAdapter()
         dialogsList.setAdapter(dialogsListAdapter)
         dialogsListAdapter!!.setOnDialogClickListener { dialog ->  dialog.channel.id}
-        KolChatApp.database
+        channelUpdateSubscriber = KolChatApp.database
                 ?.ChannelDao()
                 ?.getAllChannels()
                 ?.subscribeOn(Schedulers.io())
@@ -46,6 +47,13 @@ class ChatListFragment() : Fragment() { // empty constructor
                     dialogsListAdapter!!.setItems(dialogs)
                 }
         super.onActivityCreated(savedInstanceState)
+    }
+
+    override fun onDestroy() {
+        if (channelUpdateSubscriber != null && !channelUpdateSubscriber!!.isDisposed) {
+            channelUpdateSubscriber!!.dispose()
+        }
+        super.onDestroy()
     }
 
     fun makeDialogs(channels: List<ChatChannel>): List<DefaultDialog> {

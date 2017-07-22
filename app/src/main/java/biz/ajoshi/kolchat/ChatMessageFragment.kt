@@ -12,6 +12,7 @@ import com.stfalcon.chatkit.messages.MessagesList
 import com.stfalcon.chatkit.messages.MessagesListAdapter
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 
 /**
@@ -26,6 +27,8 @@ class ChatMessageFragment() : Fragment() {
     var id = "newbie"
     var name = "newbie"
     var isPrivate = false
+
+    var chatUpdateSubscriber: Disposable? = null
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater?.inflate(R.layout.chat_detail, container, false)
@@ -42,7 +45,7 @@ class ChatMessageFragment() : Fragment() {
         val messagesListAdapter = MessagesListAdapter<ChatkitMessage>(id, null)
         messagesList.setAdapter(messagesListAdapter)
 
-        Observable.fromCallable {
+        chatUpdateSubscriber = Observable.fromCallable {
             KolChatApp.database
                     ?.MessageDao()
                     ?.getMessagesForChannel(id)
@@ -74,6 +77,14 @@ class ChatMessageFragment() : Fragment() {
 
         }
         return true
+    }
+
+
+    override fun onDestroy() {
+        if (chatUpdateSubscriber != null && !chatUpdateSubscriber!!.isDisposed) {
+            chatUpdateSubscriber!!.dispose()
+        }
+        super.onDestroy()
     }
 
     /**
