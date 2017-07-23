@@ -8,7 +8,7 @@ import biz.ajoshi.kolchat.model.ServerChatMessage
  */
 class RoomInserter {
     fun insertMessage(serverMessage: ServerChatMessage) {
-        val dbMessage = ChatMessage(0, serverMessage.author.id, serverMessage.author.name, serverMessage.htmlText, serverMessage.channelNameServer.id, serverMessage.time)
+        val dbMessage = ChatMessage(0, serverMessage.author.id, serverMessage.author.name, serverMessage.htmlText, serverMessage.channelNameServer.id, serverMessage.time, serverMessage.localTime)
         val dbChannel = ChatChannel(serverMessage.channelNameServer.id,
                 serverMessage.channelNameServer.isPrivate,
                 serverMessage.channelNameServer.name,

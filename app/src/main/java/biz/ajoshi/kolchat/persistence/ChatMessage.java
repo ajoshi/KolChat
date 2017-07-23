@@ -56,7 +56,7 @@ public class ChatMessage {
         this.timeStamp = timeStamp;
     }
 
-    public ChatMessage(int id, String userId, String userName, String text, String channelId, long timeStamp) {
+    public ChatMessage(int id, String userId, String userName, String text, String channelId, long timeStamp, long localtimeStamp) {
 
         this.id = id;
         this.userId = userId;
@@ -64,6 +64,7 @@ public class ChatMessage {
         this.text = text;
         this.channelId = channelId;
         this.timeStamp = timeStamp;
+        this.localtimeStamp = localtimeStamp;
     }
 
     private String userId;
@@ -71,5 +72,13 @@ public class ChatMessage {
     private String text;
     private String channelId;
     private long timeStamp;
+    private long localtimeStamp;
 
+    public long getLocaltimeStamp() {
+        return localtimeStamp;
+    }
+
+    public void setLocaltimeStamp(long localtimeStamp) {
+        this.localtimeStamp = localtimeStamp;
+    }
 }

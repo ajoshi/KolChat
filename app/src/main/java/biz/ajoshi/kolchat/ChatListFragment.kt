@@ -58,7 +58,7 @@ class ChatListFragment() : Fragment() { // empty constructor
 
     fun makeDialogs(channels: List<ChatChannel>): List<DefaultDialog> {
         val dialogs = mutableListOf<DefaultDialog>()
-        for (channel in channels) dialogs.add(DefaultDialog(channel, ChatkitMessage(ChatMessage(5, "", "", channel.lastMessage, channel.id, channel.lastMessageTime))))
+        for (channel in channels) dialogs.add(DefaultDialog(channel, ChatkitMessage(ChatMessage(5, "", "", channel.lastMessage, channel.id, channel.lastMessageTime, channel.lastMessageTime))))
         return dialogs
     }
 }

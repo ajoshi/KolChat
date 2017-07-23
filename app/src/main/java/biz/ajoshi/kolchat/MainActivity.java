@@ -32,6 +32,8 @@ public class MainActivity extends AppCompatActivity {
                               Activity activity = MainActivity.this;
                               Intent serviceIntent = new Intent(activity, ChatService.class);
                               activity.startService(serviceIntent);
+                          } else {
+                              // notify the ui that we failed to log in
                           }
                       }
                   });
@@ -39,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
         b.putString(ChatMessageFragmentKt.EXTRA_CHANNEL_ID, "games");
         b.putString(ChatMessageFragmentKt.EXTRA_CHANNEL_NAME, "games");
         b.putBoolean(ChatMessageFragmentKt.EXTRA_CHANNEL_IS_PRIVATE, false);
-        Fragment chatDetailFrag = new ChatMessageFragment();
+        Fragment chatDetailFrag = new ChatListFrag();
         chatDetailFrag.setArguments(b);
         getSupportFragmentManager().beginTransaction().add(R.id.llist, chatDetailFrag, "list frag").commit();
     }

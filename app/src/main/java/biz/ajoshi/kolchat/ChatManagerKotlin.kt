@@ -71,6 +71,7 @@ class ChatManagerKotlin(val network: Network) {
      * Converts a list of raw chat messages into ServerChatMessage objects
      */
     fun parseChats(chatString: String): List<ServerChatMessage> {
+        val currentTime = System.currentTimeMillis()
         val chats = chatString.split("<br>")
         val returnList = mutableListOf<ServerChatMessage>()
         var channelServer: ServerChatChannel? = null
@@ -107,7 +108,7 @@ class ChatManagerKotlin(val network: Network) {
 //                    channelServer = channelNameRegexMatches[1]?.value ?: "defaultChannel"
 //                }
             }
-            val userId = getStringUsingRegex(regex = userIdRegex, sourceString = chat) ?: ""
+            var userId = getStringUsingRegex(regex = userIdRegex, sourceString = chat) ?: ""
 
             val userIdStartPosition = chat.indexOf(userId)
 
@@ -120,7 +121,7 @@ class ChatManagerKotlin(val network: Network) {
             //                          java.lang.StringIndexOutOfBoundsException: length=33; regionStart=7; regionLength=-8
             // regionLength = endindex - beginindex
             val indexOfATag = chat.indexOf("</a>", userIdTagEndPosition)
-            var tempUserName = "ERROR"
+            var tempUserName:String? = null
             if (indexOfATag > -1) {
                 tempUserName =  chat.substring(userIdTagEndPosition, indexOfATag)
             } else {
@@ -128,13 +129,12 @@ class ChatManagerKotlin(val network: Network) {
                 Log.e("ajoshi", "error parsing $chatString");
             }
 
-            if (tempUserName.contains("(private):")) {
+            if (tempUserName != null && tempUserName.contains("(private):")) {
                 tempUserName = tempUserName.replace(oldValue = " (private):", newValue = "")
                 // it's a pm so the channelServer name is the username
                 channelServer = ServerChatChannel(name = tempUserName, id = userId, isPrivate = true)
                 channelName = tempUserName
             }
-            val username = tempUserName
 
             val isTp : Boolean = chat.indexOf(":") == -1
             // it's a special chat message like tp or snowball
@@ -149,17 +149,36 @@ class ChatManagerKotlin(val network: Network) {
             if (!isTp) {
                 // normal messages and PMs are after a colon
                 chatText = chat.substring(chat.indexOf(":") + 1)
-            } else {
-                val smallerChat = chat.substring(chat.indexOf(username))
+            } else if (tempUserName != null){
+                /*
+                 * miasma causes index out of bounds here:
+<font color=green>[newbie]</font> <b><a target=mainpane href="showplayer.php?who=1040326"><font color=black>CaptainUrsus</font></b></a>:
+<br>Mimm mrmnks. <i>loneliness</i>
+<br><font color=green>[newbie]</font> <b><a target=mainpane href="showplayer.php?who=1969411"><font color=black>Andalusia</font></b></a>: Awww Cap'n.
+
+                 the effect adds additional <brs> which are viewed as new chats
+
+                 A solution might be to append to previous chat but that seems like a bad idea
+                 (when do we know to stop? how much state do we carry over from one iteration to the other?)
+
+                 Safer solution seems to be to simply set the userid and username as "" or invalid so it just gets clumped together
+
+                 */
+                val smallerChat = chat.substring(chat.indexOf(tempUserName))
                 val indexOfTpMessageBegin = smallerChat.indexOf("<font")
-                chatText = username + " " +  chat.substring(indexOfTpMessageBegin)
+                chatText = tempUserName + " " +  chat.substring(indexOfTpMessageBegin)
+            } else {
+                tempUserName = ""
+                userId = "clumpWithLast"
+                chatText = chat
             }
 
+            val username = tempUserName ?: ""
             //TODO clean up username
             val chatObject = ServerChatMessage(author = User(id = userId, name = username),
                     htmlText = chatText,
                     channelNameServer = channelServer ?: ServerChatChannel(name = channelName, id = channelName, isPrivate = false),
-                    time = lastSeen)
+                    time = lastSeen, localTime = currentTime)
             returnList.add(chatObject)
         }
         return returnList
