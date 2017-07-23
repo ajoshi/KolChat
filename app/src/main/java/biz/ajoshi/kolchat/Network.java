@@ -89,7 +89,12 @@ public class Network {
 //            }
 //        }
 
-        HttpUrl loginUrl = HttpUrl.parse(BASE_URL + response.header("location")).newBuilder()
+        String redirectLocation = response.header("location");
+        if (!redirectLocation.startsWith("/")) {
+            redirectLocation = '/' + redirectLocation;
+        }
+
+        HttpUrl loginUrl = HttpUrl.parse(BASE_URL + redirectLocation).newBuilder()
                 .addQueryParameter("loggingin", "Yup.")
                 .addQueryParameter("promo", "")
                 .addQueryParameter("mrstore", "")
