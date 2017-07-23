@@ -4,6 +4,7 @@ import java.util.List;
 
 import io.reactivex.Flowable;
 
+import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
@@ -22,6 +23,9 @@ public interface MessageDao {
 
     @Query("SELECT * FROM chatmessage WHERE channelId = :channel_id ORDER BY timeStamp DESC LIMIT 1")
     Flowable<ChatMessage> getLastMessageForChannel(String channel_id);
+
+    @Query("SELECT * FROM chatmessage WHERE channelId = :channel_id ORDER BY timeStamp DESC LIMIT 1")
+    LiveData<ChatMessage> getLastMessageLivedataForChannel(String channel_id);
 
     @Insert
     void insert(ChatMessage message);

@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
 
 android {
     compileSdkVersion 25
@@ -38,6 +39,10 @@ dependencies {
     compile "android.arch.persistence.room:runtime:1.0.0-alpha5"
     annotationProcessor "android.arch.persistence.room:compiler:1.0.0-alpha5"
 
+    // lifecycle components
+    compile "android.arch.lifecycle:runtime:1.0.0-alpha5"
+    compile "android.arch.lifecycle:extensions:1.0.0-alpha5"
+    annotationProcessor "android.arch.lifecycle:compiler:1.0.0-alpha5"
 
     //room rxjava support
     compile "android.arch.persistence.room:rxjava2:1.0.0-alpha5"

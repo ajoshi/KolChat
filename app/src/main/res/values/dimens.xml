@@ -2,4 +2,7 @@
     <!-- Default screen margins, per the Android Design guidelines. used to be 16dp -->
     <dimen name="activity_horizontal_margin">5dp</dimen>
     <dimen name="activity_vertical_margin">5dp</dimen>
+    <!-- padding between name and timestamp -->
+    <dimen name="timestamp_name_padding">5dp</dimen>
+    <dimen name="chat_max_lines">10</dimen>
 </resources>
