@@ -2,6 +2,8 @@ package biz.ajoshi.kolchat;
 
 import java.util.concurrent.Callable;
 
+import biz.ajoshi.kolchat.arch.ChatListFrag;
+import biz.ajoshi.kolchat.persistence.ChatChannel;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
@@ -10,6 +12,7 @@ import io.reactivex.schedulers.Schedulers;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 
 
@@ -37,18 +40,24 @@ public class MainActivity extends AppCompatActivity {
                           }
                       }
                   });
-        Bundle b = new Bundle();
-        b.putString(ChatMessageFragmentKt.EXTRA_CHANNEL_ID, "games");
-        b.putString(ChatMessageFragmentKt.EXTRA_CHANNEL_NAME, "games");
-        b.putBoolean(ChatMessageFragmentKt.EXTRA_CHANNEL_IS_PRIVATE, false);
+
+        Fragment chatMessageFrag = new ChatListFragment();
+        getSupportFragmentManager().beginTransaction().add(R.id.llist, chatMessageFrag, "list frag").commit();
+    }
+
+    public void onChannelNameClicked(ChatChannel channel) {
         Fragment chatDetailFrag = new ChatListFrag();
+        Bundle b = new Bundle();
+        b.putString(ChatMessageFragmentKt.EXTRA_CHANNEL_ID, channel.getId());
+        b.putString(ChatMessageFragmentKt.EXTRA_CHANNEL_NAME, channel.getName());
+        b.putBoolean(ChatMessageFragmentKt.EXTRA_CHANNEL_IS_PRIVATE, channel.isPrivate());
         chatDetailFrag.setArguments(b);
-        getSupportFragmentManager().beginTransaction().add(R.id.llist, chatDetailFrag, "list frag").commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.llist, chatDetailFrag, "chat frag").addToBackStack("chat frag").commit();
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
+    public void onDestroy() {
+        super.onDestroy();
         Intent stopService = new Intent(this, ChatService.class);
         stopService(stopService);
     }

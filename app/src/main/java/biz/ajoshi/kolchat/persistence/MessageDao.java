@@ -27,8 +27,14 @@ public interface MessageDao {
     @Query("SELECT * FROM chatmessage WHERE channelId = :channel_id ORDER BY timeStamp DESC LIMIT 1")
     LiveData<ChatMessage> getLastMessageLivedataForChannel(String channel_id);
 
+    @Query("SELECT * FROM chatmessage WHERE channelId = :channel_id AND timeStamp=(SELECT timeStamp FROM chatmessage WHERE channelId = :channel_id ORDER BY timeStamp DESC LIMIT 1)")
+    LiveData<List<ChatMessage>> getLastMessagesLivedataForChannel(String channel_id);
+
     @Insert
     void insert(ChatMessage message);
+
+    @Insert
+    void insertAll(ChatMessage... message);
 
     @Delete
     void delete(ChatMessage message);

@@ -9,7 +9,11 @@ import biz.ajoshi.kolchat.persistence.ChatMessage
  * just fine as a repository
  */
 class ChatRepository {
-    fun getChatStreamForChannel(channelId : String) : LiveData<ChatMessage>? {
+    fun getLastChatStreamForChannel(channelId : String) : LiveData<ChatMessage>? {
         return KolChatApp.database?.MessageDao()?.getLastMessageLivedataForChannel(channelId)
+    }
+
+    fun getChatStreamForChannel(channelId : String) : LiveData<List<ChatMessage>>? {
+        return KolChatApp.database?.MessageDao()?.getLastMessagesLivedataForChannel(channelId)
     }
 }

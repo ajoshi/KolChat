@@ -11,6 +11,7 @@ import biz.ajoshi.kolchat.persistence.ChatChannel
 import biz.ajoshi.kolchat.persistence.ChatMessage
 import com.stfalcon.chatkit.dialogs.DialogsList
 import com.stfalcon.chatkit.dialogs.DialogsListAdapter
+import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -32,7 +33,10 @@ class ChatListFragment() : Fragment() { // empty constructor
         val dialogsList = activity?.findViewById(R.id.dialogsList) as DialogsList
         dialogsListAdapter = DialogsListAdapter(null)//ImagelessDialogsListAdapter()
         dialogsList.setAdapter(dialogsListAdapter)
-        dialogsListAdapter!!.setOnDialogClickListener { dialog ->  dialog.channel.id}
+        dialogsListAdapter!!.setOnDialogClickListener { dialog ->
+            // TODO do soemthing better. Eventbus? have activity implement an interface?
+            val mainActivity = activity as MainActivity
+            mainActivity.onChannelNameClicked(dialog.channel)}
         channelUpdateSubscriber = KolChatApp.database
                 ?.ChannelDao()
                 ?.getAllChannels()
@@ -61,4 +65,6 @@ class ChatListFragment() : Fragment() { // empty constructor
         for (channel in channels) dialogs.add(DefaultDialog(channel, ChatkitMessage(ChatMessage(5, "", "", channel.lastMessage, channel.id, channel.lastMessageTime, channel.lastMessageTime))))
         return dialogs
     }
+
+
 }

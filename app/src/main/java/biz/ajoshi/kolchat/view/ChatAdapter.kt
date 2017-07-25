@@ -1,5 +1,6 @@
 package biz.ajoshi.kolchat.view
 
+import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -10,7 +11,7 @@ import biz.ajoshi.kolchat.persistence.ChatMessage
 /**
  * Created by ajoshi on 7/22/17.
  */
-class ChatAdapter : RecyclerView.Adapter<ChatMessageVH>() {
+class ChatAdapter(val layoutMgr: RecyclerView.LayoutManager) : RecyclerView.Adapter<ChatMessageVH>() {
     var messages = mutableListOf<ChatMessage>()
     var idList = mutableListOf<Int>()
 
@@ -32,6 +33,12 @@ class ChatAdapter : RecyclerView.Adapter<ChatMessageVH>() {
     fun setList(newList : List<ChatMessage>) {
         messages = newList.toMutableList()
         notifyDataSetChanged()
+        scrollToBottom()
+    }
+
+    fun scrollToBottom() {
+        // TODO only scroll when user is at the bottom (Except during first load)- else you mess up scrolling
+        layoutMgr.scrollToPosition(messages.size - 1)
     }
 
     fun addToBottom(newMessge: ChatMessage) {
@@ -39,8 +46,21 @@ class ChatAdapter : RecyclerView.Adapter<ChatMessageVH>() {
             messages.add(newMessge)
             idList.add(newMessge.id)
             notifyItemInserted(messages.size - 1)
+            scrollToBottom()
         }
-        // todo scroll to bottom?
+    }
+
+    fun addToBottom(newMessges: List<ChatMessage>) {
+        var insertedCount = 0
+        for(message in newMessges) {
+            if (!idList.contains(message.id)) {
+                messages.add(message)
+                idList.add(message.id)
+                insertedCount++
+            }
+        }
+        notifyItemRangeInserted(messages.size - insertedCount, insertedCount)
+        scrollToBottom()
     }
 }
 

@@ -28,4 +28,8 @@ object ChatSingleton {
     fun readChat(timeStamp: Long): List<ServerChatMessage>? {
         return chatManager?.readChat(timeStamp)
     }
+
+    fun postChat(message: String): List<ServerChatMessage>? {
+        return chatManager?.post(message)
+    }
 }

@@ -5,11 +5,12 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.*
-import android.util.Log
+import biz.ajoshi.kolchat.model.ServerChatMessage
 import biz.ajoshi.kolchat.persistence.RoomInserter
 
 
 const val EXTRA_POLL_INTERVAL_IN_MS = "biz.ajoshi.kolchat.ChatService.pollInterval";
+const val EXTRA_CHAT_MESSAGE_TO_SEND = "biz.ajoshi.kolchat.ChatService.messageToSend";
 // normally we'll poll ever 5 seconds
 const val DEFAULT_POLL_INTERVAL = 5000
 const val SHARED_PREF_NAME = "chat"
@@ -32,21 +33,27 @@ class ChatService() : Service() {
     }
 
     inner class ServiceHandler(looper: Looper) : Handler(looper) {
+        val roomInserter = RoomInserter()
         override fun handleMessage(msg: Message?) {
             if (ChatSingleton.chatManager == null) {
                 // not logged in so exit service. may be premature and a bad idea
                 stopSelf(msg?.arg1?: -1)
                 return
             }
+            if (msg != null && msg.obj != null) {
+                insertChatsIntoDb(ChatSingleton.postChat(msg.obj as String))
+            }
             if (msg != null) {
                 sendMessageDelayed(obtainLoopMessage(msg.arg1), pollInterval)
             }
 
             // if we can, read the chat and stick in db
-            val chatMessages = ChatSingleton.readChat(lastFetchedTime)
-            val roomInserter = RoomInserter()
-            if (chatMessages != null) {
-                for (chatMessage in chatMessages) roomInserter.insertMessage(chatMessage)
+            insertChatsIntoDb(ChatSingleton.readChat(lastFetchedTime))
+        }
+
+        fun insertChatsIntoDb(messages: List<ServerChatMessage>?) {
+            if (messages != null) {
+                roomInserter.insertAllMessages(messages)
                 lastFetchedTime = ChatSingleton.chatManager!!.lastSeen
             }
         }
@@ -70,12 +77,17 @@ class ChatService() : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val msg = obtainLoopMessage(startId)
         val interval = intent?.extras?.getInt(EXTRA_POLL_INTERVAL_IN_MS, DEFAULT_POLL_INTERVAL)
+        val chatMessageToSend = intent?.extras?.getString(EXTRA_CHAT_MESSAGE_TO_SEND, null)
+        msg?.obj = chatMessageToSend
         pollInterval = (interval?: DEFAULT_POLL_INTERVAL).toLong()
         serviceHandler?.sendMessage(msg)
         return START_STICKY;
     }
 
     fun obtainLoopMessage(id: Int): Message? {
+        // arg1 holds the service startid
+        // arg2 holds the poll interval we want the polling to have so it can be changed at will
+        // obj is used to hold any new chat messages we want to post
         val msg = serviceHandler?.obtainMessage()
         msg?.arg1 = id
         msg?.arg2 = DEFAULT_POLL_INTERVAL

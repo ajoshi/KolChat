@@ -9,12 +9,20 @@ import biz.ajoshi.kolchat.persistence.ChatMessage
  * Created by ajoshi on 7/22/17.
  */
 class ChatMessageViewModel(application: Application) : AndroidViewModel(application) {
-    private var chatListObservable: LiveData<ChatMessage>? = null
+    private var chatMessageObservable: LiveData<ChatMessage>? = null
+    private var chatListObservable: LiveData<List<ChatMessage>>? = null
 
     /**
      * We want a livedata that only gives us data for this channel. We never want to share data streams across channels
      */
-    fun getChatListObservable(channelId: String) : LiveData<ChatMessage>? {
+    fun getLastChatObservable(channelId: String) : LiveData<ChatMessage>? {
+        if (chatMessageObservable == null) {
+            chatMessageObservable = ChatRepository().getLastChatStreamForChannel(channelId = channelId)
+        }
+        return chatMessageObservable
+    }
+
+    fun getChatListObservable(channelId: String) : LiveData<List<ChatMessage>>? {
         if (chatListObservable == null) {
             chatListObservable = ChatRepository().getChatStreamForChannel(channelId = channelId)
         }
