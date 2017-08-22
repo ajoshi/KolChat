@@ -18,13 +18,18 @@ public interface MessageDao {
     @Query("SELECT * FROM chatmessage")
     List<ChatMessage> getMessages();
 
-    @Query("SELECT * FROM chatmessage WHERE channelId = :channel_id ORDER BY timeStamp DESC")
+    // gets next pages. Offset might need to depend on hwo many items are shown (db could have more inserted in the meantime)
+    @Query("SELECT * FROM chatmessage WHERE channelId = :channel_id ORDER BY timeStamp ASC LIMIT 100 OFFSET :offset")
+    List<ChatMessage> getMessagesForChannel (String channel_id, int offset);
+
+    // gets first page of messages
+    @Query("SELECT * FROM chatmessage WHERE channelId = :channel_id ORDER BY timeStamp ASC LIMIT 100")
     List<ChatMessage> getMessagesForChannel (String channel_id);
 
-    @Query("SELECT * FROM chatmessage WHERE channelId = :channel_id ORDER BY timeStamp DESC LIMIT 1")
+    @Query("SELECT * FROM chatmessage WHERE channelId = :channel_id ORDER BY timeStamp ASC LIMIT 1")
     Flowable<ChatMessage> getLastMessageForChannel(String channel_id);
 
-    @Query("SELECT * FROM chatmessage WHERE channelId = :channel_id ORDER BY timeStamp DESC LIMIT 1")
+    @Query("SELECT * FROM chatmessage WHERE channelId = :channel_id ORDER BY timeStamp ASC LIMIT 1")
     LiveData<ChatMessage> getLastMessageLivedataForChannel(String channel_id);
 
     @Query("SELECT * FROM chatmessage WHERE channelId = :channel_id AND timeStamp=(SELECT timeStamp FROM chatmessage WHERE channelId = :channel_id ORDER BY timeStamp DESC LIMIT 1)")

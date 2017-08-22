@@ -26,7 +26,7 @@ const val EXTRA_CHANNEL_ID2 = "biz.ajoshi.kolchat.ExtraChannelId"
 const val EXTRA_CHANNEL_NAME2 = "biz.ajoshi.kolchat.ExtraChannelName"
 const val EXTRA_CHANNEL_IS_PRIVATE2 = "biz.ajoshi.kolchat.ExtraChannelPrivate"
 
-class ChatListFrag : LifecycleFragment(){
+class ChatMessageFrag : LifecycleFragment(){
     var id = "newbie"
     var name = "newbie"
     var isPrivate = false

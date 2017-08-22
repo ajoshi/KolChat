@@ -11,7 +11,7 @@ import biz.ajoshi.kolchat.persistence.ChatMessage
 /**
  * Created by ajoshi on 7/22/17.
  */
-class ChatAdapter(val layoutMgr: RecyclerView.LayoutManager) : RecyclerView.Adapter<ChatMessageVH>() {
+class ChatAdapter(val layoutMgr: LinearLayoutManager) : RecyclerView.Adapter<ChatMessageVH>() {
     var messages = mutableListOf<ChatMessage>()
     var idList = mutableListOf<Int>()
 
@@ -33,12 +33,19 @@ class ChatAdapter(val layoutMgr: RecyclerView.LayoutManager) : RecyclerView.Adap
     fun setList(newList : List<ChatMessage>) {
         messages = newList.toMutableList()
         notifyDataSetChanged()
-        scrollToBottom()
+        scrollToBottomAlways()
     }
 
     fun scrollToBottom() {
-        // TODO only scroll when user is at the bottom (Except during first load)- else you mess up scrolling
-        layoutMgr.scrollToPosition(messages.size - 1)
+        // only scroll when user is near the bottom- else you mess up scrolling
+        val currentIndex = layoutMgr.findLastCompletelyVisibleItemPosition()
+        if (currentIndex + 6 >  messages.size) {
+            layoutMgr.scrollToPosition(messages.size - 1)
+        }
+    }
+
+    fun scrollToBottomAlways() {
+            layoutMgr.scrollToPosition(messages.size - 1)
     }
 
     fun addToBottom(newMessge: ChatMessage) {

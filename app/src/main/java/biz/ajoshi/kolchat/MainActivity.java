@@ -2,7 +2,7 @@ package biz.ajoshi.kolchat;
 
 import java.util.concurrent.Callable;
 
-import biz.ajoshi.kolchat.arch.ChatListFrag;
+import biz.ajoshi.kolchat.arch.ChatMessageFrag;
 import biz.ajoshi.kolchat.persistence.ChatChannel;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onChannelNameClicked(ChatChannel channel) {
-        Fragment chatDetailFrag = new ChatListFrag();
+        Fragment chatDetailFrag = new ChatMessageFrag();
         Bundle b = new Bundle();
         b.putString(ChatMessageFragmentKt.EXTRA_CHANNEL_ID, channel.getId());
         b.putString(ChatMessageFragmentKt.EXTRA_CHANNEL_NAME, channel.getName());

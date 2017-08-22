@@ -22,6 +22,7 @@ const val EXTRA_CHANNEL_ID = "biz.ajoshi.kolchat.ExtraChannelId"
 const val EXTRA_CHANNEL_NAME = "biz.ajoshi.kolchat.ExtraChannelName"
 const val EXTRA_CHANNEL_IS_PRIVATE = "biz.ajoshi.kolchat.ExtraChannelPrivate"
 
+@Deprecated("Use ChatMessageFrag now")
 class ChatMessageFragment() : Fragment() {
 
     var id = "newbie"

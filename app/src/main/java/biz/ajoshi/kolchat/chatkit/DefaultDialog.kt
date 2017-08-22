@@ -1,5 +1,6 @@
 package biz.ajoshi.kolchat.chatkit
 
+import android.text.Html
 import biz.ajoshi.kolchat.persistence.ChatChannel
 import com.stfalcon.chatkit.commons.models.IDialog
 import com.stfalcon.chatkit.commons.models.IUser
@@ -38,7 +39,7 @@ class DefaultDialog(val channel: ChatChannel, private var lastMessageInternal: C
     }
 
     override fun getDialogName(): String {
-        return channel.name
+        return Html.fromHtml(channel.name).toString()
     }
 
 }
