@@ -4,6 +4,8 @@ import android.util.Log
 import biz.ajoshi.kolchat.model.ServerChatChannel
 import biz.ajoshi.kolchat.model.ServerChatMessage
 import biz.ajoshi.kolchat.model.User
+import org.json.JSONArray
+import org.json.JSONObject
 import java.io.IOException
 import java.util.*
 
@@ -45,9 +47,26 @@ class ChatManagerKotlin(val network: Network) {
      */
     fun post(message: String): List<ServerChatMessage> {
         val chatResponse = network.postChat(message)
-        return parseChats(chatResponse)
+        return parseSentChat(chatResponse)
     }
 
+    fun parseSentChat(response: String): List<ServerChatMessage> {
+        /*
+         * This seems wrong- chat and chat commands should be separated out
+         */
+
+        val json = JSONObject(response)
+
+        /* TODO support whois
+        result of a non-chat command like whois
+        whois ajoshi
+        {"output":"<a target=mainpane href=\"showplayer.php?who=2129446\"><b style=\"color: green;\">ajoshi (#2129446)<\/b><\/a>, <font color=green>son of the patron SAINT(!) of vagrants<\/font>","msgs":[]}
+
+        who:
+        {"output":"<br><table><tr><td class=tiny><center><b>Players in this channel:<\/b><\/center><a target=mainpane href=\"showplayer.php?who=2239681\"><font color=black>Corman<\/font><\/a> (1&nbsp;total)<\/td><\/tr><\/table>","msgs":[]}
+         */
+        return parseJsonChat(json)
+    }
 
     /**
      * Fetches unread chat messages from the server
@@ -64,7 +83,120 @@ class ChatManagerKotlin(val network: Network) {
         val chatResponse = network.readChat(lastSeenTime)
         // this will be the list of chats we return. We'll add chats to this list
         // break up the response by the br tag. It's what kol uses to delimit messages
-        return parseChats(chatResponse)
+//        return parseChats(chatResponse)
+        val response = JSONObject(chatResponse)
+        val timeStampString = response.getLong("last")
+        lastSeen = timeStampString
+        return parseJsonChat(response)
+    }
+
+    fun parseJsonChat(response: JSONObject): List<ServerChatMessage> {
+        val currentTime = System.currentTimeMillis()
+
+/*
+{
+   "msgs":[
+      {
+         "msg":"<!--viva-->Gross quintinz",
+         "type":"public",
+         "mid":"1448600119",
+         "who":{
+            "name":"PIGRAt",
+            "id":"2363017",
+            "color":"black"
+         },
+         "format":"0",
+         "channel":"newbie",
+         "channelcolor":"green",
+         "time":"1505676231"
+      },
+      {
+         "msg":"yay!",
+         "type":"public",
+         "mid":"1448600120",
+         "who":{
+            "name":"RikAstley",
+            "id":"1933641",
+            "color":"black"
+         },
+         "format":"0",
+         "channel":"games",
+         "channelcolor":"green",
+         "time":"1505676232"
+      }
+   ],
+   "last":"1448600120",
+   "delay":3000
+}
+ */
+        //TODO this is where I can use retrofit or jackson to just give me pojos instead
+        val msgs = response.getJSONArray("msgs")
+        val msgCount = msgs.length()
+        val list = mutableListOf<ServerChatMessage>()
+            for (i in 0..msgCount-1) {
+                val msg = msgs.get(i) as JSONObject
+                list.add(parseChatMessageJsonObject(chatMessageJson = msg, currentTime = currentTime))
+            }
+
+        return list
+    }
+
+    /**
+     * Handles chat response for one message in json format. Message can be PMs from/to me and public chats
+     */
+    fun parseChatMessageJsonObject(chatMessageJson: JSONObject, currentTime: Long): ServerChatMessage {
+        val currentUser = network.currentUser.player
+//{"msgs":[{"type":"private","who":{"id":"2239681","name":"Corman","color":"black"},"for":{"id":"2129446","name":"ajoshi","color":"black"},"msg":"Butts","time":1505616130,"format":0}]}
+        /*
+        Special chat effects (as comments)
+        <!--viva--> = vivala
+         */
+        /*
+         formats:
+         format = 0   is normal chat
+         format = 1   is /me
+         */
+        val text = chatMessageJson.getString("msg")
+        // private, public, event
+        val type = chatMessageJson.getString("type")
+        /*
+           "msg":"<a href='showplayer.php?who=2129446' target=mainpane class=nounder>
+           <font color=green>ajoshi<\/font><\/a>
+           <a href='campground.php' target=mainpane class=nounder><font color=green>has covered your Newbiesport&trade; tent with toilet paper.<\/font><\/a>",
+
+           need html parsing to extract username and message. Probably similar for /me
+         */
+        // act like events are private messages
+        val channelIsPrivate = "public" != type// == means structural equality, === means old ==
+        val who = chatMessageJson.optJSONObject("who")
+        // player 420 has been deleted. use as placeholder for public events? currently using -1
+        var id = "-1"
+        var name = "System"
+        who?.let() {
+            id = who.getString("id")
+            name = who.getString("name")
+        }
+
+        val channel: ServerChatChannel
+        if (!channelIsPrivate) {
+            // we're in a chat room
+            val channelName = chatMessageJson.getString("channel")
+            channel = ServerChatChannel(name = channelName, id = channelName, isPrivate = channelIsPrivate)
+        } else {
+            if (id == currentUser.id) {
+                // this was a pm from me to someone else so ensure the channel name is right
+                val pmReceiver = chatMessageJson.getJSONObject("for")
+
+                channel = ServerChatChannel(name = pmReceiver.getString("name"), id = pmReceiver.getString("id"), isPrivate = channelIsPrivate)
+            } else {
+                channel = ServerChatChannel(name = name, id = id, isPrivate = channelIsPrivate)
+            }
+        }
+
+        val time = chatMessageJson.getLong("time")
+
+        val message = ServerChatMessage(author = User(id = id, name = name), htmlText = text, channelNameServer = channel, localTime = currentTime, time = time)
+        return message
     }
 
     /**
@@ -73,6 +205,16 @@ class ChatManagerKotlin(val network: Network) {
     fun parseChats(chatString: String): List<ServerChatMessage> {
         val currentTime = System.currentTimeMillis()
         val chats = chatString.split("<br>")
+
+        /*
+        {"msgs":[{"type":"private","who":{"id":"2239681","name":"Corman","color":"black"},"for":{"id":"2129446","name":"ajoshi","color":"black"},"msg":"Gfff","time":1504512754,"format":0}]}
+         */
+        /*
+         <font color=green>[newbie]</font> <b><a target=mainpane href="showplayer.php?who=2744698"><font color=black>kirahvikoira</font></b></a>: either one works for the outfit <i>Multi Czar sucks!</i><br>
+         <font color=green>[newbie]</font> <b><a target=mainpane href="showplayer.php?who=498028"><font color=black>Criswell</font></b></a>: ok offhands then<br>
+         <a target=mainpane href="showplayer.php?who=2190946"><font color=blue><b>UncleHoboCrimbo (private):</b></font></a> <font color="blue">test</font><br>
+         <!--lastseen:1447725918-->
+         */
         val returnList = mutableListOf<ServerChatMessage>()
         var channelServer: ServerChatChannel? = null
         for (chat in chats) {

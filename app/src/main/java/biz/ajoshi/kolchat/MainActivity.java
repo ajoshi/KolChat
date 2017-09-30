@@ -15,8 +15,10 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 
-
 public class MainActivity extends AppCompatActivity {
+    public static final String TAG_CHAT_DETAIL_FRAG = "chat frag";
+    public static final String TAG_CHAT_LIST_FRAG = "list frag";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,8 +43,12 @@ public class MainActivity extends AppCompatActivity {
                       }
                   });
 
-        Fragment chatMessageFrag = new ChatListFragment();
-        getSupportFragmentManager().beginTransaction().add(R.id.llist, chatMessageFrag, "list frag").commit();
+        Fragment listFrag = getSupportFragmentManager().findFragmentByTag(TAG_CHAT_LIST_FRAG);
+        if (listFrag == null) {
+            Fragment chatMessageFrag = new ChatListFragment();
+            getSupportFragmentManager().beginTransaction().add(R.id.llist, chatMessageFrag, TAG_CHAT_LIST_FRAG)
+                                       .commit();
+        }
     }
 
     public void onChannelNameClicked(ChatChannel channel) {
@@ -52,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
         b.putString(ChatMessageFragmentKt.EXTRA_CHANNEL_NAME, channel.getName());
         b.putBoolean(ChatMessageFragmentKt.EXTRA_CHANNEL_IS_PRIVATE, channel.isPrivate());
         chatDetailFrag.setArguments(b);
-        getSupportFragmentManager().beginTransaction().replace(R.id.llist, chatDetailFrag, "chat frag").addToBackStack("chat frag").commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.llist, chatDetailFrag, TAG_CHAT_DETAIL_FRAG).addToBackStack(TAG_CHAT_DETAIL_FRAG).commit();
     }
 
     @Override

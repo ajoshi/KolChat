@@ -13,7 +13,7 @@ class ChatRepository {
         return KolChatApp.database?.MessageDao()?.getLastMessageLivedataForChannel(channelId)
     }
 
-    fun getChatStreamForChannel(channelId : String) : LiveData<List<ChatMessage>>? {
-        return KolChatApp.database?.MessageDao()?.getLastMessagesLivedataForChannel(channelId)
+    fun getChatStreamForChannel(channelId : String, timestamp: Long) : LiveData<List<ChatMessage>>? {
+        return KolChatApp.database?.MessageDao()?.getLastMessagesLivedataForChannel(channelId, timestamp)
     }
 }

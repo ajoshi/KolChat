@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.os.*
 import biz.ajoshi.kolchat.model.ServerChatMessage
+import biz.ajoshi.kolchat.model.User
 import biz.ajoshi.kolchat.persistence.RoomInserter
 
 
@@ -41,20 +42,23 @@ class ChatService() : Service() {
                 return
             }
             if (msg != null && msg.obj != null) {
-                insertChatsIntoDb(ChatSingleton.postChat(msg.obj as String))
-            }
-            if (msg != null) {
-                sendMessageDelayed(obtainLoopMessage(msg.arg1), pollInterval)
-            }
+                // if we had a message to send then send it
+                insertChatsIntoDb((ChatSingleton.postChat(msg.obj as String)))
+            } else {
+                // else check for new messages and reschedule to check in 5 seconds
+                if (msg != null) {
+                    sendMessageDelayed(obtainLoopMessage(msg.arg1), pollInterval)
+                }
 
-            // if we can, read the chat and stick in db
-            insertChatsIntoDb(ChatSingleton.readChat(lastFetchedTime))
+                // if we can, read the chat and stick in db
+                insertChatsIntoDb(ChatSingleton.readChat(lastFetchedTime))
+                lastFetchedTime = ChatSingleton.chatManager!!.lastSeen
+            }
         }
 
         fun insertChatsIntoDb(messages: List<ServerChatMessage>?) {
             if (messages != null) {
                 roomInserter.insertAllMessages(messages)
-                lastFetchedTime = ChatSingleton.chatManager!!.lastSeen
             }
         }
     }

@@ -32,8 +32,18 @@ public interface MessageDao {
     @Query("SELECT * FROM chatmessage WHERE channelId = :channel_id ORDER BY timeStamp ASC LIMIT 1")
     LiveData<ChatMessage> getLastMessageLivedataForChannel(String channel_id);
 
-    @Query("SELECT * FROM chatmessage WHERE channelId = :channel_id AND timeStamp=(SELECT timeStamp FROM chatmessage WHERE channelId = :channel_id ORDER BY timeStamp DESC LIMIT 1)")
-    LiveData<List<ChatMessage>> getLastMessagesLivedataForChannel(String channel_id);
+    /*
+     * We want to show all messages inserted into the db after a given time, but we also don't want to get the newest
+     * right after it's been shown by the getMessagesForChannel call. So we ask for the newest that is newer than the
+     * last message in that call
+     * We do this by getting the newest message and looking for a
+
+     */
+    @Query("SELECT * FROM chatmessage WHERE channelId = :channel_id AND timeStamp=(SELECT timeStamp FROM chatmessage WHERE channelId = :channel_id AND timeStamp > :timestamp ORDER BY timeStamp DESC LIMIT 1)")
+    LiveData<List<ChatMessage>> getLastMessagesLivedataForChannel2(String channel_id, long timestamp);
+
+    @Query("SELECT * FROM chatmessage WHERE channelId = :channel_id AND timeStamp > :timestamp")
+    LiveData<List<ChatMessage>> getLastMessagesLivedataForChannel(String channel_id, long timestamp);
 
     @Insert
     void insert(ChatMessage message);

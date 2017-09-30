@@ -7,6 +7,12 @@ import android.arch.persistence.room.PrimaryKey;
 public class ChatMessage {
     @PrimaryKey(autoGenerate = true)
     private int id;
+    private String userId;
+    private String userName;
+    private String text;
+    private String channelId;
+    private long timeStamp;
+    private long localtimeStamp;
 
     public int getId() {
         return id;
@@ -66,13 +72,6 @@ public class ChatMessage {
         this.timeStamp = timeStamp;
         this.localtimeStamp = localtimeStamp;
     }
-
-    private String userId;
-    private String userName;
-    private String text;
-    private String channelId;
-    private long timeStamp;
-    private long localtimeStamp;
 
     public long getLocaltimeStamp() {
         return localtimeStamp;

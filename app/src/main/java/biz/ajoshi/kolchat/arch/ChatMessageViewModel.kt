@@ -22,9 +22,12 @@ class ChatMessageViewModel(application: Application) : AndroidViewModel(applicat
         return chatMessageObservable
     }
 
-    fun getChatListObservable(channelId: String) : LiveData<List<ChatMessage>>? {
+    /**
+     * Livedata for this channel starting from the passed in time so we don't get dupes of the newest message
+     */
+    fun getChatListObservable(channelId: String, timeStamp: Long) : LiveData<List<ChatMessage>>? {
         if (chatListObservable == null) {
-            chatListObservable = ChatRepository().getChatStreamForChannel(channelId = channelId)
+            chatListObservable = ChatRepository().getChatStreamForChannel(channelId = channelId, timestamp = timeStamp)
         }
         return chatListObservable
     }

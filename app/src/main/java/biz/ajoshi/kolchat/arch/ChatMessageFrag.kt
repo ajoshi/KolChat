@@ -11,6 +11,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import biz.ajoshi.kolchat.*
+import biz.ajoshi.kolchat.persistence.ChatMessage
 import biz.ajoshi.kolchat.view.ChatAdapter
 import com.stfalcon.chatkit.messages.MessageInput
 import io.reactivex.Observable
@@ -34,6 +35,8 @@ class ChatMessageFrag : LifecycleFragment(){
 
     var chatAdapter: ChatAdapter? = null
     var recyclerView : RecyclerView? = null
+
+    var lastMessage: ChatMessage? = null;
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater?.inflate(R.layout.chat_detail_custom, container, false)
@@ -67,6 +70,7 @@ class ChatMessageFrag : LifecycleFragment(){
                 ?.observeOn(AndroidSchedulers.mainThread())
                 ?.subscribe { list ->
                     chatAdapter?.setList(list)
+                    lastMessage = list.last()
                     onInitialListLoad()
                     observeViewModel(vm)
                 }
@@ -84,7 +88,7 @@ class ChatMessageFrag : LifecycleFragment(){
     }
 
     private fun observeViewModel(viewModel: ChatMessageViewModel) {
-        viewModel.getChatListObservable(id)?.observe(this, Observer
+        viewModel.getChatListObservable(id, lastMessage?.timeStamp?: 0)?.observe(this, Observer
         {
             message -> if (message!= null)
             chatAdapter?.addToBottom(message)
@@ -95,12 +99,7 @@ class ChatMessageFrag : LifecycleFragment(){
 
         if (post != null) {
             val serviceIntent = Intent(activity, ChatService::class.java)
-            val groupChatFormat = "/{1} {2}"
-            val privateChatFormat = "/w {1} {2}"
             when (isPrivate) {
-            // TODO make this call off the ui thread
-//                true -> serviceIntent.putExtra(EXTRA_CHAT_MESSAGE_TO_SEND, (String.format(privateChatFormat, post)))
-//                false -> serviceIntent.putExtra(EXTRA_CHAT_MESSAGE_TO_SEND,(String.format(groupChatFormat, post)))
                 true -> serviceIntent.putExtra(EXTRA_CHAT_MESSAGE_TO_SEND, "/w ${id} ${post}")
                 false -> serviceIntent.putExtra(EXTRA_CHAT_MESSAGE_TO_SEND, "/${id} ${post}")
             }

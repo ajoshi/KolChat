@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">KolChat</string>
+    <string name="input_area_hint">Words go here</string>
 </resources>

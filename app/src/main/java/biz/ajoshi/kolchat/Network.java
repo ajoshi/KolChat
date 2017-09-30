@@ -8,9 +8,11 @@ import java.net.URLEncoder;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 import biz.ajoshi.kolchat.model.LoggedInUser;
 import biz.ajoshi.kolchat.model.User;
+import okhttp3.Call;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -33,7 +35,7 @@ public class Network {
     private String awsCookie;
     private boolean loggedIn = false;
     OkHttpClient client;
-
+    String chatpwd;
     private LoggedInUser currentUser;
 
     public static final String ERROR = "error";
@@ -66,9 +68,11 @@ public class Network {
      * @throws IOException if an exception occured
      */
     public boolean login() throws IOException {
-        client = new OkHttpClient().newBuilder()
+        client = new OkHttpClient()
+                .newBuilder()
                 .followRedirects(false)
                 .followSslRedirects(false)
+                .readTimeout(5, TimeUnit.SECONDS)
                 .build();
 
         Request request = new Request.Builder()
@@ -149,15 +153,16 @@ public class Network {
         String postResponse = chatResponse.body().string();
         playerid = getBetweenTwoStrings(postResponse, "playerid = ", ",");
         pwdHash = getBetweenTwoStrings(postResponse, "pwdhash = \"", "\"");
-        String mainChannel = getBetweenTwoStrings(postResponse, "active = \"", "\"");
+        String mainChannel = getBetweenTwoStrings(postResponse, "active: \"", "\"");
+        chatpwd = getBetweenTwoStrings(postResponse, "setCookie('chatpwd', winW, ", ",");
         currentUser = new LoggedInUser(new User(playerid, username), pwdHash, mainChannel);
        /* $cw,
                 $inp,
                 $tabs,
-                CHMAX = 20,
+                CHMAX = 20,         // ah, max displayable channel size
                 chpointer = -1,
                 chcurrent = null,
-                delay = 3000,
+                delay = 3000,       requery time
                 lastdelay = 0,
                 chistory = [],
         payingattention = true,
@@ -190,7 +195,7 @@ public class Network {
         },
         todo = [],
         playerid = 2239681,
-                pwdhash = "8060f6ac0df07ea3853287b8386fea93";
+                pwdhash = "8060f6a";
                 */
         return postResponse;
     }
@@ -206,14 +211,19 @@ public class Network {
      * @throws IOException
      */
     public String postChat(String message) throws IOException {
-        Request readchatRequest = new Request.Builder()
-                .url(String.format(BASE_URL + "/submitnewchat.php?for=ajoshiChatApp&playerid=%s&pwd=%s&graf=%s&j=1",
+        Request readchatRequest = new Request.Builder().get()
+                .url(String.format(BASE_URL + "/submitnewchat.php?for=ajoshiChatApp&playerid=%s&pwd=%s&graf=%s&j=1&format=php",
                         playerid, pwdHash, URLEncoder.encode(message,"UTF-8")))
-                .header("cookie", String.format( "PHPSESSID=%s; AWSALB=%s", phpSessId, awsCookie))
-                .header("referer", "https://www.kingdomofloathing.com/lchat.php")
+                .addHeader("cookie", String.format( "PHPSESSID=%s; AWSALB=%s; chatpwd=%s", phpSessId, awsCookie, chatpwd))
+                .addHeader("referer", "https://www.kingdomofloathing.com/mchat.php")
+                .addHeader("Connection","close")
+                .addHeader("X-Requested-With","XMLHttpRequest")
                 .build();
-        Response chatResponse = client.newCall(readchatRequest).execute();
-        return chatResponse.body().string();
+        Call call = client.newCall(readchatRequest);
+        Response chatResponse = call.execute();
+        String response = chatResponse.body().source().readUtf8();
+        chatResponse.close();
+        return response;
     }
 
     /**
@@ -230,13 +240,15 @@ public class Network {
    // <a target=mainpane href="showplayer.php?who=2129446">
                          // <font color=blue><b>ajoshi (private):</b></font></a>
                          // <font color="blue">yolo</font><br><!--lastseen:1442257857-->
-                         "https://www.kingdomofloathing.com/newchatmessages.php?afk=0&lasttime=%d&playerid=%s&pwd=%s&format=json",
-                         timeStamp, playerid, pwdHash))
-                .header("cookie", String.format( "PHPSESSID=%s; AWSALB=%s", phpSessId, awsCookie))
-                .header("referer", "https://www.kingdomofloathing.com/lchat.php")
+                                    "https://www.kingdomofloathing.com/newchatmessages.php?lasttime=%d&j=1&aa=0.5901808745871704&format=json",
+                                    timeStamp))
+                 .header("cookie", String.format( "PHPSESSID=%s; AWSALB=%s", phpSessId, awsCookie))
+                .header("referer", "https://www.kingdomofloathing.com/mchat.php")
                 .build();
                 Response chatResponse = client.newCall(readchatRequest).execute();
                     /*
+                    Request{method=GET, url=https://www.kingdomofloathing.com/newchatmessages.php?afk=0&lasttime=1448571291&playerid=2239681&pwd=a2f587e8468f7b81657ecaadcbf1cdd3, tag=null}
+:/newchatmessages.php?aa=0.3231651053251192&j=1&lasttime=1448571209
                     /submitnewchat.php?playerid=2129446&pwd=919e0c2b6de6c757c9ac45291e8eeb34&graf=%2Fdread+b&j=1
                     /submitnewchat.php?playerid=2239681&pwd=2fec7beacb07e4c832e06a78cb4593a0&graf=%2Fgames+Hi+Butts&j=1
                     maybe https://www.kingdomofloathing.com/lchat.php
