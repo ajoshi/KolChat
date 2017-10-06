@@ -12,8 +12,8 @@ import biz.ajoshi.kolchat.persistence.RoomInserter
 
 const val EXTRA_POLL_INTERVAL_IN_MS = "biz.ajoshi.kolchat.ChatService.pollInterval";
 const val EXTRA_CHAT_MESSAGE_TO_SEND = "biz.ajoshi.kolchat.ChatService.messageToSend";
-// normally we'll poll ever 5 seconds
-const val DEFAULT_POLL_INTERVAL = 5000
+// normally we'll poll ever 3 seconds
+const val DEFAULT_POLL_INTERVAL = 3000
 const val SHARED_PREF_NAME = "chat"
 const val SHARED_PREF_LAST_FETCH_TIME = "lastFetched"
 /**
