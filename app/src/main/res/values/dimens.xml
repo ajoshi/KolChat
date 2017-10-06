@@ -4,5 +4,11 @@
     <dimen name="activity_vertical_margin">5dp</dimen>
     <!-- padding between name and timestamp -->
     <dimen name="timestamp_name_padding">5dp</dimen>
+
+    <!-- Chat message text/image sizes -->
+    <dimen name="chat_message_textsize">14sp</dimen>
+    <dimen name="chat_message_usernamesize">14sp</dimen>
+    <dimen name="chat_message_timestampsize">14sp</dimen>
+    <dimen name="chat_message_embedded_image_size">12dp</dimen>
     <integer name="chat_max_lines">10</integer>
 </resources>

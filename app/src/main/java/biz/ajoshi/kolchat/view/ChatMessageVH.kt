@@ -1,11 +1,24 @@
 package biz.ajoshi.kolchat.view
 
+import android.graphics.drawable.Animatable
+import android.net.Uri
 import android.support.v7.widget.RecyclerView
 import android.text.Html
+import android.text.SpannableStringBuilder
 import android.text.method.LinkMovementMethod
+import android.text.style.ImageSpan
+import android.util.Log
 import android.view.View
+import biz.ajoshi.kolchat.R
 import biz.ajoshi.kolchat.persistence.ChatMessage
-import kotlinx.android.synthetic.main.chat_message.*
+import com.facebook.drawee.backends.pipeline.Fresco
+import com.facebook.drawee.controller.BaseControllerListener
+import com.facebook.drawee.generic.GenericDraweeHierarchyBuilder
+import com.facebook.drawee.interfaces.DraweeController
+import com.facebook.drawee.span.DraweeSpan
+import com.facebook.drawee.span.DraweeSpanStringBuilder
+import com.facebook.imagepipeline.image.ImageInfo
+import com.facebook.imagepipeline.request.ImageRequestBuilder
 import kotlinx.android.synthetic.main.chat_message.view.*
 import java.text.SimpleDateFormat
 import java.util.*
@@ -14,12 +27,33 @@ import java.util.*
  * Created by ajoshi on 7/22/17.
  */
 val timeFormat = SimpleDateFormat.getTimeInstance()
-class ChatMessageVH(itemView: View): RecyclerView.ViewHolder(itemView) {
+
+class ChatMessageVH(itemView: View) : RecyclerView.ViewHolder(itemView) {
     // TODO this might be doing a findviewbyid each time and not caching. confirm.
     fun bind(message: ChatMessage) {
-        // TODO don't call fromhtml on ui thread. maybe use Transform/Map to convert to some ui model
-        itemView.text.text = Html.fromHtml(message.text)
-        itemView.user_name.text = Html.fromHtml(message.userName)
+        // TODO don't do all this excessive computation on ui thread. maybe use Transform/Map to convert to some ui model
+        if (message.shouldHideUsername()) {
+            itemView.user_name.visibility = View.GONE
+        } else {
+            itemView.user_name.text = Html.fromHtml(message.userName)
+            itemView.user_name.visibility = View.VISIBLE
+        }
+        val oldSpannable = Html.fromHtml(message.text)
+        val newSpannable = DraweeSpanStringBuilder(oldSpannable)
+        val imageSpans = newSpannable.getSpans(0, oldSpannable.length, ImageSpan::class.java)
+        val embeddedImageSize = itemView.context.resources.getDimensionPixelSize(R.dimen.chat_message_embedded_image_size)
+        // go through spans and replace imagespans with drawee spans
+        val draweeHierarchy = GenericDraweeHierarchyBuilder.newInstance(itemView.context.resources).setFadeDuration(0).build()
+        for (imageSpan in imageSpans) {
+            val oldSpanStartPosition = newSpannable.getSpanStart(imageSpan)
+            val imageRequest = ImageRequestBuilder.newBuilderWithSource(Uri.parse(imageSpan.source)).build()
+            val controller = Fresco.newDraweeControllerBuilder().setImageRequest(imageRequest).build()
+            newSpannable.removeSpan(imageSpan)
+            newSpannable.setImageSpan(itemView.context, draweeHierarchy, controller, oldSpanStartPosition, embeddedImageSize, embeddedImageSize
+                    , false, DraweeSpan.ALIGN_CENTER)
+        }
+
+        itemView.text.setDraweeSpanStringBuilder(newSpannable)
         itemView.timestamp.text = timeFormat.format(Date(message.localtimeStamp))
         /* allow links to be clicked
         htmlText= This is the only link I need! <a target=_blank href="https://www.kingdomofloathing.com/"><font color=blue>[link]</font></a> https:// www.kingdomofloathin g.com/,

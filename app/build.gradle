@@ -29,9 +29,12 @@ dependencies {
     compile 'com.github.stfalcon:chatkit:0.2.1'
     // networking is all okhttps
     compile 'com.squareup.okhttp3:okhttp:3.7.0'
+    // use fresco to load images
+    compile 'com.facebook.fresco:fresco:1.5.0'
+    compile 'com.facebook.fresco:drawee-span:1.5.0'
     // retrofit is useless. I want to try it out, but it literally has no use
     compile 'com.squareup.retrofit2:retrofit:2.2.0'
-  //  compile 'com.squareup.retrofit2:converter-jackson:2.2.0'
+// compile 'com.squareup.retrofit2:converter-jackson:2.2.0'
     compile 'com.android.support:appcompat-v7:25.3.1'
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 

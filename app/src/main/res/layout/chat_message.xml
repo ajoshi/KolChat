@@ -13,6 +13,7 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentLeft="true"
+        android:textSize="@dimen/chat_message_timestampsize"
     />
     <TextView
         android:id="@+id/user_name"
@@ -20,15 +21,17 @@
         android:layout_height="wrap_content"
         android:layout_toEndOf="@id/timestamp"
         android:layout_toRightOf="@id/timestamp"
+        android:textSize="@dimen/chat_message_usernamesize"
         android:maxLines="1"
         android:ellipsize="end"
         android:paddingStart="@dimen/timestamp_name_padding"
         android:paddingLeft="@dimen/timestamp_name_padding"
     />
-    <TextView android:layout_width="match_parent"
+    <com.facebook.drawee.span.SimpleDraweeSpanTextView android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/text"
         android:maxLines="@integer/chat_max_lines"
+        android:textSize="@dimen/chat_message_textsize"
         android:layout_alignParentStart="true"
         android:layout_alignParentLeft="true"
         android:layout_below="@id/timestamp"
