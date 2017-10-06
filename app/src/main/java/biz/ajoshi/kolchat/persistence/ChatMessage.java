@@ -13,6 +13,20 @@ public class ChatMessage {
     private String channelId;
     private long timeStamp;
     private long localtimeStamp;
+    private boolean shouldHideUsername;
+
+    public ChatMessage(int id, String userId, String userName, String text, String channelId, long timeStamp,
+            long localtimeStamp, boolean shouldHideUsername) {
+
+        this.id = id;
+        this.userId = userId;
+        this.userName = userName;
+        this.text = text;
+        this.channelId = channelId;
+        this.timeStamp = timeStamp;
+        this.localtimeStamp = localtimeStamp;
+        this.shouldHideUsername = shouldHideUsername;
+    }
 
     public int getId() {
         return id;
@@ -62,16 +76,6 @@ public class ChatMessage {
         this.timeStamp = timeStamp;
     }
 
-    public ChatMessage(int id, String userId, String userName, String text, String channelId, long timeStamp, long localtimeStamp) {
-
-        this.id = id;
-        this.userId = userId;
-        this.userName = userName;
-        this.text = text;
-        this.channelId = channelId;
-        this.timeStamp = timeStamp;
-        this.localtimeStamp = localtimeStamp;
-    }
 
     public long getLocaltimeStamp() {
         return localtimeStamp;
@@ -79,5 +83,13 @@ public class ChatMessage {
 
     public void setLocaltimeStamp(long localtimeStamp) {
         this.localtimeStamp = localtimeStamp;
+    }
+
+    public boolean shouldHideUsername() {
+        return shouldHideUsername;
+    }
+
+    public void setShouldHideUsername(boolean shouldHideUsername) {
+        this.shouldHideUsername = shouldHideUsername;
     }
 }

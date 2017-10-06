@@ -156,16 +156,11 @@ class ChatManagerKotlin(val network: Network) {
          format = 0   is normal chat
          format = 1   is /me
          */
-        val text = chatMessageJson.getString("msg")
+        val format = chatMessageJson.optInt("format")
+        // if format is 1, then this is an emphasis/me post
+        val isEmPost = format == 1
         // private, public, event
         val type = chatMessageJson.getString("type")
-        /*
-           "msg":"<a href='showplayer.php?who=2129446' target=mainpane class=nounder>
-           <font color=green>ajoshi<\/font><\/a>
-           <a href='campground.php' target=mainpane class=nounder><font color=green>has covered your Newbiesport&trade; tent with toilet paper.<\/font><\/a>",
-
-           need html parsing to extract username and message. Probably similar for /me
-         */
         // act like events are private messages
         val channelIsPrivate = "public" != type// == means structural equality, === means old ==
         val who = chatMessageJson.optJSONObject("who")
@@ -175,6 +170,9 @@ class ChatManagerKotlin(val network: Network) {
         who?.let() {
             id = who.getString("id")
             name = who.getString("name")
+            val color = who.getString("color")
+            // can format string be a constant? It seems not?
+            name = "<font color=$color>$name</font>"
         }
 
         val channel: ServerChatChannel
@@ -192,10 +190,17 @@ class ChatManagerKotlin(val network: Network) {
                 channel = ServerChatChannel(name = name, id = id, isPrivate = channelIsPrivate)
             }
         }
+        /*
+   "msg":"<a href='showplayer.php?who=2129446' target=mainpane class=nounder>
+   <font color=green>ajoshi<\/font><\/a>
+   <a href='campground.php' target=mainpane class=nounder><font color=green>has covered your Newbiesport&trade; tent with toilet paper.<\/font><\/a>",
 
+   need html parsing to extract username and message. Probably similar for /me
+ */
+        val text = chatMessageJson.getString("msg")
         val time = chatMessageJson.getLong("time")
 
-        val message = ServerChatMessage(author = User(id = id, name = name), htmlText = text, channelNameServer = channel, localTime = currentTime, time = time)
+        val message = ServerChatMessage(author = User(id = id, name = name), htmlText = text, channelNameServer = channel, localTime = currentTime, hideAuthorName = isEmPost, time = time)
         return message
     }
 
@@ -320,7 +325,7 @@ class ChatManagerKotlin(val network: Network) {
             val chatObject = ServerChatMessage(author = User(id = userId, name = username),
                     htmlText = chatText,
                     channelNameServer = channelServer ?: ServerChatChannel(name = channelName, id = channelName, isPrivate = false),
-                    time = lastSeen, localTime = currentTime)
+                    time = lastSeen, hideAuthorName = false, localTime = currentTime)
             returnList.add(chatObject)
         }
         return returnList

@@ -25,6 +25,7 @@ data class ServerChatMessage(val author: User,
                              val htmlText: String,
                              val channelNameServer: ServerChatChannel,
                              val time: Long,
+                             val hideAuthorName: Boolean,
                              val localTime: Long)
 
 /**

@@ -18,6 +18,7 @@ import io.reactivex.schedulers.Schedulers
 
 /**
  * Shows a list of all active chats/channels
+ * TODO don't use chatkit classes
  * Created by ajoshi on 7/4/2017.
  */
 class ChatListFragment() : Fragment() { // empty constructor
@@ -62,7 +63,7 @@ class ChatListFragment() : Fragment() { // empty constructor
 
     fun makeDialogs(channels: List<ChatChannel>): List<DefaultDialog> {
         val dialogs = mutableListOf<DefaultDialog>()
-        for (channel in channels) dialogs.add(DefaultDialog(channel, ChatkitMessage(ChatMessage(5, "", "", channel.lastMessage, channel.id, channel.lastMessageTime, channel.lastMessageTime))))
+        for (channel in channels) dialogs.add(DefaultDialog(channel, ChatkitMessage(ChatMessage(5, "", "", channel.lastMessage, channel.id, channel.lastMessageTime, channel.lastMessageTime, true))))
         return dialogs
     }
 

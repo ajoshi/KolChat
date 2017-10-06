@@ -8,7 +8,7 @@ import biz.ajoshi.kolchat.model.ServerChatMessage
  */
 class RoomInserter {
     fun insertMessage(serverMessage: ServerChatMessage) {
-        val dbMessage = ChatMessage(0, serverMessage.author.id, serverMessage.author.name, serverMessage.htmlText, serverMessage.channelNameServer.id, serverMessage.time, serverMessage.localTime)
+        val dbMessage = ChatMessage(0, serverMessage.author.id, serverMessage.author.name, serverMessage.htmlText, serverMessage.channelNameServer.id, serverMessage.time, serverMessage.localTime, serverMessage.hideAuthorName)
         val dbChannel = ChatChannel(serverMessage.channelNameServer.id,
                 serverMessage.channelNameServer.isPrivate,
                 serverMessage.channelNameServer.name,
@@ -21,7 +21,7 @@ class RoomInserter {
     fun insertAllMessages(messages: List<ServerChatMessage>) {
         val listOfMessages = mutableListOf<ChatMessage>()
         for (serverMessage in messages) {
-            val dbMessage = ChatMessage(0, serverMessage.author.id, serverMessage.author.name, serverMessage.htmlText, serverMessage.channelNameServer.id, serverMessage.time, serverMessage.localTime)
+            val dbMessage = ChatMessage(0, serverMessage.author.id, serverMessage.author.name, serverMessage.htmlText, serverMessage.channelNameServer.id, serverMessage.time, serverMessage.localTime, serverMessage.hideAuthorName)
             val dbChannel = ChatChannel(serverMessage.channelNameServer.id,
                     serverMessage.channelNameServer.isPrivate,
                     serverMessage.channelNameServer.name,
