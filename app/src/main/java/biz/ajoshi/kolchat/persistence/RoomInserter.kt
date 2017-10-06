@@ -13,7 +13,7 @@ class RoomInserter {
                 serverMessage.channelNameServer.isPrivate,
                 serverMessage.channelNameServer.name,
                 dbMessage.text,
-                dbMessage.timeStamp)
+                dbMessage.localtimeStamp)
         KolChatApp.database?.ChannelDao()?.insert(dbChannel)
         KolChatApp.database?.MessageDao()?.insert(dbMessage)
     }
@@ -26,7 +26,7 @@ class RoomInserter {
                     serverMessage.channelNameServer.isPrivate,
                     serverMessage.channelNameServer.name,
                     dbMessage.text,
-                    dbMessage.timeStamp)
+                    dbMessage.localtimeStamp)
             listOfMessages.add(dbMessage)
             // maybe we can use a set here so we don't try to insert the same channel too many times?
             KolChatApp.database?.ChannelDao()?.insert(dbChannel)
