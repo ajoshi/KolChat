@@ -7,7 +7,7 @@ import android.arch.persistence.room.RoomDatabase;
  * Created by ajoshi on 7/14/17.
  */
 
-@Database(entities = { ChatMessage.class, ChatChannel.class }, version = 2)
+@Database(entities = { ChatMessage.class, ChatChannel.class }, version = 3)
 public abstract class KolDB extends RoomDatabase {
     public abstract ChannelDao ChannelDao();
 

@@ -56,7 +56,7 @@ class ChatMessageFrag : LifecycleFragment(){
 
         val layoutMgr= LinearLayoutManager(activity)
         chatAdapter = ChatAdapter(layoutMgr)
-        recyclerView = activity?.findViewById(R.id.messagesList) as RecyclerView
+        recyclerView = activity?.findViewById<RecyclerView>(R.id.messagesList) as RecyclerView
         recyclerView?.adapter = chatAdapter
         recyclerView?.layoutManager = layoutMgr
 
@@ -76,7 +76,7 @@ class ChatMessageFrag : LifecycleFragment(){
                 }
 
 
-        val inputView = activity?.findViewById(R.id.input) as MessageInput
+        val inputView = activity?.findViewById<MessageInput>(R.id.input) as MessageInput
         inputView.setInputListener { input: CharSequence? -> makePost(input) }
 
         super.onActivityCreated(savedInstanceState)

@@ -42,7 +42,7 @@ class ChatMessageFragment() : Fragment() {
             name = args.getString(EXTRA_CHANNEL_NAME)
             isPrivate = args.getBoolean((EXTRA_CHANNEL_IS_PRIVATE))
         }
-        val messagesList = activity?.findViewById(R.id.messagesList) as MessagesList
+        val messagesList = activity?.findViewById<MessagesList>(R.id.messagesList) as MessagesList
         val messagesListAdapter = MessagesListAdapter<ChatkitMessage>(id, null)
         messagesList.setAdapter(messagesListAdapter)
 
@@ -61,7 +61,7 @@ class ChatMessageFragment() : Fragment() {
                     subscribeToChatupdates(messagesListAdapter, messagesList)
                 }
 
-        val inputView = activity?.findViewById(R.id.input) as MessageInput
+        val inputView = activity?.findViewById<MessageInput>(R.id.input) as MessageInput
         inputView.setInputListener { input: CharSequence? -> makePost(input) }
         super.onActivityCreated(savedInstanceState)
     }

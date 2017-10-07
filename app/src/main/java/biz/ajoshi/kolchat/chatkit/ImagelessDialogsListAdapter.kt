@@ -14,8 +14,8 @@ class ImagelessDialogsListAdapter() : DialogsListAdapter<DefaultDialog>(null) {
         val holder = super.onCreateViewHolder(parent, viewType)
         // yes, this is technically slower, but it's only 2 finds and it lets me use everything
         // else without maintaining another xml
-        holder.itemView.findViewById(R.id.dialogLastMessageUserAvatar).visibility = View.GONE
-        holder.itemView.findViewById(R.id.dialogAvatar).visibility = View.GONE
+        holder.itemView.findViewById<View>(R.id.dialogLastMessageUserAvatar).visibility = View.GONE
+        holder.itemView.findViewById<View>(R.id.dialogAvatar).visibility = View.GONE
         return holder
     }
 }

@@ -31,7 +31,7 @@ class ChatListFragment() : Fragment() { // empty constructor
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
-        val dialogsList = activity?.findViewById(R.id.dialogsList) as DialogsList
+        val dialogsList = activity?.findViewById<DialogsList>(R.id.dialogsList) as DialogsList
         dialogsListAdapter = DialogsListAdapter(null)//ImagelessDialogsListAdapter()
         dialogsList.setAdapter(dialogsListAdapter)
         dialogsListAdapter!!.setOnDialogClickListener { dialog ->
