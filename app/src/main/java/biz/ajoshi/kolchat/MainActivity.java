@@ -2,7 +2,6 @@ package biz.ajoshi.kolchat;
 
 import java.util.concurrent.Callable;
 
-import biz.ajoshi.kolchat.arch.ChatMessageFrag;
 import biz.ajoshi.kolchat.persistence.ChatChannel;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -54,9 +53,9 @@ public class MainActivity extends AppCompatActivity {
     public void onChannelNameClicked(ChatChannel channel) {
         Fragment chatDetailFrag = new ChatMessageFrag();
         Bundle b = new Bundle();
-        b.putString(ChatMessageFragmentKt.EXTRA_CHANNEL_ID, channel.getId());
-        b.putString(ChatMessageFragmentKt.EXTRA_CHANNEL_NAME, channel.getName());
-        b.putBoolean(ChatMessageFragmentKt.EXTRA_CHANNEL_IS_PRIVATE, channel.isPrivate());
+        b.putString(ChatMessageFragKt.EXTRA_CHANNEL_ID, channel.getId());
+        b.putString(ChatMessageFragKt.EXTRA_CHANNEL_NAME, channel.getName());
+        b.putBoolean(ChatMessageFragKt.EXTRA_CHANNEL_IS_PRIVATE, channel.isPrivate());
         chatDetailFrag.setArguments(b);
         getSupportFragmentManager().beginTransaction().replace(R.id.llist, chatDetailFrag, TAG_CHAT_DETAIL_FRAG).addToBackStack(TAG_CHAT_DETAIL_FRAG).commit();
     }

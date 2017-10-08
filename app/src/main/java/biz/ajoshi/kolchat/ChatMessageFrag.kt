@@ -1,4 +1,4 @@
-package biz.ajoshi.kolchat.arch
+package biz.ajoshi.kolchat
 
 import android.arch.lifecycle.LifecycleFragment
 import android.arch.lifecycle.Observer
@@ -10,10 +10,10 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import biz.ajoshi.kolchat.*
+import biz.ajoshi.kolchat.arch.ChatMessageViewModel
 import biz.ajoshi.kolchat.persistence.ChatMessage
 import biz.ajoshi.kolchat.view.ChatAdapter
-import com.stfalcon.chatkit.messages.MessageInput
+import biz.ajoshi.kolchat.view.ChatInputView
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -23,18 +23,18 @@ import io.reactivex.schedulers.Schedulers
  * Fragment displaying a conversation in a channel or with a user. Uses the arch components instead of rxjava
  */
 // TODO give new values when fully moving to arch components
-const val EXTRA_CHANNEL_ID2 = "biz.ajoshi.kolchat.ExtraChannelId"
-const val EXTRA_CHANNEL_NAME2 = "biz.ajoshi.kolchat.ExtraChannelName"
-const val EXTRA_CHANNEL_IS_PRIVATE2 = "biz.ajoshi.kolchat.ExtraChannelPrivate"
+const val EXTRA_CHANNEL_ID = "biz.ajoshi.kolchat.ExtraChannelId"
+const val EXTRA_CHANNEL_NAME = "biz.ajoshi.kolchat.ExtraChannelName"
+const val EXTRA_CHANNEL_IS_PRIVATE = "biz.ajoshi.kolchat.ExtraChannelPrivate"
 
-class ChatMessageFrag : LifecycleFragment(){
+class ChatMessageFrag : LifecycleFragment() {
     var id = "newbie"
     var name = "newbie"
     var isPrivate = false
     var initialChatLoadSubscriber: Disposable? = null
 
     var chatAdapter: ChatAdapter? = null
-    var recyclerView : RecyclerView? = null
+    var recyclerView: RecyclerView? = null
 
     var lastMessage: ChatMessage? = null;
 
@@ -45,22 +45,22 @@ class ChatMessageFrag : LifecycleFragment(){
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         val args = arguments
         if (args != null) {
-            id = args.getString(EXTRA_CHANNEL_ID2)
-            name = args.getString(EXTRA_CHANNEL_NAME2)
-            isPrivate = args.getBoolean((EXTRA_CHANNEL_IS_PRIVATE2))
+            id = args.getString(EXTRA_CHANNEL_ID)
+            name = args.getString(EXTRA_CHANNEL_NAME)
+            isPrivate = args.getBoolean((EXTRA_CHANNEL_IS_PRIVATE))
         }
 
 //        messagesListAdapter = MessagesListAdapter<ChatkitMessage>(id, null)
 //        val messagesList = activity?.findViewById(R.id.messagesList) as MessagesList
 //        messagesList.setAdapter(messagesListAdapter)
 
-        val layoutMgr= LinearLayoutManager(activity)
+        val layoutMgr = LinearLayoutManager(activity)
         chatAdapter = ChatAdapter(layoutMgr)
         recyclerView = activity?.findViewById<RecyclerView>(R.id.messagesList) as RecyclerView
         recyclerView?.adapter = chatAdapter
         recyclerView?.layoutManager = layoutMgr
 
-        val vm : ChatMessageViewModel = ViewModelProviders.of(this).get(ChatMessageViewModel::class.java)
+        val vm: ChatMessageViewModel = ViewModelProviders.of(this).get(ChatMessageViewModel::class.java)
 
         initialChatLoadSubscriber = Observable.fromCallable {
             KolChatApp.database
@@ -76,8 +76,8 @@ class ChatMessageFrag : LifecycleFragment(){
                 }
 
 
-        val inputView = activity?.findViewById<MessageInput>(R.id.input) as MessageInput
-        inputView.setInputListener { input: CharSequence? -> makePost(input) }
+        val inputView = activity?.findViewById<ChatInputView>(R.id.input_view) as ChatInputView
+        inputView.setSubmitListener { input: CharSequence? -> makePost(input) }
 
         super.onActivityCreated(savedInstanceState)
     }
@@ -88,10 +88,10 @@ class ChatMessageFrag : LifecycleFragment(){
     }
 
     private fun observeViewModel(viewModel: ChatMessageViewModel) {
-        viewModel.getChatListObservable(id, lastMessage?.timeStamp?: 0)?.observe(this, Observer
-        {
-            message -> if (message!= null)
-            chatAdapter?.addToBottom(message)
+        viewModel.getChatListObservable(id, lastMessage?.timeStamp ?: 0)?.observe(this, Observer
+        { message ->
+            if (message != null)
+                chatAdapter?.addToBottom(message)
         })
     }
 
