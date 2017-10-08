@@ -198,7 +198,12 @@ class ChatManagerKotlin(val network: Network) {
 
    need html parsing to extract username and message. Probably similar for /me
  */
-        val text = chatMessageJson.getString("msg")
+
+        val temptext = chatMessageJson.getString("msg")
+        val text = temptext.replace("<img src=\"https://s3.amazonaws.com/images.kingdomofloathing.com/otherimages/12x12skull.gif\" height=\"12\" width=\"12\" />", "☠")
+        //☠☠️
+        // ❤️ 💓 💕 💖 💗 💙 💚 💛
+        // ☃️  ⛄  ❄️
         val time = chatMessageJson.getLong("time")
 
         val message = ServerChatMessage(author = User(id = id, name = name), htmlText = text, channelNameServer = channel, localTime = currentTime, hideAuthorName = isEmPost, time = time)
