@@ -26,6 +26,8 @@
         android:ellipsize="end"
         android:paddingStart="@dimen/timestamp_name_padding"
         android:paddingLeft="@dimen/timestamp_name_padding"
+        android:paddingEnd="@dimen/timestamp_name_padding"
+        android:paddingRight="@dimen/timestamp_name_padding"
     />
     <com.facebook.drawee.span.SimpleDraweeSpanTextView android:layout_width="match_parent"
         android:layout_height="wrap_content"

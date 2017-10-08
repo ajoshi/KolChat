@@ -39,7 +39,7 @@ class ChatMessageFrag : LifecycleFragment() {
     var lastMessage: ChatMessage? = null;
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater?.inflate(R.layout.chat_detail_custom, container, false)
+        return inflater?.inflate(R.layout.chat_detail, container, false)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -49,10 +49,6 @@ class ChatMessageFrag : LifecycleFragment() {
             name = args.getString(EXTRA_CHANNEL_NAME)
             isPrivate = args.getBoolean((EXTRA_CHANNEL_IS_PRIVATE))
         }
-
-//        messagesListAdapter = MessagesListAdapter<ChatkitMessage>(id, null)
-//        val messagesList = activity?.findViewById(R.id.messagesList) as MessagesList
-//        messagesList.setAdapter(messagesListAdapter)
 
         val layoutMgr = LinearLayoutManager(activity)
         chatAdapter = ChatAdapter(layoutMgr)

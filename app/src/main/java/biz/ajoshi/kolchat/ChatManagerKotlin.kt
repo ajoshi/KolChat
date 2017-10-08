@@ -170,7 +170,8 @@ class ChatManagerKotlin(val network: Network) {
         who?.let() {
             id = who.getString("id")
             name = who.getString("name")
-            val color = who.getString("color")
+            // PMs seem to come under the fallback category
+            val color = who.optString("color", "black")
             // can format string be a constant? It seems not?
             name = "<font color=$color>$name</font>"
         }

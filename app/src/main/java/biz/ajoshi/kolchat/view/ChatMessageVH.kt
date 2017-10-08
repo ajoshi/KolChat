@@ -1,23 +1,17 @@
 package biz.ajoshi.kolchat.view
 
-import android.graphics.drawable.Animatable
 import android.net.Uri
 import android.support.v7.widget.RecyclerView
 import android.text.Html
-import android.text.SpannableStringBuilder
 import android.text.method.LinkMovementMethod
 import android.text.style.ImageSpan
-import android.util.Log
 import android.view.View
 import biz.ajoshi.kolchat.R
 import biz.ajoshi.kolchat.persistence.ChatMessage
 import com.facebook.drawee.backends.pipeline.Fresco
-import com.facebook.drawee.controller.BaseControllerListener
 import com.facebook.drawee.generic.GenericDraweeHierarchyBuilder
-import com.facebook.drawee.interfaces.DraweeController
 import com.facebook.drawee.span.DraweeSpan
 import com.facebook.drawee.span.DraweeSpanStringBuilder
-import com.facebook.imagepipeline.image.ImageInfo
 import com.facebook.imagepipeline.request.ImageRequestBuilder
 import kotlinx.android.synthetic.main.chat_message.view.*
 import java.text.SimpleDateFormat

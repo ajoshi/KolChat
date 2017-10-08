@@ -13,7 +13,7 @@
     <ImageButton
         android:id="@+id/submit_area"
         android:src="@drawable/ic_send"
-        android:background="@color/blue"
+        android:background="@color/colorPrimary"
         android:layout_width="37dp"
         android:layout_height="37dp"
         android:layout_alignParentEnd="true"

@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
 
         Fragment listFrag = getSupportFragmentManager().findFragmentByTag(TAG_CHAT_LIST_FRAG);
         if (listFrag == null) {
-            Fragment chatMessageFrag = new ChatListFragment();
+            Fragment chatMessageFrag = new ChatChannelListFragment();
             getSupportFragmentManager().beginTransaction().add(R.id.llist, chatMessageFrag, TAG_CHAT_LIST_FRAG)
                                        .commit();
         }

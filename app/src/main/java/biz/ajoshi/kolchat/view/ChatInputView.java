@@ -15,6 +15,7 @@ import android.widget.RelativeLayout;
 
 /**
  * Shows an input area and a submit button. Button is enabled when text is entered into the edittext
+ * // TODO do this in kotlin
  * Created by a.joshi on 10/7/17.
  */
 public class ChatInputView extends RelativeLayout {
