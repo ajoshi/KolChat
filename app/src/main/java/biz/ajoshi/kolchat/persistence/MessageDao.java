@@ -42,7 +42,13 @@ public interface MessageDao {
     @Query("SELECT * FROM chatmessage WHERE channelId = :channel_id AND timeStamp=(SELECT timeStamp FROM chatmessage WHERE channelId = :channel_id AND timeStamp > :timestamp ORDER BY timeStamp DESC LIMIT 1)")
     LiveData<List<ChatMessage>> getLastMessagesLivedataForChannel2(String channel_id, long timestamp);
 
-    @Query("SELECT * FROM chatmessage WHERE channelId = :channel_id AND timeStamp > :timestamp")
+    /**
+     * Get us the newest messages for the channel after the given time. Also show System updates
+     * @param channel_id
+     * @param timestamp
+     * @return
+     */
+    @Query("SELECT * FROM chatmessage WHERE (channelId = :channel_id OR channelId = -1) AND timeStamp > :timestamp")
     LiveData<List<ChatMessage>> getLastMessagesLivedataForChannel(String channel_id, long timestamp);
 
     @Insert

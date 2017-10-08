@@ -166,7 +166,7 @@ class ChatManagerKotlin(val network: Network) {
         val who = chatMessageJson.optJSONObject("who")
         // player 420 has been deleted. use as placeholder for public events? currently using -1
         var id = "-1"
-        var name = "System"
+        var name = "system"
         who?.let() {
             id = who.getString("id")
             name = who.getString("name")

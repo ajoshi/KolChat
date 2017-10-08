@@ -13,7 +13,7 @@ import android.arch.persistence.room.Update;
 
 @Dao
 public interface ChannelDao {
-    @Query("SELECT * FROM chatchannel ORDER BY name DESC")
+    @Query("SELECT * FROM chatchannel ORDER BY name ASC")
     Flowable<List<ChatChannel>> getAllChannels();
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
