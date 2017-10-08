@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/ic_send"
+        android:left="@dimen/send_button_padding"
+        android:right="@dimen/send_button_padding"
+        android:bottom="@dimen/send_button_padding"
+        android:top="@dimen/send_button_padding"/>
+    <item>
+        <shape
+            android:shape="rectangle">
+            <!-- TODO This just puts a transulcent white overlay on top of the image. Need a better plan for later-->
+            <solid android:color="#99ffffff"/>
+        </shape>
+    </item>
+</layer-list>

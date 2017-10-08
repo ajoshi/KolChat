@@ -12,10 +12,11 @@
         android:layout_alignParentLeft="true"/>
     <ImageButton
         android:id="@+id/submit_area"
-        android:src="@drawable/ic_send"
-        android:background="@color/colorPrimary"
-        android:layout_width="37dp"
-        android:layout_height="37dp"
+        android:src="@drawable/submit_button_states"
+        android:background="@null"
+        android:layout_width="@dimen/send_button_height"
+        android:layout_height="@dimen/send_button_height"
+        android:contentDescription="@string/submit_post"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"/>
 </merge>

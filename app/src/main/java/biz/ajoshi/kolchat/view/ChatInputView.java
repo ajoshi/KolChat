@@ -59,6 +59,7 @@ public class ChatInputView extends RelativeLayout {
         if (inflater != null) {
             View view = inflater.inflate(R.layout.chat_input_view, this);
             inputField = view.findViewById(R.id.input);
+            submitButton = view.findViewById(R.id.submit_area);
             inputField.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
@@ -75,7 +76,8 @@ public class ChatInputView extends RelativeLayout {
 
                 }
             });
-            submitButton = view.findViewById(R.id.submit_area);
+
+            shouldEnableSubmitButton(false);
             submitButton.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View view) {
