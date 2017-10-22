@@ -192,7 +192,7 @@ class ChatService() : Service() {
 
         val notificationBuilder = NotificationCompat.Builder(ctx, NotificationCompat.CATEGORY_PROGRESS)
         notificationBuilder
-                .setContentTitle("KolChat")
+                .setContentTitle(ctx.getString(R.string.app_name))
                 .setContentText(message)
                 .setSmallIcon(android.R.drawable.ic_btn_speak_now)
                 .setGroup("mentions")
