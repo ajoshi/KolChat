@@ -2,4 +2,11 @@
     <string name="app_name">KolChat</string>
     <string name="input_area_hint">Words go here</string>
     <string name="submit_post">Submit</string>
+
+    <string name="notification_description">Pull down for options</string>
+    <string name="notification_mention">Submit</string>
+
+    <string name="notification_persistent">KoLChatNotification</string>
+    <string name="notification_non_persistent">KoLChatMessageNotification</string>
+
 </resources>

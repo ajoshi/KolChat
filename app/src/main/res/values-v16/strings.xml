@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Super old devices can't pull down notifications to get more info, so different text for them -->
+    <string name="notification_description">Tap to launch app</string>
+</resources>

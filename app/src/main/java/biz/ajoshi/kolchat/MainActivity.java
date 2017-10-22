@@ -63,8 +63,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Intent stopService = new Intent(this, ChatService.class);
-        stopService(stopService);
+ //       Intent stopService = new Intent(this, ChatService.class);
+//        stopService(stopService);
     }
 
     public void getMessages() {
