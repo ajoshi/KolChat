@@ -13,6 +13,7 @@ import biz.ajoshi.kolchat.model.User
 import biz.ajoshi.kolchat.persistence.RoomInserter
 import android.app.NotificationManager
 import android.text.Html
+import java.io.IOException
 
 
 const val EXTRA_POLL_INTERVAL_IN_MS = "biz.ajoshi.kolchat.ChatService.pollInterval";
@@ -42,44 +43,49 @@ class ChatService() : Service() {
     inner class ServiceHandler(looper: Looper) : Handler(looper) {
         val roomInserter = RoomInserter()
         override fun handleMessage(msg: Message?) {
-            if (ChatSingleton.chatManager == null) {
-                // not logged in so exit service. may be premature and a bad idea
-                stop(msg?.arg1?: -1)
-                return
-            }
-            if (msg != null && msg.obj != null) {
-                // if we had a message to send then send it
-                val serviceMessage = (msg.obj as ChatServiceMessage)
-                when (serviceMessage.type) {
-                    MessageType.CHAT_MESSAGE -> {
-                        if (serviceMessage.textmessage != null) {
-                            insertChatsIntoDb((ChatSingleton.postChat(serviceMessage.textmessage)))
+            try {
+                if (ChatSingleton.chatManager == null) {
+                    // not logged in so exit service. may be premature and a bad idea
+                    stop(msg?.arg1 ?: -1)
+                    return
+                }
+                if (msg != null && msg.obj != null) {
+                    // if we had a message to send then send it
+                    val serviceMessage = (msg.obj as ChatServiceMessage)
+                    when (serviceMessage.type) {
+                        MessageType.CHAT_MESSAGE -> {
+                            if (serviceMessage.textmessage != null) {
+                                insertChatsIntoDb((ChatSingleton.postChat(serviceMessage.textmessage)))
+                            }
+                        }
+
+                        MessageType.STOP -> {
+                            // we got told to quit
+                            stop(msg.arg1 ?: -1)
+                            return
+                        }
+
+                        MessageType.START -> {
+                            // we got told to start
+                            sendMessageDelayed(obtainLoopMessage(msg.arg1), pollInterval)
                         }
                     }
 
-                    MessageType.STOP -> {
-                        // we got told to quit
-                        stop(msg.arg1?: -1)
-                        return
-                    }
-
-                    MessageType.START -> {
-                        // we got told to start
+                } else {
+                    // else check for new messages and reschedule to check in a bit
+                    if (msg != null) {
                         sendMessageDelayed(obtainLoopMessage(msg.arg1), pollInterval)
                     }
-                }
 
-            } else {
-                // else check for new messages and reschedule to check in 5 seconds
-                if (msg != null) {
-                    sendMessageDelayed(obtainLoopMessage(msg.arg1), pollInterval)
+                    val messages = ChatSingleton.readChat(lastFetchedTime)
+                    // if we can, read the chat and stick in db
+                    insertChatsIntoDb(messages)
+                    notifyUserOfPm(messages)
+                    lastFetchedTime = ChatSingleton.chatManager!!.lastSeen
                 }
-
-                val messages = ChatSingleton.readChat(lastFetchedTime)
-                // if we can, read the chat and stick in db
-                insertChatsIntoDb(messages)
-                notifyUserOfPm(messages)
-                lastFetchedTime = ChatSingleton.chatManager!!.lastSeen
+            } catch (exception: IOException) {
+                // an ioexception occured. This means we're in a bad network location. try again later
+                sendMessageDelayed(msg, pollInterval)
             }
         }
 
@@ -96,7 +102,8 @@ class ChatService() : Service() {
     private fun notifyUserOfPm(messages: List<ServerChatMessage>?) {
         messages ?.let {
             for (message in messages) {
-                if (message.channelNameServer.isPrivate) {
+                // it's a PM and not a system message
+                if (message.channelNameServer.isPrivate && !message.author.id.equals("-1")) {
                     makeMentionNotification(this, Html.fromHtml(message.channelNameServer.name + ": " + message.htmlText))
                 }
             }

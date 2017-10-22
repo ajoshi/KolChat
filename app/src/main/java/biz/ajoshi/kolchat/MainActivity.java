@@ -35,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
                           if (success) {
                               Activity activity = MainActivity.this;
                               Intent serviceIntent = new Intent(activity, ChatService.class);
+                              serviceIntent.putExtra(ChatServiceKt.EXTRA_POLL_INTERVAL_IN_MS, 2000);
                               activity.startService(serviceIntent);
                           } else {
                               // notify the ui that we failed to log in
@@ -63,8 +64,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
- //       Intent stopService = new Intent(this, ChatService.class);
-//        stopService(stopService);
+        Intent stopService = new Intent(this, ChatService.class);
+        // acitvity is gone, increase poll interval to 1 minute
+        stopService.putExtra(ChatServiceKt.EXTRA_POLL_INTERVAL_IN_MS, 60000);
+        startService(stopService);
     }
 
     public void getMessages() {

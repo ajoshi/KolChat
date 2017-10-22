@@ -1,6 +1,7 @@
 package biz.ajoshi.kolchat
 
 import biz.ajoshi.kolchat.model.ServerChatMessage
+import java.io.IOException
 
 /**
  * Created by ajoshi on 7/13/17.
@@ -25,10 +26,12 @@ object ChatSingleton {
         return true
     }
 
+    @Throws(IOException::class)
     fun readChat(timeStamp: Long): List<ServerChatMessage>? {
         return chatManager?.readChat(timeStamp)
     }
 
+    @Throws(IOException::class)
     fun postChat(message: String): List<ServerChatMessage>? {
         return chatManager?.post(message)
     }

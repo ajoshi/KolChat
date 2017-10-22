@@ -45,12 +45,13 @@ class ChatManagerKotlin(val network: Network) {
     /**
      * Makes a post and also retrieves any unread chat messages
      */
+    @Throws(IOException::class)
     fun post(message: String): List<ServerChatMessage> {
         val chatResponse = network.postChat(message)
         return parseSentChat(chatResponse)
     }
 
-    fun parseSentChat(response: String): List<ServerChatMessage> {
+    fun parseSentChat(response: String?): List<ServerChatMessage> {
         /*
          * This seems wrong- chat and chat commands should be separated out
          */
@@ -71,6 +72,7 @@ class ChatManagerKotlin(val network: Network) {
     /**
      * Fetches unread chat messages from the server
      */
+    @Throws(IOException::class)
     fun readChat():List<ServerChatMessage> {
         return readChat(lastSeen)
     }
@@ -78,6 +80,7 @@ class ChatManagerKotlin(val network: Network) {
     /**
      * Fetches unread chat messages from the server since the given timestamp
      */
+    @Throws(IOException::class)
     fun readChat(lastSeenTime: Long):List<ServerChatMessage> {
         // The responsebody we get from the server
         val chatResponse = network.readChat(lastSeenTime)

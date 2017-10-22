@@ -41,6 +41,7 @@ public class Network {
     public static final String ERROR = "error";
     public static final String BASE_URL = "https://www.kingdomofloathing.com";
     public static final String LOGIN_POSTFIX = "/login.php";
+    public static final String MAINT_POSTFIX = "maint.php";
     public static final String IS_QUIET_MODIFIER = "%s/q";
 
     /**
@@ -94,8 +95,11 @@ public class Network {
 //        }
 
         String redirectLocation = response.header("location");
-        if (!redirectLocation.startsWith("/")) {
+        if (redirectLocation != null && !redirectLocation.startsWith("/")) {
+            // this seems to only happen during RO
             redirectLocation = '/' + redirectLocation;
+            loggedIn = false;
+            return false;
         }
 
         HttpUrl loginUrl = HttpUrl.parse(BASE_URL + redirectLocation).newBuilder()
@@ -221,6 +225,11 @@ public class Network {
                 .build();
         Call call = client.newCall(readchatRequest);
         Response chatResponse = call.execute();
+        String redirectLocation = chatResponse.header("location");
+        if (redirectLocation != null && redirectLocation.contains(MAINT_POSTFIX)) {
+            // RO time
+            return null;
+        }
         String response = chatResponse.body().source().readUtf8();
         chatResponse.close();
         return response;
@@ -260,6 +269,12 @@ public class Network {
                       chatpwd=171;
                        AWSALB=60M5Fjdcg/jgLRbdoZ3DHM+g7b1v2AFBQtp2PpptlDfAS2+qeHiRYzkpyiQDzBjvpWeIaXpJzDqtlmbHyIo6df+6l+JHPMjKjqP2mzQUsH7rIxLVCAVZ0lSRZzfb
                      */
+
+        String redirectLocation = chatResponse.header("location");
+        if (redirectLocation != null && redirectLocation.contains(MAINT_POSTFIX)) {
+            // RO time
+            return null;
+        }
         return chatResponse.body().string();
     }
 
