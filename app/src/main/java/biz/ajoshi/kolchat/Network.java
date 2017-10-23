@@ -226,8 +226,8 @@ public class Network {
         Call call = client.newCall(readchatRequest);
         Response chatResponse = call.execute();
         String redirectLocation = chatResponse.header("location");
-        if (redirectLocation != null && redirectLocation.contains(MAINT_POSTFIX)) {
-            // RO time
+        if (redirectLocation != null && (redirectLocation.contains(MAINT_POSTFIX) || (redirectLocation.contains("login.php")))) {
+            // RO time or we got logged out
             return null;
         }
         String response = chatResponse.body().source().readUtf8();
