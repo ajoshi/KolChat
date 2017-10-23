@@ -19,6 +19,10 @@ import java.util.*
 // https://github.com/stfalcon-studio/ChatKit
 // https://github.com/bassaer/ChatMessageView
 // https://github.com/Slyce-Inc/SlyceMessaging
+
+const val SYSTEM_USER_ID = "-1"
+const val SYSTEM_USER_NAME = "system"
+
 class ChatManagerKotlin(val network: Network) {
     // when the last chat message was seen
     var lastSeen: Long = 0
@@ -102,6 +106,10 @@ class ChatManagerKotlin(val network: Network) {
     fun parseJsonChat(response: JSONObject): List<ServerChatMessage> {
         val currentTime = System.currentTimeMillis()
 
+ //       does this mean logout?
+        /*
+        {"msgs":[],"last":"1450743652","delay":3000,"out":1}
+         */
 /*
 {
    "msgs":[
@@ -147,6 +155,22 @@ class ChatManagerKotlin(val network: Network) {
                 list.add(parseChatMessageJsonObject(chatMessageJson = msg, currentTime = currentTime))
             }
 
+
+        /*
+         *  Handle chat command responses (like /who and /count)
+         */
+        val output = response.optString("output")
+        if (!output.isNullOrEmpty()) {
+            // this was a chat command
+            val systemMessageUser = ServerChatChannel(name = SYSTEM_USER_NAME, id = SYSTEM_USER_ID, isPrivate = true)
+            // we want this message to show up in chat, but we also don't want it to look too new.
+            // Since kol time != real time, we use the timestamp of the last receieved message as this one's timestamp.
+            // Ensures that the next message received will always be seen as newer (wouldn' happen if we used local time)
+            val commandResponseMessage = ServerChatMessage(author = User(id = systemMessageUser.id, name = systemMessageUser.name),
+                    htmlText = output, channelNameServer = systemMessageUser, localTime = currentTime, hideAuthorName = false, time = lastSeen)
+            list.add(commandResponseMessage)
+        }
+
         return list
     }
 
@@ -156,6 +180,7 @@ class ChatManagerKotlin(val network: Network) {
     fun parseChatMessageJsonObject(chatMessageJson: JSONObject, currentTime: Long): ServerChatMessage {
         val currentUser = network.currentUser.player
 //{"msgs":[{"type":"private","who":{"id":"2239681","name":"Corman","color":"black"},"for":{"id":"2129446","name":"ajoshi","color":"black"},"msg":"Butts","time":1505616130,"format":0}]}
+        //{"output":"<br><table><tr><td class=tiny><center><b>Players in this channel:<\/b><\/center><a target=mainpane href=\"showplayer.php?who=2129446\"><font color=blue>ajoshi<\/font><\/a>, <a target=mainpane href=\"showplayer.php?who=2239681\"><font color=black>Corman<\/font><\/a> (2&nbsp;total)<\/td><\/tr><\/table>","msgs":[]}
         /*
         Special chat effects (as comments)
         <!--viva--> = vivala
@@ -174,8 +199,8 @@ class ChatManagerKotlin(val network: Network) {
         val channelIsPrivate = "public" != type// == means structural equality, === means old ==
         val who = chatMessageJson.optJSONObject("who")
         // player 420 has been deleted. use as placeholder for public events? currently using -1
-        var id = "-1"
-        var name = "system"
+        var id = SYSTEM_USER_ID
+        var name = SYSTEM_USER_NAME
         who?.let() {
             id = who.getString("id")
             name = who.getString("name")
@@ -213,7 +238,7 @@ class ChatManagerKotlin(val network: Network) {
         //☠☠️
         // ❤️ 💓 💕 💖 💗 💙 💚 💛
         // ☃️  ⛄  ❄️
-        val time = chatMessageJson.getLong("time")
+        val time  = chatMessageJson.getLong("time")
 
         val message = ServerChatMessage(author = User(id = id, name = name), htmlText = text, channelNameServer = channel, localTime = currentTime, hideAuthorName = isEmPost, time = time)
         return message
