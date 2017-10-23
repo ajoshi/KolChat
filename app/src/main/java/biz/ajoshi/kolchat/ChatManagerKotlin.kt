@@ -56,6 +56,10 @@ class ChatManagerKotlin(val network: Network) {
          * This seems wrong- chat and chat commands should be separated out
          */
 
+
+        if (response.isNullOrEmpty()) {
+            return emptyList()
+        }
         val json = JSONObject(response)
 
         /* TODO support whois
@@ -86,7 +90,9 @@ class ChatManagerKotlin(val network: Network) {
         val chatResponse = network.readChat(lastSeenTime)
         // this will be the list of chats we return. We'll add chats to this list
         // break up the response by the br tag. It's what kol uses to delimit messages
-//        return parseChats(chatResponse)
+        if (chatResponse.isNullOrEmpty()) {
+            return emptyList()
+        }
         val response = JSONObject(chatResponse)
         val timeStampString = response.getLong("last")
         lastSeen = timeStampString
