@@ -189,6 +189,10 @@ class ChatManagerKotlin(val network: Network) {
          formats:
          format = 0   is normal chat
          format = 1   is /me
+
+         maybe
+         3 is mod warning (red)
+         4 is mod announcement (green)?
          */
         val format = chatMessageJson.optInt("format")
         // if format is 1, then this is an emphasis/me post
@@ -234,7 +238,17 @@ class ChatManagerKotlin(val network: Network) {
  */
 
         val temptext = chatMessageJson.getString("msg")
-        val text = temptext.replace("<img src=\"https://s3.amazonaws.com/images.kingdomofloathing.com/otherimages/12x12skull.gif\" height=\"12\" width=\"12\" />", "☠")
+        val text: String
+        when(format) {
+            // Mod warnings need to be colored correctly. 3 is a red warning, 4 is a green announcement
+            3 -> text = "<font color=\"red\">"+temptext.replace(
+                    "<img src=\"https://s3.amazonaws.com/images.kingdomofloathing.com/otherimages/12x12skull.gif\" height=\"12\" width=\"12\" />", "☠")+"</font>"
+            4 -> text = "<font color=\"green\">"+temptext.replace(
+                    "<img src=\"https://s3.amazonaws.com/images.kingdomofloathing.com/otherimages/12x12skull.gif\" height=\"12\" width=\"12\" />", "☠")+"</font>"
+            else -> {
+                text = temptext.replace("<img src=\"https://s3.amazonaws.com/images.kingdomofloathing.com/otherimages/12x12skull.gif\" height=\"12\" width=\"12\" />", "☠")
+            }
+        }
         //☠☠️
         // ❤️ 💓 💕 💖 💗 💙 💚 💛
         // ☃️  ⛄  ❄️
