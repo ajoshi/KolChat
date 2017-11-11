@@ -44,8 +44,12 @@ class ChatService() : Service() {
         val roomInserter = RoomInserter()
         override fun handleMessage(msg: Message?) {
             try {
-                if (ChatSingleton.chatManager == null) {
+                if (ChatSingleton.chatManager == null ||  // chatmgr is null so we have no userinfo to use for login
+                        (!ChatSingleton.chatManager!!.network.isLoggedIn  // we're not logged in (but have the ability)
+                                && !ChatSingleton.chatManager!!.network.login())) { // tried to login, but couldnt
                     // not logged in so exit service. may be premature and a bad idea
+                    // we couldn't log in so... stop the service?
+                    // TODO maybe notify user that error occurred here?
                     stop(msg?.arg1 ?: -1)
                     return
                 }
@@ -85,7 +89,9 @@ class ChatService() : Service() {
                 }
             } catch (exception: IOException) {
                 // an ioexception occured. This means we're in a bad network location. try again later
-                sendMessageDelayed(msg, pollInterval)
+                val newMessage = cloneMessage(msg)
+                newMessage ?: sendMessageDelayed(newMessage, pollInterval)
+
             }
         }
 
@@ -157,6 +163,16 @@ class ChatService() : Service() {
         return msg
     }
 
+
+    private fun cloneMessage(oldMessage: Message?):Message? {
+        val msg = serviceHandler?.obtainMessage()
+        msg?.arg1 = oldMessage?.arg1
+        msg?.arg2 = oldMessage?.arg2
+        msg?.obj = oldMessage?.obj
+        return msg
+    }
+
+
     /**
      * Called when this service needs to stop. Calls stopSelf and cleans up
      */
@@ -216,6 +232,7 @@ class ChatService() : Service() {
         serviceLooper?.quit()
         // todo is this safe?
         sharedPref?.edit()?.putLong(SHARED_PREF_LAST_FETCH_TIME, lastFetchedTime)?.apply()
+        ChatSingleton.network?.login()
     }
 }
 

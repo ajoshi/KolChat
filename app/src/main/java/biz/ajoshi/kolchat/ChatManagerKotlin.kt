@@ -62,6 +62,7 @@ class ChatManagerKotlin(val network: Network) {
 
 
         if (response.isNullOrEmpty()) {
+            network.logout()
             return emptyList()
         }
         val json = JSONObject(response)
@@ -95,7 +96,8 @@ class ChatManagerKotlin(val network: Network) {
         // this will be the list of chats we return. We'll add chats to this list
         // break up the response by the br tag. It's what kol uses to delimit messages
         if (chatResponse.isNullOrEmpty()) {
-            return emptyList()
+            network.logout()
+            return emptyList()//
         }
         val response = JSONObject(chatResponse)
         val timeStampString = response.getLong("last")

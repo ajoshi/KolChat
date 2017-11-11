@@ -142,6 +142,15 @@ public class Network {
         return loggedIn;
     }
 
+    public void logout() {
+        // right now just clear local state
+        loggedIn = false;
+        awsCookie = null;
+        phpSessId = null;
+        playerid = null;
+        pwdHash = null;
+    }
+
     /**
      * Fetches the passwordhash and the playerid for the current user. Maybe current channel as well?
      * @return
