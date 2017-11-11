@@ -43,13 +43,13 @@ public interface MessageDao {
     LiveData<List<ChatMessage>> getLastMessagesLivedataForChannel2(String channel_id, long timestamp);
 
     /**
-     * Get us the newest messages for the channel after the given time. Also show System updates
+     * Get us the newest messages for the channel after the given local time. Also show System updates after that time
      * @param channel_id
-     * @param timestamp
+     * @param localTimestamp
      * @return
      */
-    @Query("SELECT * FROM chatmessage WHERE (channelId = :channel_id OR channelId = -1) AND timeStamp > :timestamp")
-    LiveData<List<ChatMessage>> getLastMessagesLivedataForChannel(String channel_id, long timestamp);
+    @Query("SELECT * FROM chatmessage WHERE (channelId = :channel_id OR channelId = -1) AND localtimeStamp > :localTimestamp")
+    LiveData<List<ChatMessage>> getLastMessagesLivedataForChannel(String channel_id, long localTimestamp);
 
     @Insert
     void insert(ChatMessage message);

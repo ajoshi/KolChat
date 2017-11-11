@@ -36,8 +36,6 @@ class ChatMessageFrag : LifecycleFragment() {
     var chatAdapter: ChatAdapter? = null
     var recyclerView: RecyclerView? = null
 
-    var lastMessage: ChatMessage? = null;
-
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater?.inflate(R.layout.chat_detail, container, false)
     }
@@ -68,8 +66,6 @@ class ChatMessageFrag : LifecycleFragment() {
                 ?.subscribe { list ->
                     // we have the list, so set it as the displayed list
                     chatAdapter?.setList(list)
-                    // the last seen message is the last message in this list
-                    lastMessage = list.last()
                     onInitialListLoad()
                     // subscribe to future messages for this channel + System updates
                     observeViewModel(vm)
@@ -91,7 +87,7 @@ class ChatMessageFrag : LifecycleFragment() {
      * Listen to new chat messages that are made to this channel and show them. Will also listen for System Announcements
      */
     private fun observeViewModel(viewModel: ChatMessageViewModel) {
-        viewModel.getChatListObservable(id, lastMessage?.timeStamp ?: 0)?.observe(this, Observer
+        viewModel.getChatListObservable(id, System.currentTimeMillis())?.observe(this, Observer
         { message ->
             if (message != null)
                 //ad this new message to the bottom (will scroll down if we're at the bottom of the list)
