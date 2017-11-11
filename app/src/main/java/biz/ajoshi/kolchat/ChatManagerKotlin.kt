@@ -245,7 +245,7 @@ class ChatManagerKotlin(val network: Network) {
             // Mod warnings need to be colored correctly. 3 is a red warning, 4 is a green announcement
             3 -> text = "<font color=\"red\">"+temptext.replace(
                     "<img src=\"https://s3.amazonaws.com/images.kingdomofloathing.com/otherimages/12x12skull.gif\" height=\"12\" width=\"12\" />", "☠")+"</font>"
-            4 -> text = "<font color=\"green\">"+temptext.replace(
+            4 -> text = "<font color=\"#117A65\">"+temptext.replace(
                     "<img src=\"https://s3.amazonaws.com/images.kingdomofloathing.com/otherimages/12x12skull.gif\" height=\"12\" width=\"12\" />", "☠")+"</font>"
             else -> {
                 text = temptext.replace("<img src=\"https://s3.amazonaws.com/images.kingdomofloathing.com/otherimages/12x12skull.gif\" height=\"12\" width=\"12\" />", "☠")
