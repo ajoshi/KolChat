@@ -62,12 +62,16 @@ class ChatMessageFrag : LifecycleFragment() {
             KolChatApp.database
                     ?.MessageDao()
                     ?.getMessagesForChannel(id)
+            // get n messages for this channel (n is a limit we set in the data source (100 right now))
         }?.subscribeOn(Schedulers.io())
                 ?.observeOn(AndroidSchedulers.mainThread())
                 ?.subscribe { list ->
+                    // we have the list, so set it as the displayed list
                     chatAdapter?.setList(list)
+                    // the last seen message is the last message in this list
                     lastMessage = list.last()
                     onInitialListLoad()
+                    // subscribe to future messages for this channel + System updates
                     observeViewModel(vm)
                 }
 
@@ -79,20 +83,26 @@ class ChatMessageFrag : LifecycleFragment() {
     }
 
     private fun onInitialListLoad() {
-        // get rid of this observer now that we;ve loaded the initial list
+        // get rid of this observer now that we've loaded the initial list
         initialChatLoadSubscriber?.dispose()
     }
 
+    /**
+     * Listen to new chat messages that are made to this channel and show them. Will also listen for System Announcements
+     */
     private fun observeViewModel(viewModel: ChatMessageViewModel) {
         viewModel.getChatListObservable(id, lastMessage?.timeStamp ?: 0)?.observe(this, Observer
         { message ->
             if (message != null)
+                //ad this new message to the bottom (will scroll down if we're at the bottom of the list)
                 chatAdapter?.addToBottom(message)
         })
     }
 
+    /**
+     * Send a chat message to this channel/user
+     */
     fun makePost(post: CharSequence?): Boolean {
-
         if (post != null) {
             val serviceIntent = Intent(activity, ChatService::class.java)
             when (isPrivate) {
