@@ -22,7 +22,7 @@ public interface MessageDao {
     @Query("SELECT * FROM (SELECT * FROM chatmessage WHERE channelId = :channel_id ORDER BY timeStamp DESC LIMIT 100 OFFSET :offset) ORDER BY timestamp ASC")
     List<ChatMessage> getMessagesForChannel (String channel_id, int offset);
 
-    // gets 100 most recent messages, with the newest one at the bottom
+    // gets 100 most recent commands, with the newest one at the bottom
     @Query("SELECT * FROM (SELECT * FROM chatmessage WHERE channelId = :channel_id ORDER BY timeStamp DESC LIMIT 100) ORDER BY timestamp ASC")
     List<ChatMessage> getMessagesForChannel (String channel_id);
 
@@ -33,7 +33,7 @@ public interface MessageDao {
     LiveData<ChatMessage> getLastMessageLivedataForChannel(String channel_id);
 
     /*
-     * We want to show all messages inserted into the db after a given time, but we also don't want to get the newest
+     * We want to show all commands inserted into the db after a given time, but we also don't want to get the newest
      * right after it's been shown by the getMessagesForChannel call. So we ask for the newest that is newer than the
      * last message in that call
      * We do this by getting the newest message and looking for a
@@ -43,7 +43,7 @@ public interface MessageDao {
     LiveData<List<ChatMessage>> getLastMessagesLivedataForChannel2(String channel_id, long timestamp);
 
     /**
-     * Get us the newest messages for the channel after the given local time. Also show System updates after that time
+     * Get us the newest commands for the channel after the given local time. Also show System updates after that time
      * @param channel_id
      * @param localTimestamp
      * @return

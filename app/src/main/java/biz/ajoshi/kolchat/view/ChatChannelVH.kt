@@ -8,7 +8,7 @@ import kotlinx.android.synthetic.main.channel_list_item.view.*
 import java.util.*
 
 /**
- * Created by a.joshi on 10/7/17.
+ * Viewholder for an entry in the chat channel list
  */
 
 class ChatChannelVH(itemView: View, val listener: ChannelRowClickListener?) : RecyclerView.ViewHolder(itemView) {
@@ -27,6 +27,7 @@ class ChatChannelVH(itemView: View, val listener: ChannelRowClickListener?) : Re
         // todo use userid for right click options at some point
         channelForThisRow = channel
 
+        // TODO we should set the click listener once, and not each time
         itemView.setOnClickListener{ view: View -> listener?.OnChannelRowClicked(channelForThisRow!!)}
     }
 }

@@ -1,7 +1,5 @@
 package biz.ajoshi.kolchat.model
 
-import java.util.*
-
 /**
  *  These are all representations of data as sent by the server. Some massaging is done, but the overall structure is intact
  */

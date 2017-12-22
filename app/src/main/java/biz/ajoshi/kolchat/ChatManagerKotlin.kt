@@ -47,7 +47,7 @@ class ChatManagerKotlin(val network: Network) {
     }
 
     /**
-     * Makes a post and also retrieves any unread chat messages
+     * Makes a post and also retrieves any unread chat commands
      */
     @Throws(IOException::class)
     fun post(message: String): List<ServerChatMessage> {
@@ -79,7 +79,7 @@ class ChatManagerKotlin(val network: Network) {
     }
 
     /**
-     * Fetches unread chat messages from the server
+     * Fetches unread chat commands from the server
      */
     @Throws(IOException::class)
     fun readChat():List<ServerChatMessage> {
@@ -87,14 +87,14 @@ class ChatManagerKotlin(val network: Network) {
     }
 
     /**
-     * Fetches unread chat messages from the server since the given timestamp
+     * Fetches unread chat commands from the server since the given timestamp
      */
     @Throws(IOException::class)
     fun readChat(lastSeenTime: Long):List<ServerChatMessage> {
         // The responsebody we get from the server
         val chatResponse = network.readChat(lastSeenTime)
         // this will be the list of chats we return. We'll add chats to this list
-        // break up the response by the br tag. It's what kol uses to delimit messages
+        // break up the response by the br tag. It's what kol uses to delimit commands
         if (chatResponse.isNullOrEmpty()) {
             network.logout()
             return emptyList()//
@@ -201,7 +201,7 @@ class ChatManagerKotlin(val network: Network) {
         val isEmPost = format == 1
         // private, public, event
         val type = chatMessageJson.getString("type")
-        // act like events are private messages
+        // act like events are private commands
         val channelIsPrivate = "public" != type// == means structural equality, === means old ==
         val who = chatMessageJson.optJSONObject("who")
         // player 420 has been deleted. use as placeholder for public events? currently using -1
@@ -270,7 +270,7 @@ class ChatManagerKotlin(val network: Network) {
     }
 
     /**
-     * Converts a list of raw chat messages into ServerChatMessage objects
+     * Converts a list of raw chat commands into ServerChatMessage objects
      */
     fun parseChats(chatString: String): List<ServerChatMessage> {
         val currentTime = System.currentTimeMillis()
@@ -359,7 +359,7 @@ class ChatManagerKotlin(val network: Network) {
             val chatText : String
 
             if (!isTp) {
-                // normal messages and PMs are after a colon
+                // normal commands and PMs are after a colon
                 chatText = chat.substring(chat.indexOf(":") + 1)
             } else if (tempUserName != null){
                 /*

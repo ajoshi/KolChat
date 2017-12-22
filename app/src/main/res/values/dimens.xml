@@ -22,4 +22,9 @@
     <!-- Send chat button dimensions -->
     <dimen name="send_button_height">50dp</dimen>
     <dimen name="send_button_padding">2dp</dimen>
+
+    <!-- Dimensions for quick commands bar -->
+    <dimen name="quick_command_margin_horizontal">3dp</dimen>
+    <dimen name="quick_command_margin_vertical">2dp</dimen>
+    <dimen name="quick_command_padding">4dp</dimen>
 </resources>

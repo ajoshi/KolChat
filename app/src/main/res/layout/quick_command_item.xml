@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Shows info about a single quick command -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/list_item"
+    android:layout_height="match_parent"
+    android:layout_width="wrap_content"
+    android:background="@drawable/rounded_border"
+    android:layout_marginBottom="@dimen/quick_command_margin_vertical"
+    android:layout_marginTop="@dimen/quick_command_margin_vertical"
+    android:layout_marginStart="@dimen/quick_command_margin_horizontal"
+    android:layout_marginEnd="@dimen/quick_command_margin_horizontal"
+    android:padding="@dimen/quick_command_padding"
+>
+    <TextView
+        android:id="@+id/name"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:textSize="@dimen/chat_message_textsize"
+    />
+</FrameLayout>

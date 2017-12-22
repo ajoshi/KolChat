@@ -197,8 +197,8 @@ public class Network {
                 active: "games",
                 modifier: 0,
                 unreadbadges: 1,   Show unread badges on tabs
-                colortabs: 0,   Turn tabs pink when they have unread messages
-                channeltag: 0,   maybe Combine all channels in the main tab (only split out private messages)
+                colortabs: 0,   Turn tabs pink when they have unread commands
+                channeltag: 0,   maybe Combine all channels in the main tab (only split out private commands)
                 alwayswho: 0,    Auto-Perform /who when a channel tab opens
                 hmcsplit: 1,
                 tabsonbottom: 0,

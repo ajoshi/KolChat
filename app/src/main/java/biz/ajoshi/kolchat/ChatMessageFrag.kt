@@ -14,6 +14,8 @@ import biz.ajoshi.kolchat.arch.ChatMessageViewModel
 import biz.ajoshi.kolchat.persistence.ChatMessage
 import biz.ajoshi.kolchat.view.ChatAdapter
 import biz.ajoshi.kolchat.view.ChatInputView
+import biz.ajoshi.kolchat.view.QuickCommand
+import biz.ajoshi.kolchat.view.QuickCommandView
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -27,7 +29,7 @@ const val EXTRA_CHANNEL_ID = "biz.ajoshi.kolchat.ExtraChannelId"
 const val EXTRA_CHANNEL_NAME = "biz.ajoshi.kolchat.ExtraChannelName"
 const val EXTRA_CHANNEL_IS_PRIVATE = "biz.ajoshi.kolchat.ExtraChannelPrivate"
 
-class ChatMessageFrag : LifecycleFragment() {
+class ChatMessageFrag : LifecycleFragment(), QuickCommandView.CommandClickListener {
     var id = "newbie"
     var name = "newbie"
     var isPrivate = false
@@ -60,14 +62,14 @@ class ChatMessageFrag : LifecycleFragment() {
             KolChatApp.database
                     ?.MessageDao()
                     ?.getMessagesForChannel(id)
-            // get n messages for this channel (n is a limit we set in the data source (100 right now))
+            // get n commands for this channel (n is a limit we set in the data source (100 right now))
         }?.subscribeOn(Schedulers.io())
                 ?.observeOn(AndroidSchedulers.mainThread())
                 ?.subscribe { list ->
                     // we have the list, so set it as the displayed list
                     chatAdapter?.setList(list)
                     onInitialListLoad()
-                    // subscribe to future messages for this channel + System updates
+                    // subscribe to future commands for this channel + System updates
                     observeViewModel(vm)
                 }
 
@@ -75,6 +77,8 @@ class ChatMessageFrag : LifecycleFragment() {
         val inputView = activity?.findViewById<ChatInputView>(R.id.input_view) as ChatInputView
         inputView.setSubmitListener { input: CharSequence? -> makePost(input) }
 
+        val quickCommands = activity?.findViewById<QuickCommandView>(R.id.quick_commands) as QuickCommandView
+        quickCommands.setClickListener(this)
         super.onActivityCreated(savedInstanceState)
     }
 
@@ -84,7 +88,7 @@ class ChatMessageFrag : LifecycleFragment() {
     }
 
     /**
-     * Listen to new chat messages that are made to this channel and show them. Will also listen for System Announcements
+     * Listen to new chat commands that are made to this channel and show them. Will also listen for System Announcements
      */
     private fun observeViewModel(viewModel: ChatMessageViewModel) {
         viewModel.getChatListObservable(id, System.currentTimeMillis())?.observe(this, Observer
@@ -119,5 +123,9 @@ class ChatMessageFrag : LifecycleFragment() {
         serviceIntent.putExtra(EXTRA_CHAT_MESSAGE_TO_SEND, command)
         activity.startService(serviceIntent)
         return true
+    }
+
+    override fun OnCommandClicked(command: QuickCommand) {
+        makePost(command.command)
     }
 }

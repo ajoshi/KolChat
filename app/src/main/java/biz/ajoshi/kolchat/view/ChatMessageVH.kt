@@ -24,6 +24,7 @@ val timeFormat = SimpleDateFormat.getTimeInstance()
 
 class ChatMessageVH(itemView: View) : RecyclerView.ViewHolder(itemView) {
     // TODO this might be doing a findviewbyid each time and not caching. confirm.
+    // yes it is. DO NOT USE THIS
     fun bind(message: ChatMessage) {
         // TODO don't do all this excessive computation on ui thread. maybe use Transform/Map to convert to some ui model
         if (message.shouldHideUsername()) {

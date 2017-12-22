@@ -24,8 +24,8 @@ const val DEFAULT_POLL_INTERVAL = 3000
 const val SHARED_PREF_NAME = "chat"
 const val SHARED_PREF_LAST_FETCH_TIME = "lastFetched"
 /**
- * Service that spins bg task to periodically poll for chat messages.
- * Needs to be a service so we can get messages even when app isn't in foreground
+ * Service that spins bg task to periodically poll for chat commands.
+ * Needs to be a service so we can get commands even when app isn't in foreground
  */
 class ChatService() : Service() {
     var pollInterval: Long = DEFAULT_POLL_INTERVAL.toLong();
@@ -76,7 +76,7 @@ class ChatService() : Service() {
                     }
 
                 } else {
-                    // else check for new messages and reschedule to check in a bit
+                    // else check for new commands and reschedule to check in a bit
                     if (msg != null) {
                         sendMessageDelayed(obtainLoopMessage(msg.arg1), pollInterval)
                     }
@@ -156,7 +156,7 @@ class ChatService() : Service() {
     fun obtainLoopMessage(id: Int): Message? {
         // arg1 holds the service startid
         // arg2 holds the poll interval we want the polling to have so it can be changed at will
-        // obj is used to hold any new chat messages we want to post
+        // obj is used to hold any new chat commands we want to post
         val msg = serviceHandler?.obtainMessage()
         msg?.arg1 = id
         msg?.arg2 = DEFAULT_POLL_INTERVAL
