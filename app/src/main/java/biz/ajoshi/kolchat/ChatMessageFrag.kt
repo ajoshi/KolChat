@@ -100,13 +100,24 @@ class ChatMessageFrag : LifecycleFragment() {
      */
     fun makePost(post: CharSequence?): Boolean {
         if (post != null) {
-            val serviceIntent = Intent(activity, ChatService::class.java)
-            when (isPrivate) {
-                true -> serviceIntent.putExtra(EXTRA_CHAT_MESSAGE_TO_SEND, "/w ${id} ${post}")
-                false -> serviceIntent.putExtra(EXTRA_CHAT_MESSAGE_TO_SEND, "/${id} ${post}")
+            if (post[0] == '/') {
+                return sendChatCommand(post.toString())
             }
-            activity.startService(serviceIntent)
+            when (isPrivate) {
+                true -> return sendChatCommand("/w ${id} ${post}")
+                false -> return sendChatCommand("/${id} ${post}")
+            }
         }
+        return false
+    }
+
+    /**
+     * Send a chat command to the server. Is not scoped to this channel, so scoping should be done before calling this
+     */
+    fun sendChatCommand(command: String): Boolean {
+        val serviceIntent = Intent(activity, ChatService::class.java)
+        serviceIntent.putExtra(EXTRA_CHAT_MESSAGE_TO_SEND, command)
+        activity.startService(serviceIntent)
         return true
     }
 }
