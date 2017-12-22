@@ -210,6 +210,15 @@ class ChatManagerKotlin(val network: Network) {
         who?.let() {
             id = who.getString("id")
             name = who.getString("name")
+            /*
+             * MORE SPECIAL CASING!
+             * It turns out that when TPTB make a system message, they use their userids, but their name is shown as System Message.
+             * But because REASONS, the name is actually "<font color=>System Message</font>". Empty color value? Why not.
+             */
+            if (name == "<font color=>System Message</font>") {
+                name = SYSTEM_USER_NAME
+                id = SYSTEM_USER_ID
+            }
             // PMs seem to come under the fallback category
             val color = who.optString("color", "black")
             // can format string be a constant? It seems not?
