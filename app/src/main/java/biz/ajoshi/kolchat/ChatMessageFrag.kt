@@ -90,7 +90,7 @@ class ChatMessageFrag : LifecycleFragment() {
         viewModel.getChatListObservable(id, System.currentTimeMillis())?.observe(this, Observer
         { message ->
             if (message != null)
-                //ad this new message to the bottom (will scroll down if we're at the bottom of the list)
+                //add this new message to the bottom (will scroll down if we're at the bottom of the list)
                 chatAdapter?.addToBottom(message)
         })
     }
