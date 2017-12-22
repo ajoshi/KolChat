@@ -232,7 +232,7 @@ class ChatService() : Service() {
         serviceLooper?.quit()
         // todo is this safe?
         sharedPref?.edit()?.putLong(SHARED_PREF_LAST_FETCH_TIME, lastFetchedTime)?.apply()
-        ChatSingleton.network?.login()
+        ChatSingleton.network?.logout()
     }
 }
 
