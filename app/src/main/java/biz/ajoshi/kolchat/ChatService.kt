@@ -8,12 +8,6 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.os.*
 import android.support.v4.app.NotificationCompat
-import biz.ajoshi.kolchat.model.ServerChatMessage
-import biz.ajoshi.kolchat.model.User
-import biz.ajoshi.kolchat.persistence.RoomInserter
-import android.app.NotificationManager
-import android.text.Html
-import java.io.IOException
 
 
 const val EXTRA_POLL_INTERVAL_IN_MS = "biz.ajoshi.kolchat.ChatService.pollInterval";
@@ -27,156 +21,59 @@ const val SHARED_PREF_LAST_FETCH_TIME = "lastFetched"
  * Service that spins bg task to periodically poll for chat commands.
  * Needs to be a service so we can get commands even when app isn't in foreground
  */
-class ChatService() : Service() {
-    var pollInterval: Long = DEFAULT_POLL_INTERVAL.toLong();
+class ChatBackgroundService() : Service(), ChatServiceHandler.ChatService {
+    override fun getContext(): Context {
+        return this
+    }
 
     var serviceLooper: Looper? = null
-    var serviceHandler: ServiceHandler? = null
+    var serviceHandler: ChatServiceHandler? = null
 
     var sharedPref: SharedPreferences? = null
-    var lastFetchedTime: Long = 0
 
     override fun onBind(intent: Intent?): IBinder {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    inner class ServiceHandler(looper: Looper) : Handler(looper) {
-        val roomInserter = RoomInserter()
-        override fun handleMessage(msg: Message?) {
-            try {
-                if (ChatSingleton.chatManager == null ||  // chatmgr is null so we have no userinfo to use for login
-                        (!ChatSingleton.chatManager!!.network.isLoggedIn  // we're not logged in (but have the ability)
-                                && !ChatSingleton.chatManager!!.network.login())) { // tried to login, but couldnt
-                    // not logged in so exit service. may be premature and a bad idea
-                    // we couldn't log in so... stop the service?
-                    // TODO maybe notify user that error occurred here?
-                    stop(msg?.arg1 ?: -1)
-                    return
-                }
-                if (msg != null && msg.obj != null) {
-                    // if we had a message to send then send it
-                    val serviceMessage = (msg.obj as ChatServiceMessage)
-                    when (serviceMessage.type) {
-                        MessageType.CHAT_MESSAGE -> {
-                            if (serviceMessage.textmessage != null) {
-                                insertChatsIntoDb((ChatSingleton.postChat(serviceMessage.textmessage)))
-                            }
-                        }
-
-                        MessageType.STOP -> {
-                            // we got told to quit
-                            stop(msg.arg1 ?: -1)
-                            return
-                        }
-
-                        MessageType.START -> {
-                            // we got told to start
-                            sendMessageDelayed(obtainLoopMessage(msg.arg1), pollInterval)
-                        }
-                    }
-
-                } else {
-                    // else check for new commands and reschedule to check in a bit
-                    if (msg != null) {
-                        sendMessageDelayed(obtainLoopMessage(msg.arg1), pollInterval)
-                    }
-
-                    val messages = ChatSingleton.readChat(lastFetchedTime)
-                    // if we can, read the chat and stick in db
-                    insertChatsIntoDb(messages)
-                    notifyUserOfPm(messages)
-                    lastFetchedTime = ChatSingleton.chatManager!!.lastSeen
-                }
-            } catch (exception: IOException) {
-                // an ioexception occured. This means we're in a bad network location. try again later
-                val newMessage = cloneMessage(msg)
-                newMessage ?: sendMessageDelayed(newMessage, pollInterval)
-
-            }
-        }
-
-        fun insertChatsIntoDb(messages: List<ServerChatMessage>?) {
-            if (messages != null) {
-                roomInserter.insertAllMessages(messages)
-            }
-        }
-    }
-
-    /**
-     * Notify the user if a private msage was received
-     */
-    private fun notifyUserOfPm(messages: List<ServerChatMessage>?) {
-        messages ?.let {
-            for (message in messages) {
-                // it's a PM and not a system message
-                if (message.channelNameServer.isPrivate && !message.author.id.equals("-1")) {
-                    makeMentionNotification(this, Html.fromHtml(message.channelNameServer.name + ": " + message.htmlText))
-                }
-            }
-        }
-    }
-
     override fun onCreate() {
         super.onCreate()
-        val thread = HandlerThread("ServiceStartArguments",
-                Process.THREAD_PRIORITY_BACKGROUND)
+        val thread = HandlerThread("ServiceStartArguments", Process.THREAD_PRIORITY_BACKGROUND)
         thread.start()
 
         serviceLooper = thread.looper
         if (serviceLooper != null) {
-            serviceHandler = ServiceHandler(serviceLooper!!)
+            serviceHandler = ChatServiceHandler(serviceLooper!!, this)
         }
 
         sharedPref = applicationContext.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE)
-        lastFetchedTime = sharedPref!!.getLong(SHARED_PREF_LAST_FETCH_TIME, 0)
+        serviceHandler?.lastFetchedTime = sharedPref!!.getLong(SHARED_PREF_LAST_FETCH_TIME, 0)
     }
 
     /*
-     * Called by OS with the given data. Parse input commands and do what needs to be done (start, stop, delay, etc)
+     * Called by OS with the given data. Parse input commands and do what needs to be done (start, stopChatService, delay, etc)
      */
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        val msg = obtainLoopMessage(startId)
+        val msg = serviceHandler?.obtainLoopMessage(startId)
         val interval = intent?.extras?.getInt(EXTRA_POLL_INTERVAL_IN_MS, DEFAULT_POLL_INTERVAL)
         val chatMessageToSend = intent?.extras?.getString(EXTRA_CHAT_MESSAGE_TO_SEND, null)
         val shouldStop = intent?.getBooleanExtra(EXTRA_STOP, false) ?: false
         if (shouldStop) {
-            stop(startId)
+            stopChatService(startId)
         } else {
             msg?.obj = if (chatMessageToSend == null) ChatServiceMessage(MessageType.START, null) else ChatServiceMessage(MessageType.CHAT_MESSAGE, chatMessageToSend)
-            pollInterval = (interval?: DEFAULT_POLL_INTERVAL).toLong()
+            serviceHandler?.pollInterval = (interval?: DEFAULT_POLL_INTERVAL).toLong()
             serviceHandler?.sendMessage(msg)
             startForeground(R.string.notification_persistent, makePersistentNotification(this))
         }
         return START_STICKY;
     }
 
-    /**
-     * gets the default message for our looper. Takes in the startid of the service
-     */
-    fun obtainLoopMessage(id: Int): Message? {
-        // arg1 holds the service startid
-        // arg2 holds the poll interval we want the polling to have so it can be changed at will
-        // obj is used to hold any new chat commands we want to post
-        val msg = serviceHandler?.obtainMessage()
-        msg?.arg1 = id
-        msg?.arg2 = DEFAULT_POLL_INTERVAL
-        return msg
-    }
-
-
-    private fun cloneMessage(oldMessage: Message?):Message? {
-        val msg = serviceHandler?.obtainMessage()
-        msg?.arg1 = oldMessage?.arg1
-        msg?.arg2 = oldMessage?.arg2
-        msg?.obj = oldMessage?.obj
-        return msg
-    }
 
 
     /**
-     * Called when this service needs to stop. Calls stopSelf and cleans up
+     * Called when this service needs to stopChatService. Calls stopSelf and cleans up
      */
-    fun stop (id: Int) {
+    override fun stopChatService(id: Int) {
         stopForeground(true)
         stopSelf(id)
     }
@@ -185,8 +82,8 @@ class ChatService() : Service() {
      * Make the persistent notification
      */
     fun makePersistentNotification(ctx: Context): Notification {
-        // intent meant for this service. will be used to stop/start
-        val stopServiceIntent = Intent(ctx, ChatService::class.java)
+        // intent meant for this service. will be used to stopChatService/start
+        val stopServiceIntent = Intent(ctx, ChatBackgroundService::class.java)
         stopServiceIntent.putExtra(EXTRA_STOP, true)
         val stopPIntent = PendingIntent.getService(ctx, 1, stopServiceIntent, PendingIntent.FLAG_UPDATE_CURRENT)
 
@@ -205,45 +102,14 @@ class ChatService() : Service() {
         return notificationBuilder.build()
     }
 
-    /**
-     * Creates a notification when a direct message has been received. Vibrates and shows the passed in text
-     */
-    fun makeMentionNotification(ctx: Context, message: CharSequence) {
-        // intent meant for main activity. will launch the app
-        val launchMainActivityIntent = Intent(ctx, MainActivity::class.java)
-        val mainActivityPintent = PendingIntent.getActivity(ctx, 1, launchMainActivityIntent, PendingIntent.FLAG_UPDATE_CURRENT)
-
-        val notificationBuilder = NotificationCompat.Builder(ctx, NotificationCompat.CATEGORY_PROGRESS)
-        notificationBuilder
-                .setContentTitle(ctx.getString(R.string.app_name))
-                .setContentText(message)
-                .setSmallIcon(android.R.drawable.ic_btn_speak_now)
-                .setGroup("mentions")
-                .setAutoCancel(true)
-                .setDefaults(Notification.DEFAULT_VIBRATE)
-                .setContentIntent(mainActivityPintent)
-
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.notify(R.string.notification_non_persistent, notificationBuilder.build())
-    }
-
     override fun onDestroy() {
         // we got told to quit, so shut down the service looper
         serviceLooper?.quit()
         // todo is this safe?
-        sharedPref?.edit()?.putLong(SHARED_PREF_LAST_FETCH_TIME, lastFetchedTime)?.apply()
+        val lastFetchedTime = serviceHandler?.lastFetchedTime
+        lastFetchedTime?.let {
+            sharedPref?.edit()?.putLong(SHARED_PREF_LAST_FETCH_TIME, lastFetchedTime)?.apply()
+        }
         ChatSingleton.network?.logout()
     }
 }
-
-/**
- * Types of message that can be sent our handler
- */
-private enum class MessageType {
-    CHAT_MESSAGE, STOP, START
-}
-
-/**
- * Message that can be sent to our handler. textmessage is only used if this is a CHAT_MESSAGE
- */
-private data class ChatServiceMessage(val type: MessageType, val textmessage: String?)

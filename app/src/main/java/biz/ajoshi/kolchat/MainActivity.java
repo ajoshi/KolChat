@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
                       public void accept(Boolean success) throws Exception {
                           if (success) {
                               Activity activity = MainActivity.this;
-                              Intent serviceIntent = new Intent(activity, ChatService.class);
+                              Intent serviceIntent = new Intent(activity, ChatBackgroundService.class);
                               serviceIntent.putExtra(ChatServiceKt.EXTRA_POLL_INTERVAL_IN_MS, 2000);
                               activity.startService(serviceIntent);
                           } else {
@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Intent stopService = new Intent(this, ChatService.class);
+        Intent stopService = new Intent(this, ChatBackgroundService.class);
         // acitvity is gone, increase poll interval to 1 minute
         stopService.putExtra(ChatServiceKt.EXTRA_POLL_INTERVAL_IN_MS, 60000);
         startService(stopService);

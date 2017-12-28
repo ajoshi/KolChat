@@ -112,7 +112,7 @@ class ChatMessageFrag : Fragment(), QuickCommandView.CommandClickListener {
      * done before calling this
      */
     fun sendChatCommand(command: String): Boolean {
-        val serviceIntent = Intent(activity, ChatService::class.java)
+        val serviceIntent = Intent(activity, ChatBackgroundService::class.java)
         serviceIntent.putExtra(EXTRA_CHAT_MESSAGE_TO_SEND, command)
         activity.startService(serviceIntent)
         return true
