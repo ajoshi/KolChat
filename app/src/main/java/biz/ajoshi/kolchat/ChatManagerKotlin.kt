@@ -404,4 +404,34 @@ class ChatManagerKotlin(val network: Network) {
         return null
     }
 
+    companion object {
+        // TODO can we do this without a companion object? Is it too much of a hassle to send in these 3 vars all the
+        // way up to the post call in ChatMgr?
+        /**
+         * Business logic about how to construct a chat command from individual components
+         * @param post Text to be posted. Can be a chat command or chat text
+         * @param id id of the channel or user this is being sent to
+         * @param isPrivate true if this is a private chat, false if this is a channel
+         */
+        fun getChatString(post: CharSequence?, id: String, isPrivate: Boolean): String {
+            if (post != null) {
+                if (post[0] == '/') {
+                    // this is a command, but /me go in regular chat and should be scoped to channel
+                    if (!post.startsWith("/me")  && !post.startsWith("/em") ) {
+                        if (post.toString() == "/who") {
+                            // /who commands are scoped to channel, but as "who <channel>" instead of "<channel> who"
+                            return "${post.toString()} ${id}"
+                        }
+                        return post.toString()
+                    }
+                }
+                when (isPrivate) {
+                    true -> return "/w ${id} ${post}"
+                    false -> return "/${id} ${post}"
+                }
+            }
+            // null chat string, we can't do anything anyway
+            return ""
+        }
+    }
 }

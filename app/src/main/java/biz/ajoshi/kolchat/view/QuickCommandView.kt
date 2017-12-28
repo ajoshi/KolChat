@@ -17,6 +17,9 @@ import biz.ajoshi.kolchat.R
  */
 class QuickCommandView : LinearLayout, QuickCommandVH.VHCommandClickListener {
     interface CommandClickListener {
+        /**
+         * Called when a command in the Quick Command bar is tapped
+         */
         fun OnCommandClicked(command: QuickCommand)
     }
 
@@ -38,6 +41,7 @@ class QuickCommandView : LinearLayout, QuickCommandVH.VHCommandClickListener {
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         val view = inflater.inflate(R.layout.quick_command_view, this)
         val commands = mutableListOf<QuickCommand>()
+        commands.add(QuickCommand("em", "/em "))
         commands.add(QuickCommand("romans", "/romans"))
         commands.add(QuickCommand("who", "/who"))
         commands.add(QuickCommand(">:(", ">:("))

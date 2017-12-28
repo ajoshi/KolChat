@@ -5,6 +5,7 @@ import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.os.Bundle
+import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
@@ -28,7 +29,7 @@ const val EXTRA_CHANNEL_ID = "biz.ajoshi.kolchat.ExtraChannelId"
 const val EXTRA_CHANNEL_NAME = "biz.ajoshi.kolchat.ExtraChannelName"
 const val EXTRA_CHANNEL_IS_PRIVATE = "biz.ajoshi.kolchat.ExtraChannelPrivate"
 
-class ChatMessageFrag : LifecycleFragment(), QuickCommandView.CommandClickListener {
+class ChatMessageFrag : Fragment(), QuickCommandView.CommandClickListener {
     var id = "newbie"
     var name = "newbie"
     var isPrivate = false
@@ -103,20 +104,12 @@ class ChatMessageFrag : LifecycleFragment(), QuickCommandView.CommandClickListen
      * Send a chat message to this channel/user
      */
     fun makePost(post: CharSequence?): Boolean {
-        if (post != null) {
-            if (post[0] == '/') {
-                return sendChatCommand(post.toString())
-            }
-            when (isPrivate) {
-                true -> return sendChatCommand("/w ${id} ${post}")
-                false -> return sendChatCommand("/${id} ${post}")
-            }
-        }
-        return false
+        return sendChatCommand(ChatManagerKotlin.getChatString(post, id, isPrivate))
     }
 
     /**
-     * Send a chat command to the server. Is not scoped to this channel, so scoping should be done before calling this
+     * Send a chat command to the server. Is not scoped to this channel, so scoping should be
+     * done before calling this
      */
     fun sendChatCommand(command: String): Boolean {
         val serviceIntent = Intent(activity, ChatService::class.java)
