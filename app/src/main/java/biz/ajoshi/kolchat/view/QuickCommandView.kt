@@ -20,11 +20,11 @@ class QuickCommandView : LinearLayout, QuickCommandVH.VHCommandClickListener {
         /**
          * Called when a command in the Quick Command bar is tapped
          */
-        fun OnCommandClicked(command: QuickCommand)
+        fun onCommandClicked(command: QuickCommand)
     }
 
     override fun onViewHolderCommandClicked(command: QuickCommand) {
-        commandClickListener?.OnCommandClicked(command)
+        commandClickListener?.onCommandClicked(command)
     }
 
     constructor(context: Context) : this(context, null)

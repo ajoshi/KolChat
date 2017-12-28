@@ -118,7 +118,7 @@ class ChatMessageFrag : Fragment(), QuickCommandView.CommandClickListener {
         return true
     }
 
-    override fun OnCommandClicked(command: QuickCommand) {
+    override fun onCommandClicked(command: QuickCommand) {
         inputView?.appendInputText(command.command)
     }
 }
