@@ -113,4 +113,29 @@ public class ChatInputView extends RelativeLayout {
         listener = newListener;
     }
 
+    /**
+     * Sets the input field text to the given value
+     * @param text new value of the input field
+     */
+    public void setInputText(CharSequence text) {
+        inputField.setText(text);
+    }
+
+    /**
+     * Returns the input field text
+     * @return current value of the input field
+     */
+    public Editable getInputText() {
+        return inputField.getText();
+    }
+
+    /**
+     * Appends the given text to whatever is currently in the input field
+     * @param text CharSequence to append to the input field
+     * @return the new input field value
+     */
+    public Editable appendInputText(CharSequence text) {
+        return inputField.getText().append(text);
+    }
+
 }

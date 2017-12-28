@@ -110,7 +110,7 @@ class QuickCommandAdapter(val commandClickListener: QuickCommandVH.VHCommandClic
     }
 
     fun setCommandList(newList: List<QuickCommand>) {
-        // TODO see if this is even needed or if this can make do with an immutalbe list
+        // TODO see if this is even needed or if this can make do with an immutable list
         commands = newList.toMutableList()
         notifyDataSetChanged()
     }

@@ -11,7 +11,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import biz.ajoshi.kolchat.arch.ChatMessageViewModel
-import biz.ajoshi.kolchat.persistence.ChatMessage
 import biz.ajoshi.kolchat.view.ChatAdapter
 import biz.ajoshi.kolchat.view.ChatInputView
 import biz.ajoshi.kolchat.view.QuickCommand
@@ -37,6 +36,7 @@ class ChatMessageFrag : LifecycleFragment(), QuickCommandView.CommandClickListen
 
     var chatAdapter: ChatAdapter? = null
     var recyclerView: RecyclerView? = null
+    var inputView: ChatInputView? = null
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater?.inflate(R.layout.chat_detail, container, false)
@@ -74,8 +74,8 @@ class ChatMessageFrag : LifecycleFragment(), QuickCommandView.CommandClickListen
                 }
 
 
-        val inputView = activity?.findViewById<ChatInputView>(R.id.input_view) as ChatInputView
-        inputView.setSubmitListener { input: CharSequence? -> makePost(input) }
+        inputView = activity?.findViewById<ChatInputView>(R.id.input_view) as ChatInputView
+        inputView?.setSubmitListener { input: CharSequence? -> makePost(input) }
 
         val quickCommands = activity?.findViewById<QuickCommandView>(R.id.quick_commands) as QuickCommandView
         quickCommands.setClickListener(this)
@@ -94,7 +94,7 @@ class ChatMessageFrag : LifecycleFragment(), QuickCommandView.CommandClickListen
         viewModel.getChatListObservable(id, System.currentTimeMillis())?.observe(this, Observer
         { message ->
             if (message != null)
-                //add this new message to the bottom (will scroll down if we're at the bottom of the list)
+            //add this new message to the bottom (will scroll down if we're at the bottom of the list)
                 chatAdapter?.addToBottom(message)
         })
     }
@@ -126,6 +126,6 @@ class ChatMessageFrag : LifecycleFragment(), QuickCommandView.CommandClickListen
     }
 
     override fun OnCommandClicked(command: QuickCommand) {
-        makePost(command.command)
+        inputView?.appendInputText(command.command)
     }
 }
