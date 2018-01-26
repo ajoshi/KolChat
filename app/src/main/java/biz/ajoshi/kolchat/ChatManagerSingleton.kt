@@ -26,6 +26,10 @@ object ChatSingleton {
         return true
     }
 
+    fun isLoggedIn(): Boolean {
+        return network?.isLoggedIn() == true
+    }
+
     @Throws(IOException::class)
     fun readChat(timeStamp: Long): List<ServerChatMessage>? {
         return chatManager?.readChat(timeStamp)

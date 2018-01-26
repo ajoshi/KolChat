@@ -22,26 +22,18 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Observable.fromCallable(new Callable<Boolean>() {
-            @Override
-            public Boolean call() throws Exception {
-                return ChatSingleton.INSTANCE.loginIfNeeded("a", "b", true);
-            }
-        }).subscribeOn(Schedulers.io())
-                  .observeOn(AndroidSchedulers.mainThread())
-                  .subscribe(new Consumer<Boolean>() {
-                      @Override
-                      public void accept(Boolean success) throws Exception {
-                          if (success) {
-                              Activity activity = MainActivity.this;
-                              Intent serviceIntent = new Intent(activity, ChatBackgroundService.class);
-                              serviceIntent.putExtra(ChatServiceKt.EXTRA_POLL_INTERVAL_IN_MS, 2000);
-                              activity.startService(serviceIntent);
-                          } else {
-                              // notify the ui that we failed to log in
-                          }
-                      }
-                  });
+        if (ChatSingleton.INSTANCE.isLoggedIn()) {
+            // we're logged in
+            Activity activity = MainActivity.this;
+            Intent serviceIntent = new Intent(activity, ChatBackgroundService.class);
+            serviceIntent.putExtra(ChatServiceKt.EXTRA_POLL_INTERVAL_IN_MS, 2000);
+            activity.startService(serviceIntent);
+        } else {
+            // we're not logged in, so just open up the login activity
+            Intent loginIntent = new Intent(this, LoginActivity.class);
+            startActivity(loginIntent);
+            finish();
+        }
 
         Fragment listFrag = getSupportFragmentManager().findFragmentByTag(TAG_CHAT_LIST_FRAG);
         if (listFrag == null) {
@@ -64,10 +56,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Intent stopService = new Intent(this, ChatBackgroundService.class);
-        // acitvity is gone, increase poll interval to 1 minute
-        stopService.putExtra(ChatServiceKt.EXTRA_POLL_INTERVAL_IN_MS, 60000);
-        startService(stopService);
+        if(ChatSingleton.INSTANCE.isLoggedIn()) {
+            Intent increasePollTimeout = new Intent(this, ChatBackgroundService.class);
+            // acitvity is gone, increase poll interval to 1 minute
+            increasePollTimeout.putExtra(ChatServiceKt.EXTRA_POLL_INTERVAL_IN_MS, 60000);
+            startService(increasePollTimeout);
+        }
     }
 
     public void getMessages() {

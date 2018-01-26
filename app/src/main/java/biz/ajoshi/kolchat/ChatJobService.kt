@@ -23,6 +23,8 @@ class ChatJobService : JobService(), ChatServiceHandler.ChatService {
     override fun onStartJob(params: JobParameters?): Boolean {
         jobParams = params
 
+
+        return true
     }
 
     override fun onStopJob(params: JobParameters?): Boolean {
