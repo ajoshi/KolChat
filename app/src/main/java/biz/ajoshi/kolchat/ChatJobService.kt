@@ -7,6 +7,7 @@ import android.content.Context
 /**
  * This job will run one in a while. It will read chat once and then go away.
  * The hope is that the user will be using the foreground service enough to not really need this
+ * TODO https://developers.google.com/cloud-messaging/network-manager use that instead
  */
 class ChatJobService : JobService(), ChatServiceHandler.ChatService {
 

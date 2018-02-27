@@ -2,7 +2,12 @@
 <manifest package="biz.ajoshi.kolchat"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- Needed to send 1s and 0s across a series of tubes -->
     <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- Need this to store local account info in a secure way -->
+    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS"/>
+    <!-- Need this to fetch stored local accounts for phones under LOLLIPOP_MR1 -->
+    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
 
     <application
         android:allowBackup="true"

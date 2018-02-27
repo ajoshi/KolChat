@@ -17,6 +17,7 @@ import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.ArrayAdapter
 import android.widget.TextView
+import biz.ajoshi.kolchat.accounts.KolAccountManager
 import kotlinx.android.synthetic.main.activity_login.*
 import java.lang.ref.WeakReference
 import java.util.*
@@ -51,7 +52,7 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
 
     private fun populateAutoComplete() {
         // TODO replace with my own loader
-        loaderManager.initLoader(USERID_LOADER_ID, null, this)
+    //    loaderManager.initLoader(USERID_LOADER_ID, null, this)
     }
 
     /**
@@ -60,6 +61,7 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
      * errors are presented and no actual login attempt is made.
      */
     private fun attemptLogin() {
+        // we don't want to log in if we're already logging in
         if (mAuthTask != null) {
             return
         }
@@ -165,12 +167,18 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
 
     }
 
+    /**
+     * Called when the login task has either succeeded or failed
+     */
     protected fun onLogin(success: Boolean?) {
         mAuthTask = null
         showProgress(false)
 
         if (success!!) {
             startActivity(Intent(this, MainActivity::class.java))
+            val acctMgr = KolAccountManager(this)
+            // should i be sending these values in instead of re-finding them?
+            acctMgr.addAccount(username = username.text.toString(), password = password.text.toString())
             finish()
         } else {
             password.error = getString(R.string.error_incorrect_password)

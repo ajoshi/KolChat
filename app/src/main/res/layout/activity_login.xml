@@ -50,7 +50,7 @@
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent">
 
-                <EditText
+                <android.support.design.widget.TextInputEditText
                     android:hint="@string/prompt_password"
                     android:id="@+id/password"
                     android:imeActionId="6"
