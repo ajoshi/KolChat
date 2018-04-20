@@ -1,8 +1,6 @@
 package biz.ajoshi.kolchat
 
-import android.app.Notification
-import android.app.PendingIntent
-import android.app.Service
+import android.app.*
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -13,10 +11,13 @@ import android.support.v4.app.NotificationCompat
 const val EXTRA_POLL_INTERVAL_IN_MS = "biz.ajoshi.kolchat.ChatService.pollInterval";
 const val EXTRA_CHAT_MESSAGE_TO_SEND = "biz.ajoshi.kolchat.ChatService.messageToSend";
 const val EXTRA_STOP = "biz.ajoshi.kolchat.ChatService.staaaaahp";
-// normally we'll poll ever 3 seconds
+// normally we'll poll every 3 seconds
 const val DEFAULT_POLL_INTERVAL = 3000
 const val SHARED_PREF_NAME = "chat"
 const val SHARED_PREF_LAST_FETCH_TIME = "lastFetched"
+const val PERSISTENT_NOTIFICATION_CHANNEL_ID = "kolPersist"
+const val MENTION_NOTIFICATION_CHANNEL_ID = "kolMention"
+
 /**
  * Service that spins bg task to periodically poll for chat commands.
  * Needs to be a service so we can get commands even when app isn't in foreground
@@ -32,11 +33,27 @@ class ChatBackgroundService() : Service(), ChatServiceHandler.ChatService {
     var sharedPref: SharedPreferences? = null
 
     override fun onBind(intent: Intent?): IBinder {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        throw UnsupportedOperationException("You can't bind this")
     }
 
     override fun onCreate() {
         super.onCreate()
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            // O won't show notifications unless we add channels, and we can't define channels for anything less than O
+            val notificationMgr = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            // The persistent notification to tell people we're running and provide a logout button
+            // This gets auto-collapsed so it doesn't eat up too much space
+            val persistentChannel = NotificationChannel(PERSISTENT_NOTIFICATION_CHANNEL_ID, "KoL Chat", NotificationManager.IMPORTANCE_MIN)
+            persistentChannel.description = "Notifications from persistent notification go here"
+            notificationMgr.createNotificationChannel(persistentChannel)
+
+            // notification that only shows up when a PM is sent
+            val mentionChannel = NotificationChannel(MENTION_NOTIFICATION_CHANNEL_ID, "KoL Mention", NotificationManager.IMPORTANCE_HIGH)
+            mentionChannel.description = "Notifications from KoL private messages go here"
+            notificationMgr.createNotificationChannel(persistentChannel)
+        }
+
         val thread = HandlerThread("ServiceStartArguments", Process.THREAD_PRIORITY_BACKGROUND)
         thread.start()
 
@@ -61,13 +78,12 @@ class ChatBackgroundService() : Service(), ChatServiceHandler.ChatService {
             stopChatService(startId)
         } else {
             msg?.obj = if (chatMessageToSend == null) ChatServiceMessage(MessageType.START, null) else ChatServiceMessage(MessageType.CHAT_MESSAGE, chatMessageToSend)
-            serviceHandler?.pollInterval = (interval?: DEFAULT_POLL_INTERVAL).toLong()
+            serviceHandler?.pollInterval = (interval ?: DEFAULT_POLL_INTERVAL).toLong()
             serviceHandler?.sendMessage(msg)
             startForeground(R.string.notification_persistent, makePersistentNotification(this))
         }
         return START_STICKY;
     }
-
 
 
     /**
@@ -97,8 +113,8 @@ class ChatBackgroundService() : Service(), ChatServiceHandler.ChatService {
                 .setContentText(ctx.getString(R.string.notification_description))
                 .setSmallIcon(R.drawable.ic_send)
                 .setContentIntent(mainActivityPintent)
+                .setChannelId(PERSISTENT_NOTIFICATION_CHANNEL_ID)
                 .addAction(R.drawable.abc_ic_clear_material, "Logout", stopPIntent)
-
         return notificationBuilder.build()
     }
 

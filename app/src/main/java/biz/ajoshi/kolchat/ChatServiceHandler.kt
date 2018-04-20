@@ -111,7 +111,7 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
         return msg
     }
 
-    private fun cloneMessage(oldMessage: Message?):Message? {
+    private fun cloneMessage(oldMessage: Message?): Message? {
         val msg = obtainMessage()
         msg?.arg1 = oldMessage?.arg1
         msg?.arg2 = oldMessage?.arg2
@@ -134,6 +134,7 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
                 .setSmallIcon(android.R.drawable.ic_btn_speak_now)
                 .setGroup("mentions")
                 .setAutoCancel(true)
+                .setChannelId(MENTION_NOTIFICATION_CHANNEL_ID)
                 .setDefaults(Notification.DEFAULT_VIBRATE)
                 .setContentIntent(mainActivityPintent)
 
@@ -145,7 +146,7 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
      * Notify the user if a private msage was received
      */
     private fun notifyUserOfPm(messages: List<ServerChatMessage>?) {
-        messages ?.let {
+        messages?.let {
             for (message in messages) {
                 // it's a PM and not a system message
                 if (message.channelNameServer.isPrivate && !message.author.id.equals("-1")) {
