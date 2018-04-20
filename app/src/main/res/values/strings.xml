@@ -21,4 +21,6 @@
     <string name="error_field_required">This field is required</string>
     <string name="permission_rationale">"Contacts permissions are needed for providing email completions."</string>
 
+    <string name="account_type">KoL</string>
+
 </resources>

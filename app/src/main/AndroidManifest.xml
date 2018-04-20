@@ -8,6 +8,9 @@
     <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS"/>
     <!-- Need this to fetch stored local accounts for phones under LOLLIPOP_MR1 -->
     <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
+    <!-- Need this to store local account -->
+    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS"/>
+
 
     <application
         android:allowBackup="true"
@@ -34,6 +37,19 @@
             android:label="@string/title_activity_login"
             android:name=".LoginActivity">
         </activity>
+
+        <service
+            android:name=".accounts.FakeAuthService"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.accounts.AccountAuthenticator" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.accounts.AccountAuthenticator"
+                android:resource="@xml/authenticator" />
+        </service>
     </application>
 
 </manifest>

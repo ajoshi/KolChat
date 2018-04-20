@@ -46,7 +46,6 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
             }
             false
         })
-
         email_sign_in_button.setOnClickListener { attemptLogin() }
     }
 
@@ -178,7 +177,9 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
             startActivity(Intent(this, MainActivity::class.java))
             val acctMgr = KolAccountManager(this)
             // should i be sending these values in instead of re-finding them?
-            acctMgr.addAccount(username = username.text.toString(), password = password.text.toString())
+            if (acctMgr.getAccount(username = username.text.toString()) == null) {
+                acctMgr.addAccount(username = username.text.toString(), password = password.text.toString())
+            }
             finish()
         } else {
             password.error = getString(R.string.error_incorrect_password)
