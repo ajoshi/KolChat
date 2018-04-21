@@ -25,7 +25,7 @@ import java.util.*
 /**
  * A login screen that offers login via username/password.
  */
-class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
+class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor>, UserLoginTask.LoginFieldContainer {
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
@@ -51,7 +51,7 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
 
     private fun populateAutoComplete() {
         // TODO replace with my own loader
-    //    loaderManager.initLoader(USERID_LOADER_ID, null, this)
+        //    loaderManager.initLoader(USERID_LOADER_ID, null, this)
     }
 
     /**
@@ -166,10 +166,7 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
 
     }
 
-    /**
-     * Called when the login task has either succeeded or failed
-     */
-    protected fun onLogin(success: Boolean?) {
+    override fun onLogin(success: Boolean?, userNameText: String, passwordText: String) {
         mAuthTask = null
         showProgress(false)
 
@@ -177,17 +174,19 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
             startActivity(Intent(this, MainActivity::class.java))
             val acctMgr = KolAccountManager(this)
             // should i be sending these values in instead of re-finding them?
-            if (acctMgr.getAccount(username = username.text.toString()) == null) {
-                acctMgr.addAccount(username = username.text.toString(), password = password.text.toString())
+            if (acctMgr.getAccount(username = userNameText) == null) {
+                acctMgr.addAccount(username = userNameText, password = passwordText)
             }
             finish()
         } else {
+            // failed login, so highlight the password field in the UI
+            password.setText(passwordText)
             password.error = getString(R.string.error_incorrect_password)
             password.requestFocus()
         }
     }
 
-    protected fun onLoginCancelled() {
+    override fun onLoginCancelled() {
         mAuthTask = null
         showProgress(false)
     }
@@ -199,30 +198,48 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
 
         username.setAdapter(adapter)
     }
+}
+
+/**
+ * Represents an asynchronous login/registration task used to authenticate
+ * the user.
+ */
+class UserLoginTask constructor(private val userName: String, private val password: String, private val uiWeakRef: WeakReference<LoginFieldContainer>) : AsyncTask<Void, Void, Boolean>() {
 
     /**
-     * Represents an asynchronous login/registration task used to authenticate
-     * the user.
+     * Defines the requirements for the UI component that displays updates for this login task
      */
-    class UserLoginTask internal constructor(private val userName: String, private val password: String, private val activityRef: WeakReference<LoginActivity>) : AsyncTask<Void, Void, Boolean>() {
+    interface LoginFieldContainer {
+        /**
+         * Called when the login task has either succeeded or failed
+         * @param success true if login was successful. False if password was wrong or some other error
+         * @param userNameText user name we tried to log in with
+         * @param passwordText password we tried to log in with
+         */
+        fun onLogin(success: Boolean?, userNameText: String, passwordText: String);
 
-        override fun doInBackground(vararg params: Void): Boolean? {
-            return ChatSingleton.login(username = userName, password = password, silent = true);
+        /**
+         * Called when the login task has been cancelled (not when it fails)
+         */
+        fun onLoginCancelled()
+    }
+
+    override fun doInBackground(vararg params: Void): Boolean? {
+        return ChatSingleton.login(username = userName, password = password, silent = true);
+    }
+
+    override fun onPostExecute(success: Boolean?) {
+        // maybe use rx to notify the activity instead?
+        val activity = uiWeakRef.get()
+        activity?.let {
+            activity.onLogin(success = success, userNameText = userName, passwordText = password)
         }
+    }
 
-        override fun onPostExecute(success: Boolean?) {
-            // maybe use rx to notify the activity instead?
-            val activity = activityRef.get()
-            activity?.let {
-                activity.onLogin(success)
-            }
-        }
-
-        override fun onCancelled() {
-            val activity = activityRef.get()
-            activity?.let {
-                activity.onLoginCancelled()
-            }
+    override fun onCancelled() {
+        val activity = uiWeakRef.get()
+        activity?.let {
+            activity.onLoginCancelled()
         }
     }
 }
