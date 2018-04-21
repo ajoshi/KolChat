@@ -7,6 +7,8 @@ import android.arch.persistence.room.migration.Migration
 import biz.ajoshi.kolchat.persistence.ChannelDao
 import biz.ajoshi.kolchat.persistence.KolDB
 import com.facebook.drawee.backends.pipeline.Fresco
+import com.crashlytics.android.Crashlytics;
+import io.fabric.sdk.android.Fabric;
 
 /**
  * Created by ajoshi on 7/14/17.
@@ -19,6 +21,7 @@ class KolChatApp : Application() {
     override fun onCreate() {
         super.onCreate()
         // migrations are probably dags to allow db upgrades from one version to another?
+        Fabric.with(this, Crashlytics())
         val migration = object : Migration(3, 4) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 // if I have to write sql (and can't even reuse the db name const) what's the point of room?

@@ -50,6 +50,12 @@
                 android:name="android.accounts.AccountAuthenticator"
                 android:resource="@xml/authenticator" />
         </service>
+        <!-- I'm not convinced it's worth it to do a local key thing for fabric -->
+        <!-- Please don't send data to my account :( -->
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="5ee22c82fe4a5e99c9f0f8ea4c5cc0149d0ace93"
+            />
     </application>
 
 </manifest>
