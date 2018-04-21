@@ -22,8 +22,8 @@ class ChatChannelListFragment() : Fragment() { // empty constructor
     var chatChannelAdapter: ChatChannelAdapter? = null
     var channelUpdateSubscriber: Disposable? = null
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater?.inflate(R.layout.channel_list, container, false)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        return inflater.inflate(R.layout.channel_list, container, false)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {

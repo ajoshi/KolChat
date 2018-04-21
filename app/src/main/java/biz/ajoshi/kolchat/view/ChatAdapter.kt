@@ -9,20 +9,20 @@ import biz.ajoshi.kolchat.R
 import biz.ajoshi.kolchat.persistence.ChatMessage
 
 /**
- * Created by ajoshi on 7/22/17.
+ * Adapter for the list of chat messages (inside a given channel)
  */
 class ChatAdapter(val layoutMgr: LinearLayoutManager) : RecyclerView.Adapter<ChatMessageVH>() {
     var messages = mutableListOf<ChatMessage>()
     var idList = mutableListOf<Int>()
 
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ChatMessageVH {
-        val view = LayoutInflater.from(parent?.context).inflate(R.layout.chat_message, parent, false)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatMessageVH {
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.chat_message, parent, false)
         return ChatMessageVH(view)
     }
 
-    override fun onBindViewHolder(holder: ChatMessageVH?, position: Int) {
+    override fun onBindViewHolder(holder: ChatMessageVH, position: Int) {
         if (messages.size > position) {
-            holder?.bind(messages.get(position))
+            holder.bind(messages.get(position))
         }
     }
 
@@ -30,10 +30,16 @@ class ChatAdapter(val layoutMgr: LinearLayoutManager) : RecyclerView.Adapter<Cha
         return messages.size
     }
 
-    fun setList(newList : List<ChatMessage>) {
-        messages = newList.toMutableList()
-        notifyDataSetChanged()
-        scrollToBottomAlways()
+    /**
+     * Sets the backing list to whatever is sent in. Replaces old data.
+     * No-op if empty list is sent in
+     */
+    fun setList(newList : List<ChatMessage>?) {
+        newList?.let {
+            messages = newList.toMutableList()
+            notifyDataSetChanged()
+            scrollToBottomAlways()
+        }
     }
 
     fun scrollToBottom() {
@@ -48,6 +54,9 @@ class ChatAdapter(val layoutMgr: LinearLayoutManager) : RecyclerView.Adapter<Cha
             layoutMgr.scrollToPosition(messages.size - 1)
     }
 
+    /**
+     * Add this single message to the bottom of the chat list (newest message)
+     */
     fun addToBottom(newMessge: ChatMessage) {
         if (!idList.contains(newMessge.id)) {
             messages.add(newMessge)
@@ -57,6 +66,9 @@ class ChatAdapter(val layoutMgr: LinearLayoutManager) : RecyclerView.Adapter<Cha
         }
     }
 
+    /**
+     * Appends a list of messages to the bottom of the chat list (new messages)
+     */
     fun addToBottom(newMessges: List<ChatMessage>) {
         var insertedCount = 0
         for(message in newMessges) {

@@ -3,6 +3,7 @@ package biz.ajoshi.kolchat.persistence;
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
+import android.support.annotation.NonNull;
 
 /**
  * Created by ajoshi on 7/14/17.
@@ -51,6 +52,7 @@ public class ChatChannel {
     }
 
     @PrimaryKey
+    @NonNull
     private String id;
     private String name;
     private boolean isPrivate;

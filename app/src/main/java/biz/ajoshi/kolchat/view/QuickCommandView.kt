@@ -98,14 +98,14 @@ class QuickCommandVH(itemView: View, val commandClickListener: VHCommandClickLis
 class QuickCommandAdapter(val commandClickListener: QuickCommandVH.VHCommandClickListener) : RecyclerView.Adapter<QuickCommandVH>() {
     var commands = mutableListOf<QuickCommand>()
 
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): QuickCommandVH {
-        val view = LayoutInflater.from(parent?.context).inflate(R.layout.quick_command_item, parent, false)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): QuickCommandVH {
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.quick_command_item, parent, false)
         return QuickCommandVH(view, commandClickListener)
     }
 
-    override fun onBindViewHolder(holder: QuickCommandVH?, position: Int) {
+    override fun onBindViewHolder(holder: QuickCommandVH, position: Int) {
         if (commands.size > position) {
-            holder?.bind(commands.get(position))
+            holder.bind(commands.get(position))
         }
     }
 

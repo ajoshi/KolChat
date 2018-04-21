@@ -21,8 +21,8 @@ class ChatChannelAdapter() : RecyclerView.Adapter<ChatChannelVH>() {
     var channels = mutableListOf<ChatChannel>()
     var clickListener: ChannelClickListener? = null
 
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ChatChannelVH {
-        val view = LayoutInflater.from(parent?.context).inflate(R.layout.channel_list_item, parent, false)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatChannelVH {
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.channel_list_item, parent, false)
         return ChatChannelVH(view, object : ChatChannelVH.ChannelRowClickListener {
             override fun OnChannelRowClicked(channel: ChatChannel) {
                 clickListener?.onChannelClicked(channel)
@@ -31,9 +31,9 @@ class ChatChannelAdapter() : RecyclerView.Adapter<ChatChannelVH>() {
     }
 
 
-    override fun onBindViewHolder(holder: ChatChannelVH?, position: Int) {
+    override fun onBindViewHolder(holder: ChatChannelVH, position: Int) {
         if (channels.size > position) {
-            holder?.bind(channels.get(position))
+            holder.bind(channels.get(position))
         }
     }
 

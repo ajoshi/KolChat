@@ -1,6 +1,5 @@
 package biz.ajoshi.kolchat
 
-import android.arch.lifecycle.LifecycleFragment
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
@@ -39,8 +38,8 @@ class ChatMessageFrag : Fragment(), QuickCommandView.CommandClickListener {
     var recyclerView: RecyclerView? = null
     var inputView: ChatInputView? = null
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater?.inflate(R.layout.chat_detail, container, false)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        return inflater.inflate(R.layout.chat_detail, container, false)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -114,7 +113,7 @@ class ChatMessageFrag : Fragment(), QuickCommandView.CommandClickListener {
     fun sendChatCommand(command: String): Boolean {
         val serviceIntent = Intent(activity, ChatBackgroundService::class.java)
         serviceIntent.putExtra(EXTRA_CHAT_MESSAGE_TO_SEND, command)
-        activity.startService(serviceIntent)
+        activity?.startService(serviceIntent)
         return true
     }
 
