@@ -42,6 +42,7 @@
                     android:layout_height="wrap_content"
                     android:layout_width="match_parent"
                     android:maxLines="1"
+                    android:completionThreshold="@integer/login_username_field_completion_threshold"
                     android:singleLine="true"/>
 
             </android.support.design.widget.TextInputLayout>

@@ -3,35 +3,37 @@ package biz.ajoshi.kolchat
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.annotation.TargetApi
-import android.app.LoaderManager.LoaderCallbacks
-import android.content.CursorLoader
 import android.content.Intent
-import android.content.Loader
-import android.database.Cursor
 import android.os.AsyncTask
 import android.os.Build
 import android.os.Bundle
+import android.support.v4.app.LoaderManager
 import android.support.v7.app.AppCompatActivity
 import android.text.TextUtils
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.ArrayAdapter
+import android.widget.AutoCompleteTextView
 import android.widget.TextView
+import biz.ajoshi.kolchat.accounts.AccountLoader
+import biz.ajoshi.kolchat.accounts.KolAccount
 import biz.ajoshi.kolchat.accounts.KolAccountManager
 import kotlinx.android.synthetic.main.activity_login.*
 import java.lang.ref.WeakReference
-import java.util.*
 
 /**
  * A login screen that offers login via username/password.
  */
-class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor>, UserLoginTask.LoginFieldContainer {
+class LoginActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<List<KolAccount>>, UserLoginTask.LoginFieldContainer {
+
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
     private var mAuthTask: UserLoginTask? = null
 
-    // Loader if for list of users
+    private var accountList: List<KolAccount>? = null
+
+    // Loader id for list of users
     private val USERID_LOADER_ID = 0;
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,8 +52,21 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor>, UserLoginTas
     }
 
     private fun populateAutoComplete() {
-        // TODO replace with my own loader
-        //    loaderManager.initLoader(USERID_LOADER_ID, null, this)
+        supportLoaderManager.initLoader(USERID_LOADER_ID, null, this)
+        username.setOnClickListener { v: View ->
+            if (v is AutoCompleteTextView) {
+                v.showDropDown()
+            }
+        }
+        // set up an item click listener for the dropdown
+        username.setOnItemClickListener { _, _, position, _ ->
+            val tempAcctList = accountList
+            // if this list is not null && its size is more than the click position, go ahead
+            tempAcctList?.takeIf { tempAcctList.size > position }?.apply {
+                val account = tempAcctList[position]
+                attemptLogin(account.username, account.password, WeakReference(this@LoginActivity))
+            }
+        }
     }
 
     /**
@@ -97,15 +112,22 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor>, UserLoginTas
         } else {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
-            showProgress(true)
-            mAuthTask = UserLoginTask(usernameStr, passwordStr, WeakReference(this))
-            mAuthTask!!.execute(null as Void?)
+            attemptLogin(userNameText = usernameStr, passwordText = passwordStr, weakReference = WeakReference(this))
         }
     }
 
+    /**
+     * Attempts to log in with the given credentials
+     */
+    private fun attemptLogin(userNameText: String, passwordText: String, weakReference: WeakReference<UserLoginTask.LoginFieldContainer>) {
+        showProgress(true)
+        mAuthTask = UserLoginTask(userNameText, passwordText, weakReference)
+        mAuthTask!!.execute(null as Void?)
+    }
+
     private fun isPasswordValid(password: String): Boolean {
-        //TODO: Replace this with your own logic
-        return password.length > 4
+        //TODO: maybe we don't need this at all. I have no idea what a valid password is
+        return password.length > 1
     }
 
     /**
@@ -146,25 +168,33 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor>, UserLoginTas
         }
     }
 
-    override fun onCreateLoader(i: Int, bundle: Bundle?): Loader<Cursor> {
-        // TODO make loader that looks at some sort of storage (accountmgr? filesystem? sharedprefs?) and gives us usernames
-        return CursorLoader(this)
-
-    }
-
-    override fun onLoadFinished(cursorLoader: Loader<Cursor>, cursor: Cursor) {
-        val emails = ArrayList<String>()
-        cursor.moveToFirst()
-        while (!cursor.isAfterLast) {
-            cursor.moveToNext()
+    /**********************************************************************************
+     * LOADER CALLBACKS START
+     **********************************************************************************/
+    override fun onLoadFinished(loader: android.support.v4.content.Loader<List<KolAccount>>, data: List<KolAccount>?) {
+        // save the account list for later
+        accountList = data
+        // now go through the list (shouldn't be too big) and make list of usernames
+        // if this ends up causing issues, we can change the loader to return a list of strings
+        val usernameList = mutableListOf<String>()
+        data?.let {
+            for (account in data) {
+                usernameList.add(account.username)
+            }
         }
-
-        addEmailsToAutoComplete(emails)
+        addUsernamesToAutocomplete(usernameList)
     }
 
-    override fun onLoaderReset(cursorLoader: Loader<Cursor>) {
-
+    override fun onLoaderReset(loader: android.support.v4.content.Loader<List<KolAccount>>) {
     }
+
+    override fun onCreateLoader(id: Int, args: Bundle?): android.support.v4.content.Loader<List<KolAccount>> {
+        return AccountLoader(this)
+    }
+
+    /**********************************************************************************
+     * LOADER CALLBACKS END
+     **********************************************************************************/
 
     override fun onLogin(success: Boolean?, userNameText: String, passwordText: String) {
         mAuthTask = null
@@ -191,12 +221,14 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor>, UserLoginTas
         showProgress(false)
     }
 
-    private fun addEmailsToAutoComplete(emailAddressCollection: List<String>) {
+    private fun addUsernamesToAutocomplete(emailAddressCollection: List<String>?) {
         //Create adapter to tell the AutoCompleteTextView what to show in its dropdown list.
         val adapter = ArrayAdapter(this@LoginActivity,
                 android.R.layout.simple_dropdown_item_1line, emailAddressCollection)
 
+        // set the new values
         username.setAdapter(adapter)
+        adapter.setNotifyOnChange(true)
     }
 }
 

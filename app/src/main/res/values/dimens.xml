@@ -3,6 +3,10 @@
     <dimen name="activity_horizontal_margin">5dp</dimen>
     <dimen name="activity_vertical_margin">5dp</dimen>
 
+    <!-- Login screen stuff -->
+    <!-- How many chars do I have to type to autocomplete username. 0 gets incremented to 1 anyway -->
+    <integer name="login_username_field_completion_threshold">1</integer>
+
     <!-- Channel list dimens -->
     <dimen name="channel_list_padding">15dp</dimen>
     <dimen name="channel_name_size">19sp</dimen>
