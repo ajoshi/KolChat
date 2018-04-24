@@ -22,7 +22,8 @@ import kotlinx.android.synthetic.main.activity_login.*
 import java.lang.ref.WeakReference
 
 /**
- * A login screen that offers login via username/password.
+ * A login screen that offers login via username/password. Different activity so it's easier to have a different
+ * actionbar UI for the rest of the app (where we have an account)
  */
 class LoginActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<List<KolAccount>>, UserLoginTask.LoginFieldContainer {
 

@@ -2,6 +2,8 @@ package biz.ajoshi.kolchat;
 
 import java.util.concurrent.Callable;
 
+import com.crashlytics.android.Crashlytics;
+
 import biz.ajoshi.kolchat.persistence.ChatChannel;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -23,6 +25,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         if (ChatSingleton.INSTANCE.isLoggedIn()) {
+            // getnetwork can not return null if logged in
+            Crashlytics.setUserIdentifier(ChatSingleton.INSTANCE.getNetwork().getCurrentUser().getPlayer().getName());
             // we're logged in
             Activity activity = MainActivity.this;
             Intent serviceIntent = new Intent(activity, ChatBackgroundService.class);
@@ -58,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
         if(ChatSingleton.INSTANCE.isLoggedIn()) {
             Intent increasePollTimeout = new Intent(this, ChatBackgroundService.class);
-            // acitvity is gone, increase poll interval to 1 minute
+            // activity is gone, increase poll interval to 1 minute
             increasePollTimeout.putExtra(ChatServiceKt.EXTRA_POLL_INTERVAL_IN_MS, 60000);
             startService(increasePollTimeout);
         }
