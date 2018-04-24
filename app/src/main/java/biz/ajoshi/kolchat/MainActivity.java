@@ -23,6 +23,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Themer themer = new Themer();
+        setTheme(themer.getThemeId());
         setContentView(R.layout.activity_main);
         if (ChatSingleton.INSTANCE.isLoggedIn()) {
             // getnetwork can not return null if logged in
