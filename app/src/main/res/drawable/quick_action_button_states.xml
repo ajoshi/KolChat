@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--I don't really plan to use the disabled state, but this is here in case I do (so it's not totally terrible)-->
+    <item
+        android:state_enabled="false"
+        android:drawable="@android:drawable/btn_default"/>
+    <item
+        android:state_pressed="true"
+        android:state_enabled="true"
+        android:drawable="@drawable/rounded_border_filled" />
+    <item
+        android:state_focused="true"
+        android:state_enabled="true"
+        android:drawable="@drawable/rounded_border" />
+    <item
+        android:state_enabled="true"
+        android:drawable="@drawable/rounded_border" />
+</selector>

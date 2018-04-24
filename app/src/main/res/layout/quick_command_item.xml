@@ -4,7 +4,7 @@
     android:id="@+id/list_item"
     android:layout_height="match_parent"
     android:layout_width="wrap_content"
-    android:background="@drawable/rounded_border"
+    android:background="@drawable/quick_action_button_states"
     android:layout_marginBottom="@dimen/quick_command_margin_vertical"
     android:layout_marginTop="@dimen/quick_command_margin_vertical"
     android:layout_marginStart="@dimen/quick_command_margin_horizontal"
