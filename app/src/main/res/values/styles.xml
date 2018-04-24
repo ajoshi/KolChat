@@ -1,22 +1,31 @@
-<resources>
+<resources xmlns:app="http://schemas.android.com/tools">
 
     <!-- Base application theme. -->
-    <style name="KoLTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="KoLTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimary">@color/kol_blue</item>
         <item name="colorPrimaryDark">@color/kol_theme_dark</item>
         <item name="colorAccent">@color/kol_theme_accent</item>
+        <item name="android:textColorPrimary">@android:color/white</item>
     </style>
 
-    <style name="ChillOut" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="ChillOut" parent="KoLTheme">
         <item name="colorPrimary">@color/chill_green</item>
         <item name="colorPrimaryDark">@color/chill_theme_dark</item>
         <item name="colorAccent">@color/chill_theme_accent</item>
     </style>
 
-    <style name="Fruit" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="Fruit" parent="KoLTheme">
         <item name="colorPrimary">@color/fruit_blue</item>
         <item name="colorPrimaryDark">@color/fruit_theme_dark</item>
         <item name="colorAccent">@color/fruit_theme_accent</item>
+        <item name="android:textColorPrimary">@android:color/black</item>
+    </style>
+
+    <!--Login page should still look like kol and have an actionbar (maybe?)-->
+    <style name="LoginKolTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/kol_blue</item>
+        <item name="colorPrimaryDark">@color/kol_theme_dark</item>
+        <item name="colorAccent">@color/kol_theme_accent</item>
     </style>
 
 </resources>

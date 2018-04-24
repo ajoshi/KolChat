@@ -35,7 +35,8 @@
 
         <activity
             android:label="@string/title_activity_login"
-            android:name=".LoginActivity">
+            android:name=".LoginActivity"
+            android:theme="@style/LoginKolTheme">
         </activity>
 
         <service

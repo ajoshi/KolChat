@@ -15,6 +15,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 
 public class MainActivity extends AppCompatActivity {
     public static final String TAG_CHAT_DETAIL_FRAG = "chat frag";
@@ -23,8 +24,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Change the theme if needed. Must be done before setContentView
         Themer themer = new Themer();
         setTheme(themer.getThemeId());
+
         setContentView(R.layout.activity_main);
         if (ChatSingleton.INSTANCE.isLoggedIn()) {
             // getnetwork can not return null if logged in
@@ -40,6 +44,9 @@ public class MainActivity extends AppCompatActivity {
             startActivity(loginIntent);
             finish();
         }
+
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         Fragment listFrag = getSupportFragmentManager().findFragmentByTag(TAG_CHAT_LIST_FRAG);
         if (listFrag == null) {
