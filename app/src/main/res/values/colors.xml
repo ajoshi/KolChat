@@ -4,8 +4,18 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
 
-    <!--Color used all over KoL. Should be a familiar sight-->
+    <!-- Color used all over KoL. Should be a familiar sight-->
     <color name="kol_blue">#0000FF</color>
     <color name="kol_theme_dark">#0000ca</color>
     <color name="kol_theme_accent">#000000</color>
+
+    <!-- Alternate style 1-->
+    <color name="chill_green">#0F9D58</color>
+    <color name="chill_theme_dark">#006d2d</color>
+    <color name="chill_theme_accent">#0B8043</color>
+
+    <!-- Alternate style 2-->
+    <color name="fruit_blue">#0783FD</color>
+    <color name="fruit_theme_dark">#0057c9</color>
+    <color name="fruit_theme_accent">@android:color/darker_gray</color>
 </resources>

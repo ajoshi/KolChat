@@ -1,17 +1,22 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
-    </style>
-
     <style name="KoLTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="colorPrimary">@color/kol_blue</item>
         <item name="colorPrimaryDark">@color/kol_theme_dark</item>
         <item name="colorAccent">@color/kol_theme_accent</item>
+    </style>
+
+    <style name="ChillOut" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/chill_green</item>
+        <item name="colorPrimaryDark">@color/chill_theme_dark</item>
+        <item name="colorAccent">@color/chill_theme_accent</item>
+    </style>
+
+    <style name="Fruit" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/fruit_blue</item>
+        <item name="colorPrimaryDark">@color/fruit_theme_dark</item>
+        <item name="colorAccent">@color/fruit_theme_accent</item>
     </style>
 
 </resources>
