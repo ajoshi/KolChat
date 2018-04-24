@@ -8,4 +8,10 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="KoLTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/kol_blue</item>
+        <item name="colorPrimaryDark">@color/kol_theme_dark</item>
+        <item name="colorAccent">@color/kol_theme_accent</item>
+    </style>
+
 </resources>

@@ -3,5 +3,9 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+
+    <!--Color used all over KoL. Should be a familiar sight-->
     <color name="kol_blue">#0000FF</color>
+    <color name="kol_theme_dark">#0000ca</color>
+    <color name="kol_theme_accent">#000000</color>
 </resources>
