@@ -9,10 +9,16 @@ import android.os.Handler
 import android.os.Looper
 import android.os.Message
 import android.support.v4.app.NotificationCompat
+import android.support.v4.app.NotificationManagerCompat
 import android.text.Html
 import biz.ajoshi.kolchat.model.ServerChatMessage
 import biz.ajoshi.kolchat.persistence.RoomInserter
 import java.io.IOException
+
+// normally we'll poll every 3 seconds
+const val DEFAULT_POLL_INTERVAL = 3000
+const val FOREGROUND_NOTIFICATION_ID = 666
+const val PM_NOTIFICATION_ID = 667
 
 /**
  * A Handler that lets us read chat and insert to DB
@@ -119,6 +125,8 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
         return msg
     }
 
+
+
     /**
      * Creates a notification when a direct message has been received. Vibrates and shows the passed in text
      */
@@ -127,19 +135,21 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
         val launchMainActivityIntent = Intent(ctx, MainActivity::class.java)
         val mainActivityPintent = PendingIntent.getActivity(ctx, 1, launchMainActivityIntent, PendingIntent.FLAG_UPDATE_CURRENT)
 
-        val notificationBuilder = NotificationCompat.Builder(ctx, NotificationCompat.CATEGORY_PROGRESS)
+        // TODO use messagingstyle notificationcompat to group multiple message notifications. right now just replace to avoid spam
+        // Will have to keep track of which notifications are shown and when notification is tapped/dismissed to correctly
+        // update the notification
+        val notificationBuilder = NotificationCompat.Builder(ctx, MENTION_NOTIFICATION_CHANNEL_ID)
         notificationBuilder
                 .setContentTitle(ctx.getString(R.string.app_name))
                 .setContentText(message)
-                .setSmallIcon(android.R.drawable.ic_btn_speak_now)
+                .setSmallIcon(R.drawable.ic_send)
                 .setGroup("mentions")
                 .setAutoCancel(true)
-                .setChannelId(MENTION_NOTIFICATION_CHANNEL_ID)
                 .setDefaults(Notification.DEFAULT_VIBRATE)
                 .setContentIntent(mainActivityPintent)
 
-        val notificationManager = ctx.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.notify(R.string.notification_non_persistent, notificationBuilder.build())
+        val notificationManager = NotificationManagerCompat.from(ctx)
+            notificationManager.notify(PM_NOTIFICATION_ID, notificationBuilder.build())
     }
 
     /**

@@ -6,8 +6,12 @@
     <string name="notification_description">Pull down for options</string>
     <string name="notification_mention">Submit</string>
 
-    <string name="notification_persistent">KoLChatNotification</string>
-    <string name="notification_non_persistent">KoLChatMessageNotification</string>
+    <!-- Notification channel strings -->
+    <string name="persistent_channel_name">KoL Persistent Notification</string>
+    <string name="pm_channel_name">KoL Private Messages</string>
+    <string name="persistent_channel_desc">Shows when the app is running</string>
+    <string name="pm_channel_desc">This type of notification is shown when a PM or notification worthy event occurs in KoL</string>
+
     <string name="title_activity_login">Sign in</string>
 
     <!-- Strings related to login -->
