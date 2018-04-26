@@ -4,7 +4,6 @@ import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.os.Bundle
-import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
@@ -28,7 +27,7 @@ const val EXTRA_CHANNEL_ID = "biz.ajoshi.kolchat.ExtraChannelId"
 const val EXTRA_CHANNEL_NAME = "biz.ajoshi.kolchat.ExtraChannelName"
 const val EXTRA_CHANNEL_IS_PRIVATE = "biz.ajoshi.kolchat.ExtraChannelPrivate"
 
-class ChatMessageFrag : Fragment(), QuickCommandView.CommandClickListener {
+class ChatMessageFrag : BaseFragment(), QuickCommandView.CommandClickListener {
     var id = "newbie"
     var name = "newbie"
     var isPrivate = false
@@ -119,5 +118,9 @@ class ChatMessageFrag : Fragment(), QuickCommandView.CommandClickListener {
 
     override fun onCommandClicked(command: QuickCommand) {
         inputView?.appendInputText(command.command)
+    }
+
+    override fun getTitle(): String {
+        return name
     }
 }

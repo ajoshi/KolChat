@@ -1,7 +1,6 @@
 package biz.ajoshi.kolchat
 
 import android.os.Bundle
-import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
@@ -17,7 +16,7 @@ import io.reactivex.schedulers.Schedulers
  * Shows a list of all active chats/channels
  * Created by ajoshi on 7/4/2017.
  */
-class ChatChannelListFragment() : Fragment() { // empty constructor
+class ChatChannelListFragment() : BaseFragment() { // empty constructor
 
     var chatChannelAdapter: ChatChannelAdapter? = null
     var channelUpdateSubscriber: Disposable? = null

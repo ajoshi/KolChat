@@ -1,25 +1,22 @@
 package biz.ajoshi.kolchat;
 
-import java.util.concurrent.Callable;
-
 import com.crashlytics.android.Crashlytics;
 
 import biz.ajoshi.kolchat.persistence.ChatChannel;
-import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Consumer;
-import io.reactivex.schedulers.Schedulers;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
 
 public class MainActivity extends AppCompatActivity {
     public static final String TAG_CHAT_DETAIL_FRAG = "chat frag";
     public static final String TAG_CHAT_LIST_FRAG = "list frag";
+    Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
             finish();
         }
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         Fragment listFrag = getSupportFragmentManager().findFragmentByTag(TAG_CHAT_LIST_FRAG);
@@ -56,6 +53,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Called when a channel name is tapped
+     * TODO extract to an interface
+     *
+     * @param channel
+     */
     public void onChannelNameClicked(ChatChannel channel) {
         Fragment chatDetailFrag = new ChatMessageFrag();
         Bundle b = new Bundle();
@@ -63,13 +66,40 @@ public class MainActivity extends AppCompatActivity {
         b.putString(ChatMessageFragKt.EXTRA_CHANNEL_NAME, channel.getName());
         b.putBoolean(ChatMessageFragKt.EXTRA_CHANNEL_IS_PRIVATE, channel.isPrivate());
         chatDetailFrag.setArguments(b);
-        getSupportFragmentManager().beginTransaction().replace(R.id.llist, chatDetailFrag, TAG_CHAT_DETAIL_FRAG).addToBackStack(TAG_CHAT_DETAIL_FRAG).commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.llist, chatDetailFrag, TAG_CHAT_DETAIL_FRAG)
+                                   .addToBackStack(TAG_CHAT_DETAIL_FRAG).commit();
+        if (toolbar != null) {
+            // should crash on line 66 if this happens, honestly
+            toolbar.setTitle(getPlaintextForHtml(channel.getName()));
+        }
+    }
+
+    /**
+     * Returns plaintext representation of html. So "<b>Hi</b>" would return "Hi"
+     *
+     * @param html
+     *         string containing html
+     *
+     * @return string without html
+     */
+    @NonNull
+    private String getPlaintextForHtml(String html) {
+        return Html.fromHtml(html).toString();
+    }
+
+    public void onBackPressed() {
+        super.onBackPressed();
+        BaseFragment fragment = (BaseFragment) getSupportFragmentManager().findFragmentById(R.id.llist);
+        if (toolbar != null) {
+            toolbar.setTitle(getPlaintextForHtml(fragment.getTitle()));
+        }
+
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if(ChatSingleton.INSTANCE.isLoggedIn()) {
+        if (ChatSingleton.INSTANCE.isLoggedIn()) {
             Intent increasePollTimeout = new Intent(this, ChatBackgroundService.class);
             // activity is gone, increase poll interval to 1 minute
             increasePollTimeout.putExtra(ChatServiceKt.EXTRA_POLL_INTERVAL_IN_MS, 60000);
