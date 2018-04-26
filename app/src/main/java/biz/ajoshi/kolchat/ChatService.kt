@@ -51,7 +51,7 @@ class ChatBackgroundService() : Service(), ChatServiceHandler.ChatService {
             // notification that only shows up when a PM is sent
             val mentionChannel = NotificationChannel(MENTION_NOTIFICATION_CHANNEL_ID, "KoL Mention", NotificationManager.IMPORTANCE_HIGH)
             mentionChannel.description = "Notifications from KoL private messages go here"
-            notificationMgr.createNotificationChannel(persistentChannel)
+            notificationMgr.createNotificationChannel(mentionChannel)
         }
 
         val thread = HandlerThread("ServiceStartArguments", Process.THREAD_PRIORITY_BACKGROUND)
