@@ -7,7 +7,7 @@
     <!-- Color used all over KoL. Should be a familiar sight-->
     <color name="kol_blue">#0000FF</color>
     <color name="kol_theme_dark">#0000ca</color>
-    <color name="kol_theme_accent">#000000</color>
+    <color name="kol_theme_accent">#3333FF</color>
 
     <!-- Alternate style 1-->
     <color name="chill_green">#0F9D58</color>
