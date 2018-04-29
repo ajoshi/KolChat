@@ -3,15 +3,20 @@ package biz.ajoshi.kolchat;
 import com.crashlytics.android.Crashlytics;
 
 import biz.ajoshi.kolchat.persistence.ChatChannel;
+import biz.ajoshi.kolchat.util.StringUtil;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Build;
+import android.os.Build.VERSION;
+import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
+import android.text.Spanned;
 
 public class MainActivity extends AppCompatActivity {
     public static final String TAG_CHAT_DETAIL_FRAG = "chat frag";
@@ -84,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
      */
     @NonNull
     private String getPlaintextForHtml(String html) {
-        return Html.fromHtml(html).toString();
+        return StringUtil.getHtml(html).toString();
     }
 
     public void onBackPressed() {

@@ -1,5 +1,10 @@
 package biz.ajoshi.kolchat.util;
 
+import android.os.Build.VERSION;
+import android.os.Build.VERSION_CODES;
+import android.text.Html;
+import android.text.Spanned;
+
 /**
  * Created by ajoshi on 5/22/2017.
  */
@@ -19,4 +24,14 @@ public class StringUtil {
         return body.substring(firstEndIndex, secondStartIndex);
     }
 
+    public static Spanned getHtml(String html) {
+        Spanned returnValue;
+        if (VERSION.SDK_INT < VERSION_CODES.N) {
+            returnValue = Html.fromHtml(html);
+        } else {
+            returnValue = Html.fromHtml(html, Html.FROM_HTML_OPTION_USE_CSS_COLORS);
+        }
+
+        return  returnValue;
+    }
 }

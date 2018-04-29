@@ -8,6 +8,7 @@ import android.text.style.ImageSpan
 import android.view.View
 import biz.ajoshi.kolchat.R
 import biz.ajoshi.kolchat.persistence.ChatMessage
+import biz.ajoshi.kolchat.util.StringUtil
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.drawee.generic.GenericDraweeHierarchyBuilder
 import com.facebook.drawee.span.DraweeSpan
@@ -30,10 +31,10 @@ class ChatMessageVH(itemView: View) : RecyclerView.ViewHolder(itemView) {
         if (message.shouldHideUsername()) {
             itemView.user_name.visibility = View.GONE
         } else {
-            itemView.user_name.text = Html.fromHtml(message.userName)
+            itemView.user_name.text = StringUtil.getHtml(message.userName)
             itemView.user_name.visibility = View.VISIBLE
         }
-        val oldSpannable = Html.fromHtml(message.text)
+        val oldSpannable = StringUtil.getHtml(message.text)
         val newSpannable = DraweeSpanStringBuilder(oldSpannable)
         val imageSpans = newSpannable.getSpans(0, oldSpannable.length, ImageSpan::class.java)
         val embeddedImageSize = itemView.context.resources.getDimensionPixelSize(R.dimen.chat_message_embedded_image_size)
