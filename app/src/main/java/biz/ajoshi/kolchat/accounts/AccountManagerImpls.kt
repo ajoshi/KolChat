@@ -14,8 +14,6 @@ import android.os.IBinder
  * We use it for password storage, but this means we have to implement all the reqd interfaces.
  * Perhaps it would be easier to just encrypt and store auth creds in a file/sharedprefs?
  */
-val ACCOUNT_KEY_USERNAME = "username"
-val ACCOUNT_KEY_PASSWORD = "password"
 class FakeAcctAuthenticator(context: Context?) : AbstractAccountAuthenticator(context) {
     override fun confirmCredentials(response: AccountAuthenticatorResponse?, account: Account?, options: Bundle?): Bundle {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.

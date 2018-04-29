@@ -16,7 +16,7 @@ import io.reactivex.schedulers.Schedulers
  * Shows a list of all active chats/channels
  * Created by ajoshi on 7/4/2017.
  */
-class ChatChannelListFragment() : BaseFragment() { // empty constructor
+class ChatChannelListFragment : BaseFragment() { // empty constructor
 
     var chatChannelAdapter: ChatChannelAdapter? = null
     var channelUpdateSubscriber: Disposable? = null
@@ -26,7 +26,7 @@ class ChatChannelListFragment() : BaseFragment() { // empty constructor
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
-        val channelList = activity?.findViewById<RecyclerView>(R.id.channel_list) as RecyclerView
+        val channelList = activity?.findViewById(R.id.channel_list) as RecyclerView
         val layoutMgr = LinearLayoutManager(activity)
         chatChannelAdapter = ChatChannelAdapter()
         channelList.adapter = chatChannelAdapter
@@ -41,7 +41,7 @@ class ChatChannelListFragment() : BaseFragment() { // empty constructor
         })
         channelUpdateSubscriber = KolChatApp.database
                 ?.ChannelDao()
-                ?.getAllChannels()
+                ?.allChannels
                 ?.subscribeOn(Schedulers.io())
                 ?.observeOn(AndroidSchedulers.mainThread())
                 ?.subscribe { channels ->

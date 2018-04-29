@@ -1,4 +1,4 @@
-<resources xmlns:app="http://schemas.android.com/tools">
+<resources>
 
     <!-- Base application theme. -->
     <style name="KoLTheme" parent="Theme.AppCompat.Light.NoActionBar">

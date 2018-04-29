@@ -28,7 +28,7 @@ public class ChatInputView extends RelativeLayout {
     /**
      * Listener called when the user taps on the submit/send button
      */
-    public interface SubmitListener {
+    protected interface SubmitListener {
         /**
          * The user wants to submit this text so make a network call to do so
          *
@@ -38,9 +38,9 @@ public class ChatInputView extends RelativeLayout {
         void onSubmit(CharSequence text);
     }
 
-    protected EditText inputField;
-    protected ImageButton submitButton;
-    protected SubmitListener listener;
+    private EditText inputField;
+    private ImageButton submitButton;
+    private SubmitListener listener;
 
     public ChatInputView(Context context) {
         super(context);
@@ -123,7 +123,7 @@ public class ChatInputView extends RelativeLayout {
     /**
      * Sets a new listener to be invoked when the submit button is tapped
      *
-     * @param newListener
+     * @param newListener the listener to be called when submit button is tapped. Replaces the old listener
      */
     public void setSubmitListener(SubmitListener newListener) {
         listener = newListener;

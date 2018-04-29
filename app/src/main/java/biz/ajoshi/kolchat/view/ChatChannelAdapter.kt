@@ -9,7 +9,7 @@ import biz.ajoshi.kolchat.persistence.ChatChannel
 /**
  * Created by a.joshi on 10/7/17.
  */
-class ChatChannelAdapter() : RecyclerView.Adapter<ChatChannelVH>() {
+class ChatChannelAdapter : RecyclerView.Adapter<ChatChannelVH>() {
 
     /**
      * Called when a Channel name has been tapped on by the user
@@ -24,7 +24,7 @@ class ChatChannelAdapter() : RecyclerView.Adapter<ChatChannelVH>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatChannelVH {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.channel_list_item, parent, false)
         return ChatChannelVH(view, object : ChatChannelVH.ChannelRowClickListener {
-            override fun OnChannelRowClicked(channel: ChatChannel) {
+            override fun onChannelRowClicked(channel: ChatChannel) {
                 clickListener?.onChannelClicked(channel)
             }
         })
@@ -33,7 +33,7 @@ class ChatChannelAdapter() : RecyclerView.Adapter<ChatChannelVH>() {
 
     override fun onBindViewHolder(holder: ChatChannelVH, position: Int) {
         if (channels.size > position) {
-            holder.bind(channels.get(position))
+            holder.bind(channels[position])
         }
     }
 

@@ -51,7 +51,7 @@ class ChatMessageFrag : BaseFragment(), QuickCommandView.CommandClickListener {
 
         val layoutMgr = LinearLayoutManager(activity)
         chatAdapter = ChatAdapter(layoutMgr)
-        recyclerView = activity?.findViewById<RecyclerView>(R.id.messagesList) as RecyclerView
+        recyclerView = activity?.findViewById(R.id.messagesList) as RecyclerView
         recyclerView?.adapter = chatAdapter
         recyclerView?.layoutManager = layoutMgr
 
@@ -80,10 +80,10 @@ class ChatMessageFrag : BaseFragment(), QuickCommandView.CommandClickListener {
                 }
 
 
-        inputView = activity?.findViewById<ChatInputView>(R.id.input_view) as ChatInputView
+        inputView = activity?.findViewById(R.id.input_view) as ChatInputView
         inputView?.setSubmitListener { input: CharSequence? -> makePost(input) }
 
-        val quickCommands = activity?.findViewById<QuickCommandView>(R.id.quick_commands) as QuickCommandView
+        val quickCommands = activity?.findViewById(R.id.quick_commands) as QuickCommandView
         quickCommands.setClickListener(this)
         super.onActivityCreated(savedInstanceState)
     }

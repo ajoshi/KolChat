@@ -14,7 +14,7 @@ import android.arch.persistence.room.Update;
 @Dao
 public interface ChannelDao {
     // Name of the chat channel. not sure if I can use it in the @query one line below it
-    public static final String CHANNEL_DB_NAME = "ChatChannel";
+    String CHANNEL_DB_NAME = "ChatChannel";
     @Query("SELECT * FROM chatchannel ORDER BY name ASC")
     Flowable<List<ChatChannel>> getAllChannels();
 

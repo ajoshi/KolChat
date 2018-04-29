@@ -15,10 +15,10 @@ class Themer {
         var currentTheme = Theme.KOL
     }
     fun getThemeId(): Int {
-        when(currentTheme) {
-            Theme.CHILL -> return R.style.ChillOut
-            Theme.FRUITS -> return R.style.Fruit
-            Theme.KOL -> return R.style.KoLTheme
+        return when(currentTheme) {
+            Theme.CHILL -> R.style.ChillOut
+            Theme.FRUITS -> R.style.Fruit
+            Theme.KOL -> R.style.KoLTheme
         }
     }
 

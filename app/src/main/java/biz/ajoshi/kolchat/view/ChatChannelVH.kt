@@ -14,7 +14,7 @@ import java.util.*
 class ChatChannelVH(itemView: View, val listener: ChannelRowClickListener?) : RecyclerView.ViewHolder(itemView) {
 
     interface ChannelRowClickListener {
-        fun OnChannelRowClicked(channel: ChatChannel)
+        fun onChannelRowClicked(channel: ChatChannel)
     }
 
     var channelForThisRow: ChatChannel? = null
@@ -22,12 +22,12 @@ class ChatChannelVH(itemView: View, val listener: ChannelRowClickListener?) : Re
     // TODO this might be doing a findviewbyid each time and not caching. confirm.
     fun bind(channel: ChatChannel) {
         val spannable = Html.fromHtml(channel.name)
-        itemView.name.setText(spannable)
+        itemView.name.text = spannable
         itemView.last_message_time.text = timeFormat.format(Date(channel.lastMessageTime))
         // todo use userid for right click options at some point
         channelForThisRow = channel
 
         // TODO we should set the click listener once, and not each time
-        itemView.setOnClickListener{ view: View -> listener?.OnChannelRowClicked(channelForThisRow!!)}
+        itemView.setOnClickListener{ view: View -> listener?.onChannelRowClicked(channelForThisRow!!)}
     }
 }

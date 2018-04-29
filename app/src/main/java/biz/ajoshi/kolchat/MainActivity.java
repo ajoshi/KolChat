@@ -7,20 +7,19 @@ import biz.ajoshi.kolchat.util.StringUtil;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.os.Build;
-import android.os.Build.VERSION;
-import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.Html;
-import android.text.Spanned;
 
 public class MainActivity extends AppCompatActivity {
     public static final String TAG_CHAT_DETAIL_FRAG = "chat frag";
     public static final String TAG_CHAT_LIST_FRAG = "list frag";
+
+    // if this id is sent in, launch this chat as soon as possible- the user tapped on a notification for this chat
+    public static final String EXTRA_LAUNCH_TO_CHAT_ID = "biz.ajoshi.kolchat.MainActivity.EXTRA_LAUNCH_TO_CHAT_ID";
+
     Toolbar toolbar;
 
     @Override
@@ -33,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
         if (ChatSingleton.INSTANCE.isLoggedIn()) {
-            // getnetwork can not return null if logged in
+            // getnetwork can not return null if logged in so ignore bad static analysis
             Crashlytics.setUserIdentifier(ChatSingleton.INSTANCE.getNetwork().getCurrentUser().getPlayer().getName());
             // we're logged in
             Activity activity = MainActivity.this;
@@ -62,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
      * Called when a channel name is tapped
      * TODO extract to an interface
      *
-     * @param channel
+     * @param channel ChatChannel object describing the channel that was opened
      */
     public void onChannelNameClicked(ChatChannel channel) {
         Fragment chatDetailFrag = new ChatMessageFrag();

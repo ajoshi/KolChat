@@ -2,7 +2,6 @@ package biz.ajoshi.kolchat.view
 
 import android.net.Uri
 import android.support.v7.widget.RecyclerView
-import android.text.Html
 import android.text.method.LinkMovementMethod
 import android.text.style.ImageSpan
 import android.view.View
@@ -15,13 +14,14 @@ import com.facebook.drawee.span.DraweeSpan
 import com.facebook.drawee.span.DraweeSpanStringBuilder
 import com.facebook.imagepipeline.request.ImageRequestBuilder
 import kotlinx.android.synthetic.main.chat_message.view.*
+import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
 /**
  * Created by ajoshi on 7/22/17.
  */
-val timeFormat = SimpleDateFormat.getTimeInstance()
+val timeFormat: DateFormat = SimpleDateFormat.getTimeInstance()
 
 class ChatMessageVH(itemView: View) : RecyclerView.ViewHolder(itemView) {
     // TODO this might be doing a findviewbyid each time and not caching. confirm.
@@ -55,7 +55,7 @@ class ChatMessageVH(itemView: View) : RecyclerView.ViewHolder(itemView) {
         htmlText= This is the only link I need! <a target=_blank href="https://www.kingdomofloathing.com/"><font color=blue>[link]</font></a> https:// www.kingdomofloathin g.com/,
         only the 'link' part is clickable with this. Alt solution is to string replace and then enable autolink
         */
-        itemView.text.movementMethod = LinkMovementMethod.getInstance();
+        itemView.text.movementMethod = LinkMovementMethod.getInstance()
         // todo use userid for right click options at some point
     }
 }

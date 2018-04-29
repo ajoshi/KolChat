@@ -1,7 +1,6 @@
 package biz.ajoshi.kolchat
 
 import android.app.Notification
-import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -10,9 +9,10 @@ import android.os.Looper
 import android.os.Message
 import android.support.v4.app.NotificationCompat
 import android.support.v4.app.NotificationManagerCompat
-import android.text.Html
+import biz.ajoshi.kolchat.MainActivity.EXTRA_LAUNCH_TO_CHAT_ID
 import biz.ajoshi.kolchat.model.ServerChatMessage
 import biz.ajoshi.kolchat.persistence.RoomInserter
+import biz.ajoshi.kolchat.util.StringUtil
 import java.io.IOException
 
 // normally we'll poll every 3 seconds
@@ -31,7 +31,7 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
     }
 
     val roomInserter = RoomInserter()
-    var pollInterval: Long = DEFAULT_POLL_INTERVAL.toLong();
+    var pollInterval: Long = DEFAULT_POLL_INTERVAL.toLong()
     var lastFetchedTime: Long = 0
 
     override fun handleMessage(msg: Message?) {
@@ -45,7 +45,7 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
                 service.stopChatService(msg?.arg1 ?: -1)
                 return
             }
-            if (msg != null && msg.obj != null) {
+            if (msg?.obj != null) {
                 // if we had a message to send then send it
                 val serviceMessage = (msg.obj as ChatServiceMessage)
                 when (serviceMessage.type) {
@@ -57,7 +57,7 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
 
                     MessageType.STOP -> {
                         // we got told to quit
-                        service.stopChatService(msg.arg1 ?: -1)
+                        service.stopChatService(msg.arg1)
                         return
                     }
 
@@ -125,14 +125,13 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
         return msg
     }
 
-
-
     /**
      * Creates a notification when a direct message has been received. Vibrates and shows the passed in text
      */
-    fun makeMentionNotification(ctx: Context, message: CharSequence) {
+    fun makeMentionNotification(ctx: Context, message: CharSequence, chatId: String) {
         // intent meant for main activity. will launch the app
         val launchMainActivityIntent = Intent(ctx, MainActivity::class.java)
+        launchMainActivityIntent.putExtra(EXTRA_LAUNCH_TO_CHAT_ID, chatId)
         val mainActivityPintent = PendingIntent.getActivity(ctx, 1, launchMainActivityIntent, PendingIntent.FLAG_UPDATE_CURRENT)
 
         // TODO use messagingstyle notificationcompat to group multiple message notifications. right now just replace to avoid spam
@@ -159,8 +158,8 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
         messages?.let {
             for (message in messages) {
                 // it's a PM and not a system message
-                if (message.channelNameServer.isPrivate && !message.author.id.equals("-1")) {
-                    makeMentionNotification(service.getContext(), Html.fromHtml(message.channelNameServer.name + ": " + message.htmlText))
+                if (message.channelNameServer.isPrivate && message.author.id != "-1") {
+                    makeMentionNotification(service.getContext(), StringUtil.getHtml(message.channelNameServer.name + ": " + message.htmlText), message.author.id)
                 }
             }
         }

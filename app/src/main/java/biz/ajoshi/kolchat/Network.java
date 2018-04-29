@@ -1,11 +1,7 @@
 package biz.ajoshi.kolchat;
 
-import android.text.TextUtils;
-
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
@@ -17,6 +13,9 @@ import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
+
+import android.text.TextUtils;
 
 import static biz.ajoshi.kolchat.util.StringUtil.getBetweenTwoStrings;
 
@@ -34,9 +33,9 @@ public class Network {
     private String phpSessId;
     private String awsCookie;
     private boolean loggedIn = false;
-    OkHttpClient client;
-    String chatpwd;
+    private String chatpwd;
     private LoggedInUser currentUser;
+    OkHttpClient client;
 
     public static final String ERROR = "error";
     public static final String BASE_URL = "https://www.kingdomofloathing.com";
@@ -46,27 +45,32 @@ public class Network {
 
     /**
      * Creates a Network object for the given user
+     *
      * @param username
      * @param password
      */
-    public Network(String username, String password) throws NoSuchAlgorithmException, UnsupportedEncodingException {
+    public Network(String username, String password) {
         this.username = username;
         this.password = password;
     }
 
     /**
      * Creates a Network object for the given user
+     *
      * @param username
      * @param password
      */
-    public Network(String username, String password, boolean isQuiet) throws NoSuchAlgorithmException, UnsupportedEncodingException {
-        this(isQuiet ?  String.format(IS_QUIET_MODIFIER, username): username, password);
+    public Network(String username, String password, boolean isQuiet) {
+        this(isQuiet ? String.format(IS_QUIET_MODIFIER, username) : username, password);
     }
 
     /**
      * Logs in
+     *
      * @return true if login succeeded, else false
-     * @throws IOException if an exception occured
+     *
+     * @throws IOException
+     *         if an exception occured
      */
     public boolean login() throws IOException {
         client = new OkHttpClient()
@@ -77,7 +81,7 @@ public class Network {
                 .build();
 
         Request request = new Request.Builder()
-                .url(BASE_URL+LOGIN_POSTFIX)
+                .url(BASE_URL + LOGIN_POSTFIX)
                 .build();
 
         // Apparently there is a challenge id to be extracted. I've never seen it
@@ -102,15 +106,20 @@ public class Network {
             return false;
         }
 
-        HttpUrl loginUrl = HttpUrl.parse(BASE_URL + redirectLocation).newBuilder()
-                .addQueryParameter("loggingin", "Yup.")
-                .addQueryParameter("promo", "")
-                .addQueryParameter("mrstore", "")
-                .addQueryParameter("secure", "1")
-                .addQueryParameter("loginname", username)
-                .addQueryParameter("password", password)
-                .addQueryParameter("submitbutton", "Log+In")
-                .build();
+        HttpUrl loginUrl = HttpUrl.parse(BASE_URL + redirectLocation);
+
+        if (loginUrl == null) {
+            return false;
+        }
+        loginUrl = loginUrl.newBuilder()
+                           .addQueryParameter("loggingin", "Yup.")
+                           .addQueryParameter("promo", "")
+                           .addQueryParameter("mrstore", "")
+                           .addQueryParameter("secure", "1")
+                           .addQueryParameter("loginname", username)
+                           .addQueryParameter("password", password)
+                           .addQueryParameter("submitbutton", "Log+In")
+                           .build();
 
         Request loginrequest = new Request.Builder()
                 .url(loginUrl)
@@ -118,28 +127,32 @@ public class Network {
 
         Response loginResponse = client.newCall(loginrequest).execute();
 
-        List<String> cookies = loginResponse.networkResponse().headers("set-cookie");
-        int cookieCount = cookies.size();
-        for (int i = 0; i < cookieCount; i++) {
-            String cookie = cookies.get(i);
-            if (!TextUtils.isEmpty(cookie)) {
-                if (cookie.startsWith("PHPSESSID")) {
-                    // we have the sessid!
-                    phpSessId = getBetweenTwoStrings(cookie, "=", ";");
-                }
-                if (cookie.startsWith("AWSALB")) {
-                    awsCookie = getBetweenTwoStrings(cookie, "=", ";");
+        if (loginResponse.networkResponse() == null) {
+            return false;
+        } else {
+            List<String> cookies = loginResponse.networkResponse().headers("set-cookie");
+            int cookieCount = cookies.size();
+            for (int i = 0; i < cookieCount; i++) {
+                String cookie = cookies.get(i);
+                if (!TextUtils.isEmpty(cookie)) {
+                    if (cookie.startsWith("PHPSESSID")) {
+                        // we have the sessid!
+                        phpSessId = getBetweenTwoStrings(cookie, "=", ";");
+                    }
+                    if (cookie.startsWith("AWSALB")) {
+                        awsCookie = getBetweenTwoStrings(cookie, "=", ";");
+                    }
                 }
             }
-        }
-        if (awsCookie != null && phpSessId != null) {
-            fetchPlayerData();
-            if (pwdHash != null && playerid != null) {
-                // I guess we must have logged in!
-                loggedIn = true;
+            if (awsCookie != null && phpSessId != null) {
+                String playerData = fetchPlayerData();
+                if (playerData != null && pwdHash != null && playerid != null) {
+                    // I guess we must have logged in!
+                    loggedIn = true;
+                }
             }
+            return loggedIn;
         }
-        return loggedIn;
     }
 
     public void logout() {
@@ -153,22 +166,28 @@ public class Network {
 
     /**
      * Fetches the passwordhash and the playerid for the current user. Maybe current channel as well?
+     *
      * @return
+     *
      * @throws IOException
      */
     public String fetchPlayerData() throws IOException {
         Request readchatRequest = new Request.Builder()
                 .url(BASE_URL + "/mchat.php?for=ajoshiChatApp")
-                .header("cookie", String.format( "PHPSESSID=%s; AWSALB=%s", phpSessId, awsCookie))
+                .header("cookie", String.format("PHPSESSID=%s; AWSALB=%s", phpSessId, awsCookie))
                 .header("referer", "https://www.kingdomofloathing.com/lchat.php")
                 .build();
         Response chatResponse = client.newCall(readchatRequest).execute();
-        String postResponse = chatResponse.body().string();
-        playerid = getBetweenTwoStrings(postResponse, "playerid = ", ",");
-        pwdHash = getBetweenTwoStrings(postResponse, "pwdhash = \"", "\"");
-        String mainChannel = getBetweenTwoStrings(postResponse, "active: \"", "\"");
-        chatpwd = getBetweenTwoStrings(postResponse, "setCookie('chatpwd', winW, ", ",");
-        currentUser = new LoggedInUser(new User(playerid, username), pwdHash, mainChannel);
+        ResponseBody body = chatResponse.body();
+        if (body == null) {
+            return null;
+        } else {
+            String postResponse = body.string();
+            playerid = getBetweenTwoStrings(postResponse, "playerid = ", ",");
+            pwdHash = getBetweenTwoStrings(postResponse, "pwdhash = \"", "\"");
+            String mainChannel = getBetweenTwoStrings(postResponse, "active: \"", "\"");
+            chatpwd = getBetweenTwoStrings(postResponse, "setCookie('chatpwd', winW, ", ",");
+            currentUser = new LoggedInUser(new User(playerid, username), pwdHash, mainChannel);
        /* $cw,
                 $inp,
                 $tabs,
@@ -210,7 +229,8 @@ public class Network {
         playerid = 2239681,
                 pwdhash = "8060f6a";
                 */
-        return postResponse;
+            return postResponse;
+        }
     }
 
     public LoggedInUser getCurrentUser() {
@@ -219,51 +239,71 @@ public class Network {
 
     /**
      * URL encodes and posts a message to chat
-     * @param message Message to be posted
+     *
+     * @param message
+     *         Message to be posted
+     *
      * @return server response in string form
+     *
      * @throws IOException
      */
     public String postChat(String message) throws IOException {
         Request readchatRequest = new Request.Builder().get()
-                .url(String.format(BASE_URL + "/submitnewchat.php?for=ajoshiChatApp&playerid=%s&pwd=%s&graf=%s&j=1&format=php",
-                        playerid, pwdHash, URLEncoder.encode(message,"UTF-8")))
-                .addHeader("cookie", String.format( "PHPSESSID=%s; AWSALB=%s; chatpwd=%s", phpSessId, awsCookie, chatpwd))
-                .addHeader("referer", "https://www.kingdomofloathing.com/mchat.php")
-                .addHeader("Connection","close")
-                .addHeader("X-Requested-With","XMLHttpRequest")
-                .build();
+                                                       .url(String.format(BASE_URL +
+                                                                          "/submitnewchat.php?for=ajoshiChatApp&playerid=%s&pwd=%s&graf=%s&j=1&format=php",
+                                                                          playerid,
+                                                                          pwdHash,
+                                                                          URLEncoder.encode(message, "UTF-8")))
+                                                       .addHeader("cookie",
+                                                                  String.format("PHPSESSID=%s; AWSALB=%s; chatpwd=%s",
+                                                                                phpSessId,
+                                                                                awsCookie,
+                                                                                chatpwd))
+                                                       .addHeader("referer",
+                                                                  "https://www.kingdomofloathing.com/mchat.php")
+                                                       .addHeader("Connection", "close")
+                                                       .addHeader("X-Requested-With", "XMLHttpRequest")
+                                                       .build();
         Call call = client.newCall(readchatRequest);
         Response chatResponse = call.execute();
         String redirectLocation = chatResponse.header("location");
-        if (redirectLocation != null && (redirectLocation.contains(MAINT_POSTFIX) || (redirectLocation.contains("login.php")))) {
+        if (redirectLocation != null &&
+            (redirectLocation.contains(MAINT_POSTFIX) || (redirectLocation.contains("login.php")))) {
             // RO time or we got logged out
             return null;
         }
-        String response = chatResponse.body().source().readUtf8();
+        String response = null;
+        ResponseBody body = chatResponse.body();
+        if (body != null) {
+            response = body.source().readUtf8();
+        }
         chatResponse.close();
         return response;
     }
 
     /**
      * Requests new chat events since the last time. We can't use retrofit at all for chat.
+     *
      * @param timeStamp
+     *
      * @return String response
+     *
      * @throws IOException
      */
     public String readChat(long timeStamp) throws IOException {
         // chat response is always html
         // chat command response (which is returned from the GET) is json containing html
         Request readchatRequest = new Request.Builder()
-                 .url(String.format(Locale.US,
-   // <a target=mainpane href="showplayer.php?who=2129446">
-                         // <font color=blue><b>ajoshi (private):</b></font></a>
-                         // <font color="blue">yolo</font><br><!--lastseen:1442257857-->
-                                    "https://www.kingdomofloathing.com/newchatmessages.php?lasttime=%d&j=1&aa=0.5901808745871704&format=json",
-                                    timeStamp))
-                 .header("cookie", String.format( "PHPSESSID=%s; AWSALB=%s", phpSessId, awsCookie))
+                .url(String.format(Locale.US,
+                                   // <a target=mainpane href="showplayer.php?who=2129446">
+                                   // <font color=blue><b>ajoshi (private):</b></font></a>
+                                   // <font color="blue">yolo</font><br><!--lastseen:1442257857-->
+                                   "https://www.kingdomofloathing.com/newchatmessages.php?lasttime=%d&j=1&aa=0.5901808745871704&format=json",
+                                   timeStamp))
+                .header("cookie", String.format("PHPSESSID=%s; AWSALB=%s", phpSessId, awsCookie))
                 .header("referer", "https://www.kingdomofloathing.com/mchat.php")
                 .build();
-                Response chatResponse = client.newCall(readchatRequest).execute();
+        Response chatResponse = client.newCall(readchatRequest).execute();
                     /*
                     Request{method=GET, url=https://www.kingdomofloathing.com/newchatmessages.php?afk=0&lasttime=1448571291&playerid=2239681&pwd=a2f587e8468f7b81657ecaadcbf1cdd3, tag=null}
 :/newchatmessages.php?aa=0.3231651053251192&j=1&lasttime=1448571209
@@ -284,7 +324,11 @@ public class Network {
             // RO time
             return null;
         }
-        return chatResponse.body().string();
+        ResponseBody body = chatResponse.body();
+        if (body != null) {
+            return body.string();
+        }
+        return null;
     }
 
     public boolean isLoggedIn() {

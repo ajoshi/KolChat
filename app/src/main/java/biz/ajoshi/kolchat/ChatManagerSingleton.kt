@@ -30,7 +30,7 @@ object ChatSingleton {
     }
 
     fun isLoggedIn(): Boolean {
-        return network?.isLoggedIn() == true
+        return network?.isLoggedIn == true
     }
 
     @Throws(IOException::class)

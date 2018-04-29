@@ -4,7 +4,6 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.ListAdapter
 import biz.ajoshi.kolchat.R
 import biz.ajoshi.kolchat.persistence.ChatMessage
 
@@ -22,7 +21,7 @@ class ChatAdapter(val layoutMgr: LinearLayoutManager) : RecyclerView.Adapter<Cha
 
     override fun onBindViewHolder(holder: ChatMessageVH, position: Int) {
         if (messages.size > position) {
-            holder.bind(messages.get(position))
+            holder.bind(messages[position])
         }
     }
 
@@ -34,7 +33,7 @@ class ChatAdapter(val layoutMgr: LinearLayoutManager) : RecyclerView.Adapter<Cha
      * Sets the backing list to whatever is sent in. Replaces old data.
      * No-op if empty list is sent in
      */
-    fun setList(newList : List<ChatMessage>?) {
+    fun setList(newList: List<ChatMessage>?) {
         newList?.let {
             messages = newList.toMutableList()
             notifyDataSetChanged()
@@ -53,7 +52,7 @@ class ChatAdapter(val layoutMgr: LinearLayoutManager) : RecyclerView.Adapter<Cha
      */
     fun scrollToBottom(ifCloserThan: Int) {
         val currentIndex = layoutMgr.findLastCompletelyVisibleItemPosition()
-        if (currentIndex + ifCloserThan >  messages.size) {
+        if (currentIndex + ifCloserThan > messages.size) {
             layoutMgr.scrollToPosition(messages.size - 1)
         }
     }
@@ -63,7 +62,7 @@ class ChatAdapter(val layoutMgr: LinearLayoutManager) : RecyclerView.Adapter<Cha
      * disruptive to the user
      */
     fun scrollToBottomAlways() {
-            layoutMgr.scrollToPosition(messages.size - 1)
+        layoutMgr.scrollToPosition(messages.size - 1)
     }
 
     /**
@@ -83,7 +82,7 @@ class ChatAdapter(val layoutMgr: LinearLayoutManager) : RecyclerView.Adapter<Cha
      */
     fun addToBottom(newMessges: List<ChatMessage>) {
         var insertedCount = 0
-        for(message in newMessges) {
+        for (message in newMessges) {
             if (!idList.contains(message.id)) {
                 messages.add(message)
                 idList.add(message.id)

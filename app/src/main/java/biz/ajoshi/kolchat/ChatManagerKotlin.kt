@@ -82,7 +82,7 @@ class ChatManagerKotlin(val network: Network, internal val sharedPrefs: SharedPr
      * Fetches unread chat commands from the server
      */
     @Throws(IOException::class)
-    fun readChat():List<ServerChatMessage> {
+    fun readChat(): List<ServerChatMessage> {
         return readChat(lastSeen)
     }
 
@@ -90,7 +90,7 @@ class ChatManagerKotlin(val network: Network, internal val sharedPrefs: SharedPr
      * Fetches unread chat commands from the server since the given timestamp
      */
     @Throws(IOException::class)
-    fun readChat(lastSeenTime: Long):List<ServerChatMessage> {
+    fun readChat(lastSeenTime: Long): List<ServerChatMessage> {
         // The responsebody we get from the server
         val chatResponse = network.readChat(lastSeenTime)
         // this will be the list of chats we return. We'll add chats to this list
@@ -114,7 +114,7 @@ class ChatManagerKotlin(val network: Network, internal val sharedPrefs: SharedPr
     fun parseJsonChat(response: JSONObject): List<ServerChatMessage> {
         val currentTime = System.currentTimeMillis()
 
- //       does this mean logout?
+        //       does this mean logout?
         /*
         {"msgs":[],"last":"1450743652","delay":3000,"out":1}
          */
@@ -158,10 +158,10 @@ class ChatManagerKotlin(val network: Network, internal val sharedPrefs: SharedPr
         val msgs = response.getJSONArray("msgs")
         val msgCount = msgs.length()
         val list = mutableListOf<ServerChatMessage>()
-            for (i in 0..msgCount-1) {
-                val msg = msgs.get(i) as JSONObject
-                list.add(parseChatMessageJsonObject(chatMessageJson = msg, currentTime = currentTime))
-            }
+        for (i in 0 until msgCount) {
+            val msg = msgs.get(i) as JSONObject
+            list.add(parseChatMessageJsonObject(chatMessageJson = msg, currentTime = currentTime))
+        }
 
 
         /*
@@ -213,7 +213,7 @@ class ChatManagerKotlin(val network: Network, internal val sharedPrefs: SharedPr
         // player 420 has been deleted. use as placeholder for public events? currently using -1
         var id = SYSTEM_USER_ID
         var name = SYSTEM_USER_NAME
-        who?.let() {
+        who?.let {
             id = who.getString("id")
             name = who.getString("name")
             /*
@@ -232,18 +232,18 @@ class ChatManagerKotlin(val network: Network, internal val sharedPrefs: SharedPr
         }
 
         val channel: ServerChatChannel
-        if (!channelIsPrivate) {
+        channel = if (!channelIsPrivate) {
             // we're in a chat room
             val channelName = chatMessageJson.getString("channel")
-            channel = ServerChatChannel(name = channelName, id = channelName, isPrivate = channelIsPrivate)
+            ServerChatChannel(name = channelName, id = channelName, isPrivate = channelIsPrivate)
         } else {
             if (id == currentUser.id) {
                 // this was a pm from me to someone else so ensure the channel name is right
                 val pmReceiver = chatMessageJson.getJSONObject("for")
 
-                channel = ServerChatChannel(name = pmReceiver.getString("name"), id = pmReceiver.getString("id"), isPrivate = channelIsPrivate)
+                ServerChatChannel(name = pmReceiver.getString("name"), id = pmReceiver.getString("id"), isPrivate = channelIsPrivate)
             } else {
-                channel = ServerChatChannel(name = name, id = id, isPrivate = channelIsPrivate)
+                ServerChatChannel(name = name, id = id, isPrivate = channelIsPrivate)
             }
         }
         /*
@@ -256,20 +256,20 @@ class ChatManagerKotlin(val network: Network, internal val sharedPrefs: SharedPr
 
         val temptext = chatMessageJson.getString("msg")
         val text: String
-        when(format) {
-            // Mod warnings need to be colored correctly. 3 is a red warning, 4 is a green announcement
-            3 -> text = "<font color=\"red\">"+temptext.replace(
-                    "<img src=\"https://s3.amazonaws.com/images.kingdomofloathing.com/otherimages/12x12skull.gif\" height=\"12\" width=\"12\" />", "☠")+"</font>"
-            4 -> text = "<font color=\"#117A65\">"+temptext.replace(
-                    "<img src=\"https://s3.amazonaws.com/images.kingdomofloathing.com/otherimages/12x12skull.gif\" height=\"12\" width=\"12\" />", "☠")+"</font>"
+        text = when (format) {
+        // Mod warnings need to be colored correctly. 3 is a red warning, 4 is a green announcement
+            3 -> "<font color=\"red\">" + temptext.replace(
+                    "<img src=\"https://s3.amazonaws.com/images.kingdomofloathing.com/otherimages/12x12skull.gif\" height=\"12\" width=\"12\" />", "☠") + "</font>"
+            4 -> "<font color=\"#117A65\">" + temptext.replace(
+                    "<img src=\"https://s3.amazonaws.com/images.kingdomofloathing.com/otherimages/12x12skull.gif\" height=\"12\" width=\"12\" />", "☠") + "</font>"
             else -> {
-                text = temptext.replace("<img src=\"https://s3.amazonaws.com/images.kingdomofloathing.com/otherimages/12x12skull.gif\" height=\"12\" width=\"12\" />", "☠")
+                temptext.replace("<img src=\"https://s3.amazonaws.com/images.kingdomofloathing.com/otherimages/12x12skull.gif\" height=\"12\" width=\"12\" />", "☠")
             }
         }
         //☠☠️
         // ❤️ 💓 💕 💖 💗 💙 💚 💛
         // ☃️  ⛄  ❄️
-        val time  = chatMessageJson.getLong("time")
+        val time = chatMessageJson.getLong("time")
 
         val message = ServerChatMessage(author = User(id = id, name = name), htmlText = text, channelNameServer = channel, localTime = currentTime, hideAuthorName = isEmPost, time = time)
         return message
@@ -299,7 +299,7 @@ class ChatManagerKotlin(val network: Network, internal val sharedPrefs: SharedPr
                 // TODO send some sort of error back up so this failure can be identified and shown to the user/some ui
                 continue
             }
-            if (chat.get(1) == '!') {
+            if (chat[1] == '!') {
                 // it's a comment of some sort (hopefully timestamp)
                 //    if (chat.startsWith(timeStampPrefix)) {
                 val lastSeenRegexMatches = timeStampRegex.find(chat)?.groups
@@ -316,7 +316,7 @@ class ChatManagerKotlin(val network: Network, internal val sharedPrefs: SharedPr
 
             // iterate through each chat message and create a ChatObject
             // by default the channelServer is the one we logged in to. If something went wrong, it is empty
-            var channelName  = network.currentUser.mainChannel ?: ""
+            var channelName = network.currentUser.mainChannel ?: ""
             val channelNameStartIndex = chat.indexOf('[')
             // if [ is too late, then it's likely not a channelServer name
             if (channelNameStartIndex < 25) {
@@ -339,12 +339,12 @@ class ChatManagerKotlin(val network: Network, internal val sharedPrefs: SharedPr
             //                          java.lang.StringIndexOutOfBoundsException: length=33; regionStart=7; regionLength=-8
             // regionLength = endindex - beginindex
             val indexOfATag = chat.indexOf("</a>", userIdTagEndPosition)
-            var tempUserName:String? = null
+            var tempUserName: String? = null
             if (indexOfATag > -1) {
-                tempUserName =  chat.substring(userIdTagEndPosition, indexOfATag)
+                tempUserName = chat.substring(userIdTagEndPosition, indexOfATag)
             } else {
-                Log.e("ajoshi", "error parsing $chat");
-                Log.e("ajoshi", "error parsing $chatString");
+                Log.e("ajoshi", "error parsing $chat")
+                Log.e("ajoshi", "error parsing $chatString")
             }
 
             if (tempUserName != null && tempUserName.contains("(private):")) {
@@ -354,7 +354,7 @@ class ChatManagerKotlin(val network: Network, internal val sharedPrefs: SharedPr
                 channelName = tempUserName
             }
 
-            val isTp : Boolean = chat.indexOf(":") == -1
+            val isTp: Boolean = chat.indexOf(":") == -1
             // it's a special chat message like tp or snowball
             //<font color=green>
             // <a href='showplayer.php?who=2129446' target=mainpane class=nounder>
@@ -362,12 +362,12 @@ class ChatManagerKotlin(val network: Network, internal val sharedPrefs: SharedPr
             // <a href='campground.php' target=mainpane class=nounder>
             // <font color=green>has covered your Newbiesport&trade; tent with toilet paper.</font></a></font>
 
-            val chatText : String
+            val chatText: String
 
             if (!isTp) {
                 // normal commands and PMs are after a colon
                 chatText = chat.substring(chat.indexOf(":") + 1)
-            } else if (tempUserName != null){
+            } else if (tempUserName != null) {
                 /*
                  * miasma causes index out of bounds here:
 <font color=green>[newbie]</font> <b><a target=mainpane href="showplayer.php?who=1040326"><font color=black>CaptainUrsus</font></b></a>:
@@ -384,7 +384,7 @@ class ChatManagerKotlin(val network: Network, internal val sharedPrefs: SharedPr
                  */
                 val smallerChat = chat.substring(chat.indexOf(tempUserName))
                 val indexOfTpMessageBegin = smallerChat.indexOf("<font")
-                chatText = tempUserName + " " +  chat.substring(indexOfTpMessageBegin)
+                chatText = tempUserName + " " + chat.substring(indexOfTpMessageBegin)
             } else {
                 tempUserName = ""
                 userId = "clumpWithLast"
@@ -395,14 +395,15 @@ class ChatManagerKotlin(val network: Network, internal val sharedPrefs: SharedPr
             //TODO clean up username
             val chatObject = ServerChatMessage(author = User(id = userId, name = username),
                     htmlText = chatText,
-                    channelNameServer = channelServer ?: ServerChatChannel(name = channelName, id = channelName, isPrivate = false),
+                    channelNameServer = channelServer
+                            ?: ServerChatChannel(name = channelName, id = channelName, isPrivate = false),
                     time = lastSeen, hideAuthorName = false, localTime = currentTime)
             returnList.add(chatObject)
         }
         return returnList
     }
 
-    private fun getStringUsingRegex(regex :Regex, sourceString: String) :String? {
+    private fun getStringUsingRegex(regex: Regex, sourceString: String): String? {
         val potentialRegexMatches = regex.find(sourceString)?.groups
         if (potentialRegexMatches != null && potentialRegexMatches.size > 1) {
             return potentialRegexMatches[1]?.value
@@ -423,7 +424,7 @@ class ChatManagerKotlin(val network: Network, internal val sharedPrefs: SharedPr
             if (post != null) {
                 if (post[0] == '/') {
                     // this is a command, but /me go in regular chat and should be scoped to channel
-                    if (!post.startsWith("/me")  && !post.startsWith("/em") ) {
+                    if (!post.startsWith("/me") && !post.startsWith("/em")) {
                         if (post.toString() == "/who") {
                             // /who commands are scoped to channel, but as "who <channel>" instead of "<channel> who"
                             return "${post.toString()} ${id}"
@@ -431,9 +432,9 @@ class ChatManagerKotlin(val network: Network, internal val sharedPrefs: SharedPr
                         return post.toString()
                     }
                 }
-                when (isPrivate) {
-                    true -> return "/w ${id} ${post}"
-                    false -> return "/${id} ${post}"
+                return when (isPrivate) {
+                    true -> "/w ${id} ${post}"
+                    false -> "/${id} ${post}"
                 }
             }
             // null chat string, we can't do anything anyway

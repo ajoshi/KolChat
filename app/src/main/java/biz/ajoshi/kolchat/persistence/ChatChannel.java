@@ -11,15 +11,16 @@ import android.support.annotation.NonNull;
 
 @Entity
 public class ChatChannel {
+    @NonNull
     public String getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(@NonNull String id) {
         this.id = id;
     }
 
-    public ChatChannel(String id, boolean isPrivate, String name, String lastMessage, long lastMessageTime) {
+    public ChatChannel(@NonNull String id, boolean isPrivate, String name, String lastMessage, long lastMessageTime) {
         this.id = id;
         this.isPrivate = isPrivate;
         this.name = name;

@@ -7,8 +7,8 @@ import android.arch.persistence.room.migration.Migration
 import biz.ajoshi.kolchat.persistence.ChannelDao
 import biz.ajoshi.kolchat.persistence.KolDB
 import com.facebook.drawee.backends.pipeline.Fresco
-import com.crashlytics.android.Crashlytics;
-import io.fabric.sdk.android.Fabric;
+import com.crashlytics.android.Crashlytics
+import io.fabric.sdk.android.Fabric
 
 /**
  * Created by ajoshi on 7/14/17.

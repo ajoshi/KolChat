@@ -73,11 +73,10 @@ class QuickCommandVH(itemView: View, val commandClickListener: VHCommandClickLis
         fun onViewHolderCommandClicked(command: QuickCommand)
     }
 
-    val nameTv: TextView
+    val nameTv: TextView = itemView.findViewById(R.id.name)
     var currentCommand: QuickCommand? = null
 
     init {
-        nameTv = itemView.findViewById<TextView>(R.id.name)
         itemView.setOnClickListener {
             currentCommand?.let {
                 commandClickListener.onViewHolderCommandClicked(currentCommand!!)
@@ -105,7 +104,7 @@ class QuickCommandAdapter(val commandClickListener: QuickCommandVH.VHCommandClic
 
     override fun onBindViewHolder(holder: QuickCommandVH, position: Int) {
         if (commands.size > position) {
-            holder.bind(commands.get(position))
+            holder.bind(commands[position])
         }
     }
 

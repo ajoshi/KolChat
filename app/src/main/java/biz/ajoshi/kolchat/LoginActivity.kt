@@ -36,7 +36,7 @@ class LoginActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<List<Ko
     private var accountList: List<KolAccount>? = null
 
     // Loader id for list of users
-    private val USERID_LOADER_ID = 0;
+    private val USERID_LOADER_ID = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -250,7 +250,7 @@ class UserLoginTask constructor(private val userName: String, private val passwo
          * @param userNameText user name we tried to log in with
          * @param passwordText password we tried to log in with
          */
-        fun onLogin(success: Boolean?, userNameText: String, passwordText: String);
+        fun onLogin(success: Boolean?, userNameText: String, passwordText: String)
 
         /**
          * Called when the login task has been cancelled (not when it fails)
@@ -266,7 +266,7 @@ class UserLoginTask constructor(private val userName: String, private val passwo
     override fun doInBackground(vararg params: Void): Boolean? {
         val activity = uiWeakRef.get()
         activity?.let {
-            return ChatSingleton.login(username = userName, password = password, silent = true, context = activity.getApplicationContext());
+            return ChatSingleton.login(username = userName, password = password, silent = true, context = activity.getApplicationContext())
         }
         return false
     }

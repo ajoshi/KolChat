@@ -8,9 +8,9 @@ import android.os.*
 import android.support.v4.app.NotificationCompat
 
 
-const val EXTRA_POLL_INTERVAL_IN_MS = "biz.ajoshi.kolchat.ChatService.pollInterval";
-const val EXTRA_CHAT_MESSAGE_TO_SEND = "biz.ajoshi.kolchat.ChatService.messageToSend";
-const val EXTRA_STOP = "biz.ajoshi.kolchat.ChatService.staaaaahp";
+const val EXTRA_POLL_INTERVAL_IN_MS = "biz.ajoshi.kolchat.ChatService.pollInterval"
+const val EXTRA_CHAT_MESSAGE_TO_SEND = "biz.ajoshi.kolchat.ChatService.messageToSend"
+const val EXTRA_STOP = "biz.ajoshi.kolchat.ChatService.staaaaahp"
 const val SHARED_PREF_NAME = "chat"
 const val SHARED_PREF_LAST_FETCH_TIME = "lastFetched"
 const val PERSISTENT_NOTIFICATION_CHANNEL_ID = "kolPersist"
@@ -86,7 +86,7 @@ class ChatBackgroundService : Service(), ChatServiceHandler.ChatService {
             serviceHandler?.sendMessage(msg)
             startForeground(FOREGROUND_NOTIFICATION_ID, makePersistentNotification(this))
         }
-        return START_STICKY;
+        return START_STICKY
     }
 
 

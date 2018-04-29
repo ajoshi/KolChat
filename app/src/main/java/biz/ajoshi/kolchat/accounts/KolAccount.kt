@@ -11,7 +11,7 @@ import biz.ajoshi.kolchat.R
 data class KolAccount(val username: String, val password: String)
 
 class KolAccountManager(val ctx: Context) {
-    val USER_TYPE_KOL = ctx.getString(R.string.account_type)
+    val USER_TYPE_KOL = ctx.getString(R.string.account_type)!!
 
     fun addAccount(username: String, password: String) {
         // TODO insert credentials into acctmgr or smartlock(?), maybe both?
@@ -23,7 +23,7 @@ class KolAccountManager(val ctx: Context) {
         val acctMgr = AccountManager.get(ctx)
         val accountList = acctMgr.getAccountsByType(USER_TYPE_KOL)
         for (account in accountList) {
-            if (account.name.equals(username)) {
+            if (account.name == username) {
                 return KolAccount(username = account.name, password = acctMgr.getPassword(account))
             }
         }
