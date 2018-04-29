@@ -12,7 +12,8 @@
         android:maxLines="@integer/chat_max_lines"
         android:maxLength="@integer/chat_max_characters"
         android:layout_alignParentStart="true"
-        android:layout_alignParentLeft="true"/>
+        android:layout_alignParentLeft="true"
+        android:imeOptions="actionSend"/>
     <ImageButton
         android:id="@+id/submit_area"
         android:src="@drawable/submit_button_states"

@@ -7,11 +7,15 @@ import android.support.annotation.Nullable;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.TextView.OnEditorActionListener;
 
 /**
  * Shows an input area and a submit button. Button is enabled when text is entered into the edittext
@@ -77,7 +81,7 @@ public class ChatInputView extends RelativeLayout {
 
                 }
             });
-
+            // submit button is disabled when view is created (there is no text to submit)
             shouldEnableSubmitButton(false);
             submitButton.setOnClickListener(new OnClickListener() {
                 @Override
@@ -88,6 +92,18 @@ public class ChatInputView extends RelativeLayout {
                     }
                     // clear the edittext
                     inputField.setText("");
+                }
+            });
+            // allow users to press then keyboard 'send' button to send
+            inputField.setOnEditorActionListener(new OnEditorActionListener() {
+                @Override
+                public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                    boolean eventHandled = false;
+                    if (actionId == EditorInfo.IME_ACTION_SEND) {
+                        submitButton.callOnClick();
+                        eventHandled = true;
+                    }
+                    return eventHandled;
                 }
             });
         }
@@ -115,7 +131,9 @@ public class ChatInputView extends RelativeLayout {
 
     /**
      * Sets the input field text to the given value
-     * @param text new value of the input field
+     *
+     * @param text
+     *         new value of the input field
      */
     public void setInputText(CharSequence text) {
         inputField.setText(text);
@@ -123,6 +141,7 @@ public class ChatInputView extends RelativeLayout {
 
     /**
      * Returns the input field text
+     *
      * @return current value of the input field
      */
     public Editable getInputText() {
@@ -131,7 +150,10 @@ public class ChatInputView extends RelativeLayout {
 
     /**
      * Appends the given text to whatever is currently in the input field
-     * @param text CharSequence to append to the input field
+     *
+     * @param text
+     *         CharSequence to append to the input field
+     *
      * @return the new input field value
      */
     public Editable appendInputText(CharSequence text) {
