@@ -1,13 +1,12 @@
 package biz.ajoshi.kolchat
 
+import android.content.SharedPreferences
 import android.util.Log
 import biz.ajoshi.kolchat.model.ServerChatChannel
 import biz.ajoshi.kolchat.model.ServerChatMessage
 import biz.ajoshi.kolchat.model.User
-import org.json.JSONArray
 import org.json.JSONObject
 import java.io.IOException
-import java.util.*
 
 /**
  * Created by ajoshi on 6/8/2017.
@@ -23,9 +22,10 @@ import java.util.*
 const val SYSTEM_USER_ID = "-1"
 const val SYSTEM_USER_NAME = "system"
 
-class ChatManagerKotlin(val network: Network) {
+class ChatManagerKotlin(val network: Network, internal val sharedPrefs: SharedPreferences) {
+    val PREF_LAST_MESSAGE_TIMESTAMP = "lastSeenChat"
     // when the last chat message was seen
-    var lastSeen: Long = 0
+    var lastSeen: Long = sharedPrefs.getLong(PREF_LAST_MESSAGE_TIMESTAMP, 0)
 
     // Each chat response contains this followed by the timestamp
     private val timeStampPrefix = "<!--lastseen:"
@@ -101,8 +101,14 @@ class ChatManagerKotlin(val network: Network) {
         }
         val response = JSONObject(chatResponse)
         val timeStampString = response.getLong("last")
-        lastSeen = timeStampString
+        setLastSeenTime(timeStampString)
         return parseJsonChat(response)
+    }
+
+    private fun setLastSeenTime(newTime: Long) {
+        lastSeen = newTime
+        sharedPrefs.edit().putLong(SHARED_PREF_LAST_FETCH_TIME, lastSeen).apply()
+
     }
 
     fun parseJsonChat(response: JSONObject): List<ServerChatMessage> {
@@ -300,7 +306,7 @@ class ChatManagerKotlin(val network: Network) {
                 if (lastSeenRegexMatches != null && lastSeenRegexMatches.size > 1) {
                     val nullableTimestamp = lastSeenRegexMatches[1]?.value?.toLong()
                     if (nullableTimestamp != null) {
-                        lastSeen = nullableTimestamp
+                        setLastSeenTime(nullableTimestamp)
                     }
                 }
                 //   }

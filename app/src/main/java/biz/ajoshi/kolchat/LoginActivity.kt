@@ -3,6 +3,7 @@ package biz.ajoshi.kolchat
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.annotation.TargetApi
+import android.content.Context
 import android.content.Intent
 import android.os.AsyncTask
 import android.os.Build
@@ -255,10 +256,19 @@ class UserLoginTask constructor(private val userName: String, private val passwo
          * Called when the login task has been cancelled (not when it fails)
          */
         fun onLoginCancelled()
+
+        /**
+         * Returns a context object so we can persist data in sharedprefs/file
+         */
+        fun getApplicationContext(): Context
     }
 
     override fun doInBackground(vararg params: Void): Boolean? {
-        return ChatSingleton.login(username = userName, password = password, silent = true);
+        val activity = uiWeakRef.get()
+        activity?.let {
+            return ChatSingleton.login(username = userName, password = password, silent = true, context = activity.getApplicationContext());
+        }
+        return false
     }
 
     override fun onPostExecute(success: Boolean?) {
