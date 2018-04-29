@@ -44,12 +44,24 @@ class ChatAdapter(val layoutMgr: LinearLayoutManager) : RecyclerView.Adapter<Cha
 
     fun scrollToBottom() {
         // only scroll when user is near the bottom- else you mess up scrolling
+        // 6 is arbitrarily close enough to the bottom for me
+        scrollToBottom(6)
+    }
+
+    /**
+     * Scroll to the bottom if we are closer than n elements away from the bottom
+     */
+    fun scrollToBottom(ifCloserThan: Int) {
         val currentIndex = layoutMgr.findLastCompletelyVisibleItemPosition()
-        if (currentIndex + 6 >  messages.size) {
+        if (currentIndex + ifCloserThan >  messages.size) {
             layoutMgr.scrollToPosition(messages.size - 1)
         }
     }
 
+    /**
+     * Unconditionally scroll to the bottom. Does not check to see where the user is before scrolling down and might be
+     * disruptive to the user
+     */
     fun scrollToBottomAlways() {
             layoutMgr.scrollToPosition(messages.size - 1)
     }

@@ -55,6 +55,13 @@ class ChatMessageFrag : BaseFragment(), QuickCommandView.CommandClickListener {
         recyclerView?.adapter = chatAdapter
         recyclerView?.layoutManager = layoutMgr
 
+        // scroll when the keyboard comes up
+        recyclerView?.addOnLayoutChangeListener({ _, _, _, _, bottom, _, _, _, oldBottom ->
+            if (bottom < oldBottom) {
+                recyclerView?.post({ chatAdapter?.scrollToBottom(16) })
+            }
+        })
+
         val vm: ChatMessageViewModel = ViewModelProviders.of(this).get(ChatMessageViewModel::class.java)
 
         initialChatLoadSubscriber = Observable.fromCallable {
