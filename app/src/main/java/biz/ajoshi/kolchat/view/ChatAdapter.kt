@@ -35,7 +35,7 @@ class ChatAdapter(val layoutMgr: LinearLayoutManager) : RecyclerView.Adapter<Cha
      */
     fun setList(newList: List<ChatMessage>?) {
         newList?.let {
-            messages = newList.toMutableList()
+            messages = it.toMutableList()
             notifyDataSetChanged()
             scrollToBottomAlways()
         }

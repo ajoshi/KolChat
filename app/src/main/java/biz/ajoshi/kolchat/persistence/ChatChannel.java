@@ -20,12 +20,13 @@ public class ChatChannel {
         this.id = id;
     }
 
-    public ChatChannel(@NonNull String id, boolean isPrivate, String name, String lastMessage, long lastMessageTime) {
+    public ChatChannel(@NonNull String id, boolean isPrivate, String name, String lastMessage, long lastMessageTime, String currentUserName) {
         this.id = id;
         this.isPrivate = isPrivate;
         this.name = name;
         this.lastMessage = lastMessage;
         this.lastMessageTime = lastMessageTime;
+        this.currentUserName = currentUserName;
     }
 
     public String getName() {
@@ -57,6 +58,7 @@ public class ChatChannel {
     private String id;
     private String name;
     private boolean isPrivate;
+    private String currentUserName;
 
     public boolean isPrivate() {
         return isPrivate;
@@ -69,4 +71,12 @@ public class ChatChannel {
     private String lastMessage;
     @ColumnInfo(name = "last_message_time")
     private long lastMessageTime;
+
+    public String getCurrentUserName() {
+        return currentUserName;
+    }
+
+    public void setCurrentUserName(String currentUserName) {
+        this.currentUserName = currentUserName;
+    }
 }

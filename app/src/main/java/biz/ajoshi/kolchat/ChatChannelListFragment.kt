@@ -41,7 +41,8 @@ class ChatChannelListFragment : BaseFragment() { // empty constructor
         })
         channelUpdateSubscriber = KolChatApp.database
                 ?.ChannelDao()
-                ?.allChannels
+                // TODO pass in the username instead of directly accessing from the singleton
+                ?.getAllChannels(ChatSingleton.network?.currentUser?.player?.name)
                 ?.subscribeOn(Schedulers.io())
                 ?.observeOn(AndroidSchedulers.mainThread())
                 ?.subscribe { channels ->

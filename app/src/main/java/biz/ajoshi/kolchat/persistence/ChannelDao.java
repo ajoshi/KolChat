@@ -15,8 +15,8 @@ import android.arch.persistence.room.Update;
 public interface ChannelDao {
     // Name of the chat channel. not sure if I can use it in the @query one line below it
     String CHANNEL_DB_NAME = "ChatChannel";
-    @Query("SELECT * FROM chatchannel ORDER BY name ASC")
-    Flowable<List<ChatChannel>> getAllChannels();
+    @Query("SELECT * FROM chatchannel WHERE currentUserName=:userName ORDER BY name ASC")
+    Flowable<List<ChatChannel>> getAllChannels(String userName);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(ChatChannel channel);

@@ -19,6 +19,7 @@ import java.io.IOException
 const val DEFAULT_POLL_INTERVAL = 3000
 const val FOREGROUND_NOTIFICATION_ID = 666
 const val PM_NOTIFICATION_ID = 667
+const val ERROR_STRING = "error"
 
 /**
  * A Handler that lets us read chat and insert to DB
@@ -51,7 +52,8 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
                 when (serviceMessage.type) {
                     MessageType.CHAT_MESSAGE -> {
                         if (serviceMessage.textmessage != null) {
-                            insertChatsIntoDb((ChatSingleton.postChat(serviceMessage.textmessage)))
+                            insertChatsIntoDb((ChatSingleton.postChat(serviceMessage.textmessage)), ChatSingleton.network?.currentUser?.player?.name
+                                    ?: ERROR_STRING)
                         }
                     }
 
@@ -93,14 +95,14 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
     private fun readChat() {
         val messages = ChatSingleton.readChat(lastFetchedTime)
         // if we can, read the chat and stick in db
-        insertChatsIntoDb(messages)
+        insertChatsIntoDb(messages, ChatSingleton.network?.currentUser?.player?.name ?: ERROR_STRING)
         notifyUserOfPm(messages)
         lastFetchedTime = ChatSingleton.chatManager!!.lastSeen
     }
 
-    fun insertChatsIntoDb(messages: List<ServerChatMessage>?) {
+    fun insertChatsIntoDb(messages: List<ServerChatMessage>?, currentUserName: String) {
         if (messages != null) {
-            roomInserter.insertAllMessages(messages)
+            roomInserter.insertAllMessages(messages, currentUserName)
         }
     }
 
@@ -148,7 +150,7 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
                 .setContentIntent(mainActivityPintent)
 
         val notificationManager = NotificationManagerCompat.from(ctx)
-            notificationManager.notify(PM_NOTIFICATION_ID, notificationBuilder.build())
+        notificationManager.notify(PM_NOTIFICATION_ID, notificationBuilder.build())
     }
 
     /**
