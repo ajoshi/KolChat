@@ -1,7 +1,7 @@
 package biz.ajoshi.kolchat
 
 import android.content.Context
-import biz.ajoshi.kolchat.model.ServerChatMessage
+import biz.ajoshi.kolnetwork.model.ServerChatMessage
 import java.io.IOException
 
 /**
@@ -9,12 +9,12 @@ import java.io.IOException
  */
 object ChatSingleton {
     var chatManager: ChatManagerKotlin? = null
-    var network: Network? = null
+    var network: biz.ajoshi.kolnetwork.Network? = null
 
     const val SHARED_PREF_CHAT = "chatPreference"
 
     fun login(username: String, password: String, silent: Boolean, context: Context): Boolean {
-        network = Network(username, password, silent)
+        network = biz.ajoshi.kolnetwork.Network(username, password, silent)
         // TODO this assumes success. Handle failure
         network!!.login()
         if (!network!!.isLoggedIn) return false

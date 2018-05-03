@@ -10,9 +10,9 @@ import android.os.Message
 import android.support.v4.app.NotificationCompat
 import android.support.v4.app.NotificationManagerCompat
 import biz.ajoshi.kolchat.MainActivity.EXTRA_LAUNCH_TO_CHAT_ID
-import biz.ajoshi.kolchat.model.ServerChatMessage
+import biz.ajoshi.kolnetwork.model.ServerChatMessage
 import biz.ajoshi.kolchat.persistence.RoomInserter
-import biz.ajoshi.kolchat.util.StringUtil
+import biz.ajoshi.commonutils.StringUtilities
 import java.io.IOException
 
 // normally we'll poll every 3 seconds
@@ -161,7 +161,7 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
             for (message in messages) {
                 // it's a PM and not a system message
                 if (message.channelNameServer.isPrivate && message.author.id != "-1") {
-                    makeMentionNotification(service.getContext(), StringUtil.getHtml(message.channelNameServer.name + ": " + message.htmlText), message.author.id)
+                    makeMentionNotification(service.getContext(), StringUtilities.getHtml(message.channelNameServer.name + ": " + message.htmlText), message.author.id)
                 }
             }
         }

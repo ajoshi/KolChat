@@ -2,9 +2,9 @@ package biz.ajoshi.kolchat
 
 import android.content.SharedPreferences
 import android.util.Log
-import biz.ajoshi.kolchat.model.ServerChatChannel
-import biz.ajoshi.kolchat.model.ServerChatMessage
-import biz.ajoshi.kolchat.model.User
+import biz.ajoshi.kolnetwork.model.ServerChatChannel
+import biz.ajoshi.kolnetwork.model.ServerChatMessage
+import biz.ajoshi.kolnetwork.model.User
 import org.json.JSONObject
 import java.io.IOException
 
@@ -22,7 +22,7 @@ import java.io.IOException
 const val SYSTEM_USER_ID = "-1"
 const val SYSTEM_USER_NAME = "system"
 
-class ChatManagerKotlin(val network: Network, internal val sharedPrefs: SharedPreferences) {
+class ChatManagerKotlin(val network: biz.ajoshi.kolnetwork.Network, internal val sharedPrefs: SharedPreferences) {
     val PREF_LAST_MESSAGE_TIMESTAMP = "lastSeenChat"
     // when the last chat message was seen
     var lastSeen: Long = sharedPrefs.getLong(PREF_LAST_MESSAGE_TIMESTAMP, 0)

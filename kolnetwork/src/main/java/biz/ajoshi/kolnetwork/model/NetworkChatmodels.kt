@@ -1,4 +1,4 @@
-package biz.ajoshi.kolchat.model
+package biz.ajoshi.kolnetwork.model
 
 /**
  *  These are all representations of data as sent by the server. Some massaging is done, but the overall structure is intact

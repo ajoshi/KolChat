@@ -1,4 +1,4 @@
-package biz.ajoshi.kolchat;
+package biz.ajoshi.kolnetwork;
 
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -6,8 +6,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
-import biz.ajoshi.kolchat.model.LoggedInUser;
-import biz.ajoshi.kolchat.model.User;
+import biz.ajoshi.commonutils.StringUtilities;
+import biz.ajoshi.kolnetwork.model.LoggedInUser;
+import biz.ajoshi.kolnetwork.model.User;
 import okhttp3.Call;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
@@ -16,8 +17,6 @@ import okhttp3.Response;
 import okhttp3.ResponseBody;
 
 import android.text.TextUtils;
-
-import static biz.ajoshi.kolchat.util.StringUtil.getBetweenTwoStrings;
 
 /**
  * Class that makes network calls to KoL.
@@ -137,10 +136,10 @@ public class Network {
                 if (!TextUtils.isEmpty(cookie)) {
                     if (cookie.startsWith("PHPSESSID")) {
                         // we have the sessid!
-                        phpSessId = getBetweenTwoStrings(cookie, "=", ";");
+                        phpSessId = StringUtilities.getBetweenTwoStrings(cookie, "=", ";");
                     }
                     if (cookie.startsWith("AWSALB")) {
-                        awsCookie = getBetweenTwoStrings(cookie, "=", ";");
+                        awsCookie = StringUtilities.getBetweenTwoStrings(cookie, "=", ";");
                     }
                 }
             }
@@ -183,10 +182,10 @@ public class Network {
             return null;
         } else {
             String postResponse = body.string();
-            playerid = getBetweenTwoStrings(postResponse, "playerid = ", ",");
-            pwdHash = getBetweenTwoStrings(postResponse, "pwdhash = \"", "\"");
-            String mainChannel = getBetweenTwoStrings(postResponse, "active: \"", "\"");
-            chatpwd = getBetweenTwoStrings(postResponse, "setCookie('chatpwd', winW, ", ",");
+            playerid = StringUtilities.getBetweenTwoStrings(postResponse, "playerid = ", ",");
+            pwdHash = StringUtilities.getBetweenTwoStrings(postResponse, "pwdhash = \"", "\"");
+            String mainChannel = StringUtilities.getBetweenTwoStrings(postResponse, "active: \"", "\"");
+            chatpwd = StringUtilities.getBetweenTwoStrings(postResponse, "setCookie('chatpwd', winW, ", ",");
             currentUser = new LoggedInUser(new User(playerid, username), pwdHash, mainChannel);
        /* $cw,
                 $inp,

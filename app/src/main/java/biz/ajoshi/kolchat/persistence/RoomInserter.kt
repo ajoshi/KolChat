@@ -1,7 +1,7 @@
 package biz.ajoshi.kolchat.persistence
 
 import biz.ajoshi.kolchat.KolChatApp
-import biz.ajoshi.kolchat.model.ServerChatMessage
+import biz.ajoshi.kolnetwork.model.ServerChatMessage
 
 /**
  * Converts Networkmodels into Room's models and inserts into db

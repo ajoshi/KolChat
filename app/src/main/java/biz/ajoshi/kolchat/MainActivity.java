@@ -2,8 +2,8 @@ package biz.ajoshi.kolchat;
 
 import com.crashlytics.android.Crashlytics;
 
+import biz.ajoshi.commonutils.StringUtilities;
 import biz.ajoshi.kolchat.persistence.ChatChannel;
-import biz.ajoshi.kolchat.util.StringUtil;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -88,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
      */
     @NonNull
     private String getPlaintextForHtml(String html) {
-        return StringUtil.getHtml(html).toString();
+        return StringUtilities.getHtml(html).toString();
     }
 
     public void onBackPressed() {

@@ -1,4 +1,4 @@
-package biz.ajoshi.kolchat.util;
+package biz.ajoshi.commonutils;
 
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
@@ -9,7 +9,7 @@ import android.text.Spanned;
  * Created by ajoshi on 5/22/2017.
  */
 
-public class StringUtil {
+public class StringUtilities {
     public static String getBetweenTwoStrings(String body, String first, String second) {
         int firstStartIndex = body.indexOf(first);
         if (firstStartIndex < 0) {
