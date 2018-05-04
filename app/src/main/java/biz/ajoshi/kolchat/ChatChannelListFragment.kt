@@ -26,7 +26,7 @@ class ChatChannelListFragment : BaseFragment() { // empty constructor
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
-        val channelList = activity?.findViewById(R.id.channel_list) as RecyclerView
+        val channelList = activity?.findViewById<RecyclerView>(R.id.channel_list) as RecyclerView
         val layoutMgr = LinearLayoutManager(activity)
         chatChannelAdapter = ChatChannelAdapter()
         channelList.adapter = chatChannelAdapter
