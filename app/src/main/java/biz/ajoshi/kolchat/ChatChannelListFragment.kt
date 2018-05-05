@@ -6,7 +6,8 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import biz.ajoshi.kolchat.persistence.ChatChannel
+import biz.ajoshi.kolchat.persistence.chat.ChatChannel
+import biz.ajoshi.kolchat.persistence.KolDB
 import biz.ajoshi.kolchat.view.ChatChannelAdapter
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -39,7 +40,7 @@ class ChatChannelListFragment : BaseFragment() { // empty constructor
                 mainActivity.onChannelNameClicked(channel)
             }
         })
-        channelUpdateSubscriber = KolChatApp.database
+        channelUpdateSubscriber = KolDB.getDb()
                 ?.ChannelDao()
                 // TODO pass in the username instead of directly accessing from the singleton
                 ?.getAllChannels(ChatSingleton.network?.currentUser?.player?.name)

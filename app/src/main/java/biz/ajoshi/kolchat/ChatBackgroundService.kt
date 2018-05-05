@@ -1,15 +1,18 @@
 package biz.ajoshi.kolchat
 
 import android.app.*
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.*
 import android.support.v4.app.NotificationCompat
+import biz.ajoshi.commonutils.Logg
 
 
 const val EXTRA_POLL_INTERVAL_IN_MS = "biz.ajoshi.kolchat.ChatService.pollInterval"
 const val EXTRA_CHAT_MESSAGE_TO_SEND = "biz.ajoshi.kolchat.ChatService.messageToSend"
+const val EXTRA_MAIN_ACTIVITY_COMPONENTNAME = "biz.ajoshi.kolchat.ChatService.mainActivityComponentName"
 const val EXTRA_STOP = "biz.ajoshi.kolchat.ChatService.staaaaahp"
 const val SHARED_PREF_NAME = "chat"
 const val SHARED_PREF_LAST_FETCH_TIME = "lastFetched"
@@ -27,6 +30,7 @@ class ChatBackgroundService : Service(), ChatServiceHandler.ChatService {
 
     var serviceLooper: Looper? = null
     var serviceHandler: ChatServiceHandler? = null
+    var mainActivityComponentName: ComponentName? = null
 
     var sharedPref: SharedPreferences? = null
 
@@ -75,6 +79,12 @@ class ChatBackgroundService : Service(), ChatServiceHandler.ChatService {
         val msg = serviceHandler?.obtainLoopMessage(startId)
         val interval = intent?.extras?.getInt(EXTRA_POLL_INTERVAL_IN_MS, DEFAULT_POLL_INTERVAL)
         val chatMessageToSend = intent?.extras?.getString(EXTRA_CHAT_MESSAGE_TO_SEND, null)
+        intent?.extras?.getParcelable<ComponentName>(EXTRA_MAIN_ACTIVITY_COMPONENTNAME)?.let {
+            mainActivityComponentName = intent.extras.getParcelable(EXTRA_MAIN_ACTIVITY_COMPONENTNAME)
+        }
+        if(mainActivityComponentName == null) {
+            Logg.e("No componentname was passed in for ChatBGService- no activity launchable on tap")
+        }
         val shouldStop = intent?.getBooleanExtra(EXTRA_STOP, false) ?: false
         if (shouldStop) {
             stopChatService(startId)
@@ -98,6 +108,12 @@ class ChatBackgroundService : Service(), ChatServiceHandler.ChatService {
         stopSelf(id)
     }
 
+    override fun getMainActivityIntent(): Intent  {
+        val launchMainActivityIntent = Intent()
+        launchMainActivityIntent.component = mainActivityComponentName
+        return launchMainActivityIntent
+    }
+
     /**
      * Make the persistent notification
      */
@@ -108,7 +124,7 @@ class ChatBackgroundService : Service(), ChatServiceHandler.ChatService {
         val stopPIntent = PendingIntent.getService(ctx, 1, stopServiceIntent, PendingIntent.FLAG_UPDATE_CURRENT)
 
         // intent meant for main activity. will launch the app
-        val launchMainActivityIntent = Intent(ctx, MainActivity::class.java)
+        val launchMainActivityIntent = getMainActivityIntent()
         val mainActivityPintent = PendingIntent.getActivity(ctx,
                 1,
                 launchMainActivityIntent,

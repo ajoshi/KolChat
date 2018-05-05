@@ -1,4 +1,4 @@
-package biz.ajoshi.kolchat.persistence;
+package biz.ajoshi.kolchat.persistence.chat;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;

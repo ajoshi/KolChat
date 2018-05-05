@@ -1,1 +1,1 @@
-include ':app', ':commonutils', ':kolnetwork'
+include ':app', ':commonutils', ':kolnetwork', ':persistence', ':chat'

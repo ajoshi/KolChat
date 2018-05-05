@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import biz.ajoshi.kolchat.arch.ChatMessageViewModel
+import biz.ajoshi.kolchat.persistence.KolDB
 import biz.ajoshi.kolchat.view.ChatAdapter
 import biz.ajoshi.kolchat.view.ChatInputView
 import biz.ajoshi.kolchat.view.QuickCommand
@@ -65,7 +66,7 @@ class ChatMessageFrag : BaseFragment(), QuickCommandView.CommandClickListener {
         val vm: ChatMessageViewModel = ViewModelProviders.of(this).get(ChatMessageViewModel::class.java)
 
         initialChatLoadSubscriber = Observable.fromCallable {
-            KolChatApp.database
+            KolDB.getDb()
                     ?.MessageDao()
                     ?.getMessagesForChannel(id)
             // get n commands for this channel (n is a limit we set in the data source (100 right now))

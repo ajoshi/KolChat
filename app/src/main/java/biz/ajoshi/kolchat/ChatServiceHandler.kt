@@ -29,6 +29,11 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
     interface ChatService {
         fun stopChatService(id: Int)
         fun getContext(): Context
+        /**
+         * Returns an Intent that will launch 1 'main' activity. If any decision making needs to be done to
+         * correctly direct the user to another activity, the 'main' activity must do this.
+         */
+        fun getMainActivityIntent(): Intent
     }
 
     val roomInserter = RoomInserter()
@@ -132,7 +137,7 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
      */
     fun makeMentionNotification(ctx: Context, message: CharSequence, chatId: String) {
         // intent meant for main activity. will launch the app
-        val launchMainActivityIntent = Intent(ctx, MainActivity::class.java)
+        val launchMainActivityIntent = service.getMainActivityIntent()
         launchMainActivityIntent.putExtra(EXTRA_LAUNCH_TO_CHAT_ID, chatId)
         val mainActivityPintent = PendingIntent.getActivity(ctx, 1, launchMainActivityIntent, PendingIntent.FLAG_UPDATE_CURRENT)
 
@@ -154,7 +159,7 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
     }
 
     /**
-     * Notify the user if a private msage was received
+     * Notify the user if a private message was received
      */
     private fun notifyUserOfPm(messages: List<ServerChatMessage>?) {
         messages?.let {

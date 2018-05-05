@@ -200,8 +200,6 @@ class LoginActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<List<Ko
 
     override fun onLogin(success: Boolean?, userNameText: String, passwordText: String) {
         mAuthTask = null
-        showProgress(false)
-
         if (success!!) {
             startActivity(Intent(this, MainActivity::class.java))
             val acctMgr = KolAccountManager(this)

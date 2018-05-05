@@ -3,9 +3,10 @@ package biz.ajoshi.kolchat;
 import com.crashlytics.android.Crashlytics;
 
 import biz.ajoshi.commonutils.StringUtilities;
-import biz.ajoshi.kolchat.persistence.ChatChannel;
+import biz.ajoshi.kolchat.persistence.chat.ChatChannel;
 
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -37,7 +38,8 @@ public class MainActivity extends AppCompatActivity {
             // we're logged in
             Activity activity = MainActivity.this;
             Intent serviceIntent = new Intent(activity, ChatBackgroundService.class);
-            serviceIntent.putExtra(ChatServiceKt.EXTRA_POLL_INTERVAL_IN_MS, 2000);
+            serviceIntent.putExtra(ChatBackgroundServiceKt.EXTRA_POLL_INTERVAL_IN_MS, 2000);
+            serviceIntent.putExtra(ChatBackgroundServiceKt.EXTRA_MAIN_ACTIVITY_COMPONENTNAME, new ComponentName(this, getClass()));
             activity.startService(serviceIntent);
         } else {
             // we're not logged in, so just open up the login activity
@@ -106,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
         if (ChatSingleton.INSTANCE.isLoggedIn()) {
             Intent increasePollTimeout = new Intent(this, ChatBackgroundService.class);
             // activity is gone, increase poll interval to 1 minute
-            increasePollTimeout.putExtra(ChatServiceKt.EXTRA_POLL_INTERVAL_IN_MS, 60000);
+            increasePollTimeout.putExtra(ChatBackgroundServiceKt.EXTRA_POLL_INTERVAL_IN_MS, 60000);
             startService(increasePollTimeout);
         }
     }

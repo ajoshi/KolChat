@@ -6,7 +6,7 @@ import android.text.method.LinkMovementMethod
 import android.text.style.ImageSpan
 import android.view.View
 import biz.ajoshi.kolchat.R
-import biz.ajoshi.kolchat.persistence.ChatMessage
+import biz.ajoshi.kolchat.persistence.chat.ChatMessage
 import biz.ajoshi.commonutils.StringUtilities
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.drawee.generic.GenericDraweeHierarchyBuilder

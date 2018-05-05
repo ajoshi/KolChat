@@ -3,7 +3,7 @@ package biz.ajoshi.kolchat.view
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import biz.ajoshi.commonutils.StringUtilities
-import biz.ajoshi.kolchat.persistence.ChatChannel
+import biz.ajoshi.kolchat.persistence.chat.ChatChannel
 import kotlinx.android.synthetic.main.channel_list_item.view.*
 import java.util.*
 
@@ -29,6 +29,6 @@ class ChatChannelVH(itemView: View, val listener: ChannelRowClickListener?) : Re
         channelForThisRow = channel
 
         // TODO we should set the click listener once, and not each time
-        itemView.setOnClickListener{ _ -> listener?.onChannelRowClicked(channelForThisRow!!)}
+        itemView.setOnClickListener { _ -> listener?.onChannelRowClicked(channelForThisRow!!) }
     }
 }

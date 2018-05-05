@@ -5,7 +5,7 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import biz.ajoshi.kolchat.R
-import biz.ajoshi.kolchat.persistence.ChatMessage
+import biz.ajoshi.kolchat.persistence.chat.ChatMessage
 
 /**
  * Adapter for the list of chat messages (inside a given channel)

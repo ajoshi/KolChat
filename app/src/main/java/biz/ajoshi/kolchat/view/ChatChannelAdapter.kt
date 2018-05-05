@@ -4,7 +4,7 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import biz.ajoshi.kolchat.R
-import biz.ajoshi.kolchat.persistence.ChatChannel
+import biz.ajoshi.kolchat.persistence.chat.ChatChannel
 
 /**
  * Created by a.joshi on 10/7/17.
