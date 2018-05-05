@@ -118,7 +118,7 @@ class ChatMessageFrag : BaseFragment(), QuickCommandView.CommandClickListener {
         // log to anayltics as well
         Answers.getInstance().logCustom(CustomEvent("Message Sent")
                 .putCustomAttribute("Recipient", if (isPrivate) "PM" else id)
-                .putCustomAttribute("Message Length", post?.length ?: 0)
+                .putCustomAttribute("Message Length", post?.length)
         )
 
         return sendChatCommand(ChatManagerKotlin.getChatString(post, id, isPrivate))
