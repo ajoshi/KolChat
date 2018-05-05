@@ -8,7 +8,8 @@ import android.view.View
 import android.view.ViewGroup
 import biz.ajoshi.kolchat.persistence.chat.ChatChannel
 import biz.ajoshi.kolchat.persistence.KolDB
-import biz.ajoshi.kolchat.view.ChatChannelAdapter
+import biz.ajoshi.kolchat.chat.view.ChatChannelAdapter
+import biz.ajoshi.kolchat.chat.ChatSingleton
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers

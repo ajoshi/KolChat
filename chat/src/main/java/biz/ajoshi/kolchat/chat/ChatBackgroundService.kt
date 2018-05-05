@@ -1,4 +1,4 @@
-package biz.ajoshi.kolchat
+package biz.ajoshi.kolchat.chat
 
 import android.app.*
 import android.content.ComponentName
@@ -82,7 +82,7 @@ class ChatBackgroundService : Service(), ChatServiceHandler.ChatService {
         intent?.extras?.getParcelable<ComponentName>(EXTRA_MAIN_ACTIVITY_COMPONENTNAME)?.let {
             mainActivityComponentName = intent.extras.getParcelable(EXTRA_MAIN_ACTIVITY_COMPONENTNAME)
         }
-        if(mainActivityComponentName == null) {
+        if (mainActivityComponentName == null) {
             Logg.e("No componentname was passed in for ChatBGService- no activity launchable on tap")
         }
         val shouldStop = intent?.getBooleanExtra(EXTRA_STOP, false) ?: false
@@ -108,7 +108,7 @@ class ChatBackgroundService : Service(), ChatServiceHandler.ChatService {
         stopSelf(id)
     }
 
-    override fun getMainActivityIntent(): Intent  {
+    override fun getMainActivityIntent(): Intent {
         val launchMainActivityIntent = Intent()
         launchMainActivityIntent.component = mainActivityComponentName
         return launchMainActivityIntent

@@ -19,6 +19,7 @@ import android.widget.TextView
 import biz.ajoshi.kolchat.accounts.AccountLoader
 import biz.ajoshi.kolchat.accounts.KolAccount
 import biz.ajoshi.kolchat.accounts.KolAccountManager
+import biz.ajoshi.kolchat.chat.ChatSingleton
 import kotlinx.android.synthetic.main.activity_login.*
 import java.lang.ref.WeakReference
 

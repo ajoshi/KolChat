@@ -1,4 +1,4 @@
-package biz.ajoshi.kolchat
+package biz.ajoshi.kolchat.chat
 
 import android.app.job.JobParameters
 import android.app.job.JobService
@@ -18,7 +18,7 @@ class ChatJobService : JobService(), ChatServiceHandler.ChatService {
     private var jobParams: JobParameters? = null
 
     override fun stopChatService(id: Int) {
-      // jobFinished(jobParams, false)
+        // jobFinished(jobParams, false)
     }
 
     override fun getContext(): Context {

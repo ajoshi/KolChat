@@ -1,4 +1,4 @@
-package biz.ajoshi.kolchat
+package biz.ajoshi.kolchat.chat
 
 import android.app.Notification
 import android.app.PendingIntent
@@ -9,10 +9,9 @@ import android.os.Looper
 import android.os.Message
 import android.support.v4.app.NotificationCompat
 import android.support.v4.app.NotificationManagerCompat
-import biz.ajoshi.kolchat.MainActivity.EXTRA_LAUNCH_TO_CHAT_ID
-import biz.ajoshi.kolnetwork.model.ServerChatMessage
-import biz.ajoshi.kolchat.persistence.RoomInserter
 import biz.ajoshi.commonutils.StringUtilities
+import biz.ajoshi.kolchat.chat.persistence.RoomInserter
+import biz.ajoshi.kolnetwork.model.ServerChatMessage
 import java.io.IOException
 
 // normally we'll poll every 3 seconds
@@ -21,6 +20,8 @@ const val FOREGROUND_NOTIFICATION_ID = 666
 const val PM_NOTIFICATION_ID = 667
 const val ERROR_STRING = "error"
 
+// if this id is sent in, launch this chat as soon as possible- the user tapped on a notification for this chat
+const val EXTRA_LAUNCH_TO_CHAT_ID = "biz.ajoshi.kolchat.chat.ChatServiceHandler.EXTRA_LAUNCH_TO_CHAT_ID"
 /**
  * A Handler that lets us read chat and insert to DB
  */

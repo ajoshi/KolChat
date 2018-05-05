@@ -9,12 +9,12 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import biz.ajoshi.kolchat.arch.ChatMessageViewModel
+import biz.ajoshi.kolchat.chat.*
+import biz.ajoshi.kolchat.chat.view.ChatAdapter
+import biz.ajoshi.kolchat.chat.view.ChatInputView
+import biz.ajoshi.kolchat.chat.view.QuickCommand
+import biz.ajoshi.kolchat.chat.view.QuickCommandView
 import biz.ajoshi.kolchat.persistence.KolDB
-import biz.ajoshi.kolchat.view.ChatAdapter
-import biz.ajoshi.kolchat.view.ChatInputView
-import biz.ajoshi.kolchat.view.QuickCommand
-import biz.ajoshi.kolchat.view.QuickCommandView
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -84,7 +84,7 @@ class ChatMessageFrag : BaseFragment(), QuickCommandView.CommandClickListener {
         inputView = activity?.findViewById<ChatInputView>(R.id.input_view) as ChatInputView
         inputView?.setSubmitListener { input: CharSequence? -> makePost(input) }
 
-        val quickCommands = activity?.findViewById<ChatInputView>(R.id.quick_commands) as QuickCommandView
+        val quickCommands = activity?.findViewById<QuickCommandView>(R.id.quick_commands) as QuickCommandView
         quickCommands.setClickListener(this)
         super.onActivityCreated(savedInstanceState)
     }

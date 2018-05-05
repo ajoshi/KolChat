@@ -1,5 +1,6 @@
-package biz.ajoshi.kolchat.persistence
+package biz.ajoshi.kolchat.chat.persistence
 
+import biz.ajoshi.kolchat.persistence.KolDB
 import biz.ajoshi.kolchat.persistence.chat.ChatChannel
 import biz.ajoshi.kolchat.persistence.chat.ChatMessage
 import biz.ajoshi.kolnetwork.model.ServerChatMessage

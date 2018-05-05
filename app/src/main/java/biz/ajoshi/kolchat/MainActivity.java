@@ -3,6 +3,9 @@ package biz.ajoshi.kolchat;
 import com.crashlytics.android.Crashlytics;
 
 import biz.ajoshi.commonutils.StringUtilities;
+import biz.ajoshi.kolchat.chat.ChatBackgroundService;
+import biz.ajoshi.kolchat.chat.ChatBackgroundServiceKt;
+import biz.ajoshi.kolchat.chat.ChatSingleton;
 import biz.ajoshi.kolchat.persistence.chat.ChatChannel;
 
 import android.app.Activity;
@@ -17,9 +20,6 @@ import android.support.v7.widget.Toolbar;
 public class MainActivity extends AppCompatActivity {
     public static final String TAG_CHAT_DETAIL_FRAG = "chat frag";
     public static final String TAG_CHAT_LIST_FRAG = "list frag";
-
-    // if this id is sent in, launch this chat as soon as possible- the user tapped on a notification for this chat
-    public static final String EXTRA_LAUNCH_TO_CHAT_ID = "biz.ajoshi.kolchat.MainActivity.EXTRA_LAUNCH_TO_CHAT_ID";
 
     Toolbar toolbar;
 

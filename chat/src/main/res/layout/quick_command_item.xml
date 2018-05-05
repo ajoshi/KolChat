@@ -9,8 +9,7 @@
     android:layout_marginTop="@dimen/quick_command_margin_vertical"
     android:layout_marginStart="@dimen/quick_command_margin_horizontal"
     android:layout_marginEnd="@dimen/quick_command_margin_horizontal"
-    android:padding="@dimen/quick_command_padding"
->
+    android:padding="@dimen/quick_command_padding">
     <TextView
         android:id="@+id/name"
         android:layout_height="wrap_content"

@@ -1,9 +1,9 @@
-package biz.ajoshi.kolchat.view
+package biz.ajoshi.kolchat.chat.view
 
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import biz.ajoshi.kolchat.R
+import biz.ajoshi.kolchat.chat.R
 import biz.ajoshi.kolchat.persistence.chat.ChatChannel
 
 /**

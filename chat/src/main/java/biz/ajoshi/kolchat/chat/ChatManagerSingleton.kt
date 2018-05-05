@@ -1,4 +1,4 @@
-package biz.ajoshi.kolchat
+package biz.ajoshi.kolchat.chat
 
 import android.content.Context
 import biz.ajoshi.kolnetwork.model.ServerChatMessage

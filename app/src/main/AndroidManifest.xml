@@ -27,10 +27,10 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".ChatBackgroundService"/>
+        <service android:name=".chat.ChatBackgroundService"/>
         <service
             android:exported="true"
-            android:name=".ChatJobService"
+            android:name=".chat.ChatJobService"
             android:permission="android.permission.BIND_JOB_SERVICE"/>
 
         <activity

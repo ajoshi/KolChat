@@ -1,8 +1,8 @@
-package biz.ajoshi.kolchat.arch
+package biz.ajoshi.kolchat.chat.arch
 
 import android.arch.lifecycle.LiveData
-import biz.ajoshi.kolchat.persistence.chat.ChatMessage
 import biz.ajoshi.kolchat.persistence.KolDB
+import biz.ajoshi.kolchat.persistence.chat.ChatMessage
 
 /**
  * Potentially useless Repository class for livedata learning. I don't really see a point yet since Room seems to serve

@@ -1,6 +1,6 @@
-package biz.ajoshi.kolchat.view;
+package biz.ajoshi.kolchat.chat.view;
 
-import biz.ajoshi.kolchat.R;
+import biz.ajoshi.kolchat.chat.R;
 
 import android.content.Context;
 import android.support.annotation.Nullable;
@@ -123,7 +123,8 @@ public class ChatInputView extends RelativeLayout {
     /**
      * Sets a new listener to be invoked when the submit button is tapped
      *
-     * @param newListener the listener to be called when submit button is tapped. Replaces the old listener
+     * @param newListener
+     *         the listener to be called when submit button is tapped. Replaces the old listener
      */
     public void setSubmitListener(SubmitListener newListener) {
         listener = newListener;

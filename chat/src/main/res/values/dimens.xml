@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="chat_message_padding">5dp</dimen>
+    <!-- Channel list dimens -->
+    <dimen name="channel_list_padding">15dp</dimen>
+    <dimen name="channel_name_size">19sp</dimen>
+
+    <!-- padding between name and timestamp -->
+    <dimen name="timestamp_name_padding">5dp</dimen>
+
+    <!-- Chat message text/image sizes -->
+    <dimen name="chat_message_textsize">14sp</dimen>
+    <dimen name="chat_message_usernamesize">14sp</dimen>
+    <dimen name="chat_message_timestampsize">14sp</dimen>
+    <dimen name="chat_message_embedded_image_size">12dp</dimen>
+    <integer name="chat_max_lines">10</integer>
+    <integer name="chat_max_characters">200</integer>
+
+    <!-- Send chat button dimensions -->
+    <dimen name="send_button_height">50dp</dimen>
+    <dimen name="send_button_padding">2dp</dimen>
+
+    <!-- Dimensions for quick commands bar -->
+    <dimen name="quick_command_margin_horizontal">3dp</dimen>
+    <dimen name="quick_command_margin_vertical">2dp</dimen>
+    <dimen name="quick_command_padding">4dp</dimen>
+</resources>

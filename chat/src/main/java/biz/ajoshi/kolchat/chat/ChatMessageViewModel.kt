@@ -1,8 +1,9 @@
-package biz.ajoshi.kolchat.arch
+package biz.ajoshi.kolchat.chat
 
 import android.app.Application
 import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.LiveData
+import biz.ajoshi.kolchat.chat.arch.ChatRepository
 import biz.ajoshi.kolchat.persistence.chat.ChatMessage
 
 /**

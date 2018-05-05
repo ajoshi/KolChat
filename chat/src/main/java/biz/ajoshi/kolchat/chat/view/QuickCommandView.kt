@@ -1,4 +1,4 @@
-package biz.ajoshi.kolchat.view
+package biz.ajoshi.kolchat.chat.view
 
 import android.content.Context
 import android.support.v7.widget.LinearLayoutManager
@@ -9,7 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
-import biz.ajoshi.kolchat.R
+import biz.ajoshi.kolchat.chat.R
 
 /**
  * View that contains a list (should the be a recylcler/listview?) of buttons that map to chat commands

@@ -1,4 +1,4 @@
-package biz.ajoshi.kolchat
+package biz.ajoshi.kolchat.chat
 
 import android.content.SharedPreferences
 import android.util.Log

@@ -1,13 +1,13 @@
-package biz.ajoshi.kolchat.view
+package biz.ajoshi.kolchat.chat.view
 
 import android.net.Uri
 import android.support.v7.widget.RecyclerView
 import android.text.method.LinkMovementMethod
 import android.text.style.ImageSpan
 import android.view.View
-import biz.ajoshi.kolchat.R
-import biz.ajoshi.kolchat.persistence.chat.ChatMessage
 import biz.ajoshi.commonutils.StringUtilities
+import biz.ajoshi.kolchat.chat.R
+import biz.ajoshi.kolchat.persistence.chat.ChatMessage
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.drawee.generic.GenericDraweeHierarchyBuilder
 import com.facebook.drawee.span.DraweeSpan

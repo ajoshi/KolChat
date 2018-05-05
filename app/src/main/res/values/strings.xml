@@ -1,15 +1,5 @@
 <resources>
     <string name="app_name">KolChat</string>
-    <string name="input_area_hint">Words go here</string>
-    <string name="submit_post">Submit</string>
-
-    <string name="notification_description">Pull down for options</string>
-
-    <!-- Notification channel strings -->
-    <string name="persistent_channel_name">KoL Persistent Notification</string>
-    <string name="pm_channel_name">KoL Private Messages</string>
-    <string name="persistent_channel_desc">Shows when the app is running</string>
-    <string name="pm_channel_desc">This type of notification is shown when a PM or notification worthy event occurs in KoL</string>
 
     <string name="title_activity_login">Sign in</string>
 
