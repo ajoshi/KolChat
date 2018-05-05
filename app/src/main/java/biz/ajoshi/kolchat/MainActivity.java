@@ -1,6 +1,8 @@
 package biz.ajoshi.kolchat;
 
 import com.crashlytics.android.Crashlytics;
+import com.crashlytics.android.answers.Answers;
+import com.crashlytics.android.answers.ContentViewEvent;
 
 import biz.ajoshi.commonutils.StringUtilities;
 import biz.ajoshi.kolchat.chat.ChatBackgroundService;
@@ -78,6 +80,10 @@ public class MainActivity extends AppCompatActivity {
             // should crash on line 66 if this happens, honestly
             toolbar.setTitle(getPlaintextForHtml(channel.getName()));
         }
+        Answers.getInstance().logContentView(new ContentViewEvent()
+                                                     .putContentName("Channel detail opened")
+                                                     .putContentId(channel.isPrivate()? "PM" : channel.getName()));
+
     }
 
     /**

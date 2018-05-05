@@ -9,12 +9,17 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import biz.ajoshi.kolchat.chat.*
+import biz.ajoshi.kolchat.chat.ChatBackgroundService
+import biz.ajoshi.kolchat.chat.ChatManagerKotlin
+import biz.ajoshi.kolchat.chat.ChatMessageViewModel
+import biz.ajoshi.kolchat.chat.EXTRA_CHAT_MESSAGE_TO_SEND
 import biz.ajoshi.kolchat.chat.view.ChatAdapter
 import biz.ajoshi.kolchat.chat.view.ChatInputView
 import biz.ajoshi.kolchat.chat.view.QuickCommand
 import biz.ajoshi.kolchat.chat.view.QuickCommandView
 import biz.ajoshi.kolchat.persistence.KolDB
+import com.crashlytics.android.answers.Answers
+import com.crashlytics.android.answers.CustomEvent
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -110,6 +115,12 @@ class ChatMessageFrag : BaseFragment(), QuickCommandView.CommandClickListener {
      * Send a chat message to this channel/user
      */
     fun makePost(post: CharSequence?): Boolean {
+        // log to anayltics as well
+        Answers.getInstance().logCustom(CustomEvent("Message Sent")
+                .putCustomAttribute("Recipient", if (isPrivate) "PM" else id)
+                .putCustomAttribute("Message Length", post?.length ?: 0)
+        )
+
         return sendChatCommand(ChatManagerKotlin.getChatString(post, id, isPrivate))
     }
 
