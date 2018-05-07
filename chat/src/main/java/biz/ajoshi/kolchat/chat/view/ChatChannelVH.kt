@@ -24,7 +24,7 @@ class ChatChannelVH(itemView: View, val listener: ChannelRowClickListener?) : Re
     fun bind(channel: ChatChannel) {
         val spannable = StringUtilities.getHtml(channel.name)
         itemView.name.text = spannable
-        itemView.last_message_time.text = timeFormat.format(Date(channel.lastMessageTime))
+        itemView.last_message_time.text = chatMessageTimeFormat.format(Date(channel.lastMessageTime))
         // todo use userid for right click options at some point
         channelForThisRow = channel
 
