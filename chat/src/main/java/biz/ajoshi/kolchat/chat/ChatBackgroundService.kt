@@ -14,7 +14,9 @@ const val EXTRA_POLL_INTERVAL_IN_MS = "biz.ajoshi.kolchat.ChatService.pollInterv
 const val EXTRA_CHAT_MESSAGE_TO_SEND = "biz.ajoshi.kolchat.ChatService.messageToSend"
 const val EXTRA_MAIN_ACTIVITY_COMPONENTNAME = "biz.ajoshi.kolchat.ChatService.mainActivityComponentName"
 const val EXTRA_STOP = "biz.ajoshi.kolchat.ChatService.staaaaahp"
-const val SHARED_PREF_NAME = "chat"
+// Name of the sharedPref file
+const val CHAT_SHARED_PREF_NAME = "chat"
+// sharedpref for the timestamp of the last fetched chat
 const val SHARED_PREF_LAST_FETCH_TIME = "lastFetched"
 const val PERSISTENT_NOTIFICATION_CHANNEL_ID = "kolPersist"
 const val MENTION_NOTIFICATION_CHANNEL_ID = "kolMention"
@@ -68,7 +70,7 @@ class ChatBackgroundService : Service(), ChatServiceHandler.ChatService {
             serviceHandler = ChatServiceHandler(serviceLooper!!, this)
         }
 
-        sharedPref = applicationContext.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE)
+        sharedPref = applicationContext.getSharedPreferences(CHAT_SHARED_PREF_NAME, Context.MODE_PRIVATE)
         serviceHandler?.lastFetchedTime = sharedPref!!.getLong(SHARED_PREF_LAST_FETCH_TIME, 0)
     }
 

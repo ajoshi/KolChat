@@ -22,10 +22,9 @@ import java.io.IOException
 const val SYSTEM_USER_ID = "-1"
 const val SYSTEM_USER_NAME = "system"
 
-class ChatManagerKotlin(val network: biz.ajoshi.kolnetwork.Network, internal val sharedPrefs: SharedPreferences) {
-    val PREF_LAST_MESSAGE_TIMESTAMP = "lastSeenChat"
+class ChatManager(val network: biz.ajoshi.kolnetwork.Network, internal val sharedPrefs: SharedPreferences) {
     // when the last chat message was seen
-    var lastSeen: Long = sharedPrefs.getLong(PREF_LAST_MESSAGE_TIMESTAMP, 0)
+    var lastSeen: Long = sharedPrefs.getLong(SHARED_PREF_LAST_FETCH_TIME, 0)
 
     // Each chat response contains this followed by the timestamp
     private val timeStampPrefix = "<!--lastseen:"

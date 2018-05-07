@@ -10,7 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import biz.ajoshi.kolchat.chat.ChatBackgroundService
-import biz.ajoshi.kolchat.chat.ChatManagerKotlin
+import biz.ajoshi.kolchat.chat.ChatManager
 import biz.ajoshi.kolchat.chat.ChatMessageViewModel
 import biz.ajoshi.kolchat.chat.EXTRA_CHAT_MESSAGE_TO_SEND
 import biz.ajoshi.kolchat.chat.view.ChatAdapter
@@ -115,13 +115,13 @@ class ChatMessageFrag : BaseFragment(), QuickCommandView.CommandClickListener {
      * Send a chat message to this channel/user
      */
     fun makePost(post: CharSequence?): Boolean {
-        // log to anayltics as well
+        // log to analytics as well
         Answers.getInstance().logCustom(CustomEvent("Message Sent")
                 .putCustomAttribute("Recipient", if (isPrivate) "PM" else id)
                 .putCustomAttribute("Message Length", post?.length)
         )
 
-        return sendChatCommand(ChatManagerKotlin.getChatString(post, id, isPrivate))
+        return sendChatCommand(ChatManager.getChatString(post, id, isPrivate))
     }
 
     /**
