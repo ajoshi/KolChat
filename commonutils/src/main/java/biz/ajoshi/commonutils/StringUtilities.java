@@ -15,7 +15,7 @@ public class StringUtilities {
         if (firstStartIndex < 0) {
             return null;
         }
-        int firstEndIndex =  firstStartIndex + first.length();
+        int firstEndIndex = firstStartIndex + first.length();
         int secondStartIndex = body.indexOf(second, firstEndIndex);
         if (secondStartIndex < 0) {
             // we couldn't find the second string. Just return everything after string1
@@ -32,6 +32,6 @@ public class StringUtilities {
             returnValue = Html.fromHtml(html, Html.FROM_HTML_OPTION_USE_CSS_COLORS);
         }
 
-        return  returnValue;
+        return returnValue;
     }
 }

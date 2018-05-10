@@ -257,17 +257,12 @@ class ChatManager(val network: biz.ajoshi.kolnetwork.Network, internal val share
         val text: String
         text = when (format) {
         // Mod warnings need to be colored correctly. 3 is a red warning, 4 is a green announcement
-            3 -> "<font color=\"red\">" + temptext.replace(
-                    "<img src=\"https://s3.amazonaws.com/images.kingdomofloathing.com/otherimages/12x12skull.gif\" height=\"12\" width=\"12\" />", "☠") + "</font>"
-            4 -> "<font color=\"#117A65\">" + temptext.replace(
-                    "<img src=\"https://s3.amazonaws.com/images.kingdomofloathing.com/otherimages/12x12skull.gif\" height=\"12\" width=\"12\" />", "☠") + "</font>"
+            3 -> "<font color=\"red\">" + replaceChatEffectImagesWithEmojis(temptext) + "</font>"
+            4 -> "<font color=\"#117A65\">" + replaceChatEffectImagesWithEmojis(temptext) + "</font>"
             else -> {
-                temptext.replace("<img src=\"https://s3.amazonaws.com/images.kingdomofloathing.com/otherimages/12x12skull.gif\" height=\"12\" width=\"12\" />", "☠")
+                replaceChatEffectImagesWithEmojis(temptext)
             }
         }
-        //☠☠️
-        // ❤️ 💓 💕 💖 💗 💙 💚 💛
-        // ☃️  ⛄  ❄️
         val time = chatMessageJson.getLong("time")
 
         val message = ServerChatMessage(author = User(id = id, name = name), htmlText = text, channelNameServer = channel, localTime = currentTime, hideAuthorName = isEmPost, time = time)
@@ -438,6 +433,26 @@ class ChatManager(val network: biz.ajoshi.kolnetwork.Network, internal val share
             }
             // null chat string, we can't do anything anyway
             return ""
+        }
+
+
+        val imageBasePath = "<img src=\"https:\\/\\/s3\\.amazonaws\\.com\\/images\\.kingdomofloathing\\.com\\/otherimages\\/12x12%s\\.gif\" height=\"12\" width=\"12\" \\/>"
+        val skullRegex = Regex(imageBasePath.format("skull"))
+        val heartRegex = Regex(imageBasePath.format("heart"))
+        /**
+         * Some chat effects have tiny images in them. Instead of converting these images to ImageSpans and then trying
+         * to load the image, we just replace the img tags with emojis
+         */
+        fun replaceChatEffectImagesWithEmojis(input: String): String {
+            // replace all <img src="https://s3.amazonaws.com/images.kingdomofloathing.com/otherimages/<imagename>" height="12" width="12" />
+            // 12x12skull ☠☠️
+            // 12x12heart ❤️ 💓 💕 💖 💗 💙 💚 💛
+            // not doing yet 12x12snowman ☃️  ⛄  ❄️
+
+            // I would have thought that using stringbuilders would be better here, but strings are much faster
+            return input
+                    .replace(skullRegex, "☠")
+                    .replace(heartRegex, "❤")
         }
     }
 }
