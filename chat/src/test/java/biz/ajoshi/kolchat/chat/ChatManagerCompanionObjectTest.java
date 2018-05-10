@@ -102,4 +102,22 @@ public class ChatManagerCompanionObjectTest {
         assertEquals(String.format("%s %s", userEnteredString, channelName),
                      ChatManager.Companion.getChatString(userEnteredString, channelName, true));
     }
+
+    @Test
+    public void getChatString_emptyString_returnsEmptyString() {
+        // /who should be changed to "/who username" EVEN THOUGH that doesn't work since that's how the web chat does it
+        String userEnteredString = "";
+        String channelName = "ajoshi";
+        assertEquals("",
+                     ChatManager.Companion.getChatString(userEnteredString, channelName, true));
+    }
+
+    @Test
+    public void getChatString_nullString_returnsEmptyString() {
+        // /who should be changed to "/who username" EVEN THOUGH that doesn't work since that's how the web chat does it
+        String userEnteredString = null;
+        String channelName = "ajoshi";
+        assertEquals("",
+                     ChatManager.Companion.getChatString(userEnteredString, channelName, true));
+    }
 }

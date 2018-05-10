@@ -415,8 +415,8 @@ class ChatManager(val network: biz.ajoshi.kolnetwork.Network, internal val share
          * @param isPrivate true if this is a private chat, false if this is a channel
          */
         fun getChatString(post: CharSequence?, id: String, isPrivate: Boolean): String {
-            if (post != null) {
-                if (post[0] == '/') {
+            post?.takeIf { post.isNotBlank() }?.let {
+                if (post.isNotBlank() && post[0] == '/') {
                     // this is a command, but /me go in regular chat and should be scoped to channel
                     if (!post.startsWith("/me") && !post.startsWith("/em")) {
                         if (post.toString() == "/who") {
