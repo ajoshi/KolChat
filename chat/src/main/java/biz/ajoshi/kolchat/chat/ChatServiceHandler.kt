@@ -9,6 +9,7 @@ import android.os.Looper
 import android.os.Message
 import android.support.v4.app.NotificationCompat
 import android.support.v4.app.NotificationManagerCompat
+import biz.ajoshi.commonutils.Logg
 import biz.ajoshi.commonutils.StringUtilities
 import biz.ajoshi.kolchat.chat.persistence.RoomInserter
 import biz.ajoshi.kolnetwork.model.ServerChatMessage
@@ -99,9 +100,12 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
      * Reads queued chat messages and inserts them into DB. If user has any direct messages, a notification is also created
      */
     private fun readChat() {
+        Logg.i("Fetching chat data")
         val messages = ChatSingleton.readChat(lastFetchedTime)
+        Logg.i("chat data fetched " + messages?.size + " messages read")
         // if we can, read the chat and stick in db
         insertChatsIntoDb(messages, ChatSingleton.network?.currentUser?.player?.name ?: ERROR_STRING)
+        Logg.i("chat data fetched and inserted into db")
         notifyUserOfPm(messages)
         lastFetchedTime = ChatSingleton.chatManager!!.lastSeen
     }
