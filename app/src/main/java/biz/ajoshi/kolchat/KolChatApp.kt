@@ -1,7 +1,7 @@
 package biz.ajoshi.kolchat
 
 import android.app.Application
-import biz.ajoshi.commonutils.Logg
+import android.os.StrictMode
 import biz.ajoshi.kolchat.persistence.KolDB
 import com.crashlytics.android.Crashlytics
 import com.facebook.drawee.backends.pipeline.Fresco
@@ -18,5 +18,6 @@ class KolChatApp : Application() {
         Fabric.with(this, Crashlytics())
         KolDB.createDb(this)
         Fresco.initialize(this)
+        StrictMode.setThreadPolicy(StrictMode.ThreadPolicy.Builder().detectAll().build())
     }
 }
