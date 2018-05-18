@@ -93,12 +93,13 @@ class ChatBackgroundService : Service(), ChatServiceHandler.ChatService {
         } else {
             msg?.obj =
                     if (chatMessageToSend == null) ChatServiceMessage(MessageType.START, null)
-                    else ChatServiceMessage(MessageType.CHAT_MESSAGE, chatMessageToSend)
+                    else ChatServiceMessage(MessageType.SEND_CHAT_MESSAGE, chatMessageToSend)
+            msg?.arg2 = serviceHandler?.getAgeIntForNewMessage()
             serviceHandler?.pollInterval = (interval ?: DEFAULT_POLL_INTERVAL).toLong()
             serviceHandler?.sendMessage(msg)
             startForeground(FOREGROUND_NOTIFICATION_ID, makePersistentNotification(this))
         }
-        return START_STICKY
+        return START_STICKY_COMPATIBILITY
     }
 
 

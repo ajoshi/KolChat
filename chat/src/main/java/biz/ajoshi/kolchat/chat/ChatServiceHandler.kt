@@ -23,6 +23,7 @@ const val ERROR_STRING = "error"
 
 // if this id is sent in, launch this chat as soon as possible- the user tapped on a notification for this chat
 const val EXTRA_LAUNCH_TO_CHAT_ID = "biz.ajoshi.kolchat.chat.ChatServiceHandler.EXTRA_LAUNCH_TO_CHAT_ID"
+
 /**
  * A Handler that lets us read chat and insert to DB
  */
@@ -42,6 +43,8 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
     var pollInterval: Long = DEFAULT_POLL_INTERVAL.toLong()
     var lastFetchedTime: Long = 0
 
+    var inverseAgeOfMessage = 0
+
     override fun handleMessage(msg: Message?) {
         try {
             if (ChatSingleton.chatManager == null ||  // chatmgr is null so we have no userinfo to use for login
@@ -55,38 +58,38 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
             }
             if (msg?.obj != null) {
                 // if we had a message to send then send it
+                // periodic chat read message has no object
                 val serviceMessage = (msg.obj as ChatServiceMessage)
                 when (serviceMessage.type) {
-                    MessageType.CHAT_MESSAGE -> {
-                        if (serviceMessage.textmessage != null) {
-                            insertChatsIntoDb((ChatSingleton.postChat(serviceMessage.textmessage)), ChatSingleton.network?.currentUser?.player?.name
-                                    ?: ERROR_STRING)
-                        }
-                    }
 
+                    MessageType.START -> {
+                        // we got told to start. read chat asap and also send a delayed read request
+                        readChat()
+                        sendMessageDelayed(obtainLoopMessage(msg.arg1), pollInterval)
+                    }
                     MessageType.STOP -> {
                         // we got told to quit
                         service.stopChatService(msg.arg1)
                         return
                     }
-
-                    MessageType.START -> {
-                        // we got told to start
-                        sendMessageDelayed(obtainLoopMessage(msg.arg1), pollInterval)
+                    MessageType.SEND_CHAT_MESSAGE -> {
+                        if (serviceMessage.textmessage != null) {
+                            insertChatsIntoDb((ChatSingleton.postChat(serviceMessage.textmessage)), ChatSingleton.network?.currentUser?.player?.name
+                                    ?: ERROR_STRING)
+                        }
                     }
-
                     MessageType.READ_ONCE -> {
-                        // read once and do not send messae to read again
+                        // read once and do not send message to read again
                         readChat()
                     }
                 }
 
             } else {
                 // else check for new commands and reschedule to check in a bit
-                if (msg != null) {
+                if (msg != null && msg.arg2 == inverseAgeOfMessage) {
                     sendMessageDelayed(obtainLoopMessage(msg.arg1), pollInterval)
+                    readChat()
                 }
-                readChat()
             }
         } catch (exception: IOException) {
             // an ioexception occured. This means we're in a bad network location. try again later
@@ -122,10 +125,10 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
     fun obtainLoopMessage(id: Int): Message? {
         // arg1 holds the service startid
         // arg2 holds the poll interval we want the polling to have so it can be changed at will
-        // obj is used to hold any new chat commands we want to post
+        // obj is used to hold an integer that tells us how old this message really is. Big numbers are newer
         val msg = obtainMessage()
         msg?.arg1 = id
-        msg?.arg2 = DEFAULT_POLL_INTERVAL
+        msg?.arg2 = inverseAgeOfMessage
         return msg
     }
 
@@ -135,6 +138,17 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
         msg?.arg2 = oldMessage?.arg2
         msg?.obj = oldMessage?.obj
         return msg
+    }
+
+    /**
+     * Returns an int that lets us know which message is newest. This ensures that delayed messages that have been
+     * waiting for a while do not suddenly start running and queueing child jobs when their time comes in.
+     *
+     * Eg: poll interval is at 1 minute when app is in bg, but set to 3 sec when app is launched. If we don't check age,
+     * delayed messages will pile up with 3 second intervals
+     */
+    fun getAgeIntForNewMessage(): Int {
+        return ++inverseAgeOfMessage
     }
 
     /**
@@ -182,10 +196,10 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
  * Types of message that can be sent our handler
  */
 enum class MessageType {
-    CHAT_MESSAGE, STOP, START, READ_ONCE
+    SEND_CHAT_MESSAGE, STOP, START, READ_ONCE
 }
 
 /**
- * Message that can be sent to our handler. textmessage is only used if this is a CHAT_MESSAGE
+ * Message that can be sent to our handler. textmessage is only used if this is a SEND_CHAT_MESSAGE
  */
 data class ChatServiceMessage(val type: MessageType, val textmessage: String?)
