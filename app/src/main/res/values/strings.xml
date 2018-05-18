@@ -12,6 +12,11 @@
     <string name="error_incorrect_password">This password is incorrect</string>
     <string name="error_field_required">This field is required</string>
 
-    <string name="account_type">KoL</string>
+    <!-- Arguments for fragments since navgraph wants it to be a string in xml -->
+    <string name="argument_chat_message_id" translatable="false">argument_chat_message_id</string>
+    <string name="argument_chat_message_name" translatable="false">argument_chat_message_name</string>
+    <string name="argument_chat_message_is_private" translatable="false">argument_chat_message_is_private</string>
+
+    <string name="account_type" translatable="false">KoL</string>
 
 </resources>

@@ -9,14 +9,18 @@ buildscript {
 
         // We recommend changing it to the latest version from our changelog:
         // https://docs.fabric.io/android/changelog.html#fabric-gradle-plugin
-        classpath 'io.fabric.tools:gradle:1.22.1'
+        classpath 'io.fabric.tools:gradle:1.25.1'
     }
 }
 
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
+// might not want this one- lets you do findviewbyid easily (maybe other things as well)
 apply plugin: 'kotlin-android-extensions'
+// need this for fabric
 apply plugin: 'io.fabric'
+// need this for nav components to be able to generate type safe args for bundles
+//apply plugin: 'androidx.navigation.safeargs'
 
 def nav_version = '1.0.0-alpha01'
 
@@ -88,7 +92,8 @@ dependencies {
     implementation "android.arch.navigation:navigation-ui-ktx:$nav_version" // use -ktx for Kotlin
 
     // optional - Test helpers
-    androidTestImplementation "android.arch.navigation:navigation-testing-ktx:$nav_version" // use -ktx for Kotlin
+    androidTestImplementation "android.arch.navigation:navigation-testing-ktx:$nav_version"
+    implementation 'android.arch.navigation:navigation-fragment:1.0.0-alpha01' // use -ktx for Kotlin
 
 }
 repositories {

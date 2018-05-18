@@ -5,6 +5,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
+import androidx.navigation.NavController
+import androidx.navigation.findNavController
 import biz.ajoshi.commonutils.StringUtilities
 import biz.ajoshi.kolchat.chat.ChatBackgroundService
 import biz.ajoshi.kolchat.chat.ChatSingleton
@@ -18,6 +20,7 @@ import com.crashlytics.android.answers.ContentViewEvent
 class MainActivity : AppCompatActivity() {
 
     internal var toolbar: Toolbar? = null
+    internal val navController = NavController(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,7 +55,11 @@ class MainActivity : AppCompatActivity() {
             supportFragmentManager.beginTransaction().add(R.id.llist, chatMessageFrag, TAG_CHAT_LIST_FRAG)
                     .commit()
         }
+//        navController.setGraph(R.navigation.nav_graph)
     }
+
+    override fun onSupportNavigateUp()
+            = findNavController(R.id.llist).navigateUp()
 
     /**
      * Called when a channel name is tapped
@@ -61,11 +68,14 @@ class MainActivity : AppCompatActivity() {
      * @param channel ChatChannel object describing the channel that was opened
      */
     fun onChannelNameClicked(channel: ChatChannel) {
-        val chatDetailFrag = ChatMessageFrag()
         val b = Bundle()
         b.putString(EXTRA_CHANNEL_ID, channel.id)
         b.putString(EXTRA_CHANNEL_NAME, channel.name)
         b.putBoolean(EXTRA_CHANNEL_IS_PRIVATE, channel.isPrivate)
+//        navController.navigate(R.id.nav_chat_message, b)
+
+       // Go back to this if nav arch is as half baked as it seems
+        val chatDetailFrag = ChatMessageFrag()
         chatDetailFrag.arguments = b
         supportFragmentManager.beginTransaction().replace(R.id.llist, chatDetailFrag, TAG_CHAT_DETAIL_FRAG)
                 .addToBackStack(TAG_CHAT_DETAIL_FRAG).commit()
