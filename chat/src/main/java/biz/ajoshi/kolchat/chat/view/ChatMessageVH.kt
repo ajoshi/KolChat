@@ -6,6 +6,7 @@ import android.text.format.DateUtils
 import android.text.method.LinkMovementMethod
 import android.text.style.ImageSpan
 import android.view.View
+import android.widget.TextView
 import biz.ajoshi.commonutils.StringUtilities
 import biz.ajoshi.kolchat.chat.R
 import biz.ajoshi.kolchat.persistence.chat.ChatMessage
@@ -13,6 +14,7 @@ import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.drawee.generic.GenericDraweeHierarchyBuilder
 import com.facebook.drawee.span.DraweeSpan
 import com.facebook.drawee.span.DraweeSpanStringBuilder
+import com.facebook.drawee.span.SimpleDraweeSpanTextView
 import com.facebook.imagepipeline.request.ImageRequestBuilder
 import kotlinx.android.synthetic.main.chat_message.view.*
 import java.util.*
@@ -26,15 +28,17 @@ class ChatMessageVH(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
     val date = Date()
 
-    // TODO this might be doing a findviewbyid each time and not caching. confirm.
-    // yes it is. DO NOT USE THIS
+    val userNameTv = itemView.user_name
+    val chatMessageTv = itemView.text
+    val timeStampTv = itemView.timestamp
+
     fun bind(message: ChatMessage) {
         // TODO don't do all this excessive computation on ui thread. maybe use Transform/Map to convert to some ui model
         if (message.shouldHideUsername()) {
-            itemView.user_name.visibility = View.GONE
+            userNameTv.visibility = View.GONE
         } else {
-            itemView.user_name.text = StringUtilities.getHtml(message.userName)
-            itemView.user_name.visibility = View.VISIBLE
+            userNameTv.text = StringUtilities.getHtml(message.userName)
+            userNameTv.visibility = View.VISIBLE
         }
         val oldSpannable = StringUtilities.getHtml(message.text)
         val newSpannable = DraweeSpanStringBuilder(oldSpannable)
@@ -51,10 +55,10 @@ class ChatMessageVH(itemView: View) : RecyclerView.ViewHolder(itemView) {
             newSpannable.setImageSpan(itemView.context, draweeHierarchy, controller, oldSpanStartPosition, embeddedImageSize, embeddedImageSize
                     , false, DraweeSpan.ALIGN_CENTER)
         }
-        itemView.text.setDraweeSpanStringBuilder(newSpannable)
+        chatMessageTv.setDraweeSpanStringBuilder(newSpannable)
 
         date.time = message.localtimeStamp
-        itemView.timestamp.text = if (DateUtils.isToday(message.localtimeStamp)) {
+        timeStampTv.text = if (DateUtils.isToday(message.localtimeStamp)) {
             // if this is today then no need to show date
             chatMessageTimeFormat.format(date)
         } else {
@@ -65,7 +69,7 @@ class ChatMessageVH(itemView: View) : RecyclerView.ViewHolder(itemView) {
         htmlText= This is the only link I need! <a target=_blank href="https://www.kingdomofloathing.com/"><font color=blue>[link]</font></a> https:// www.kingdomofloathin g.com/,
         only the 'link' part is clickable with this. Alt solution is to string replace and then enable autolink
         */
-        itemView.text.movementMethod = LinkMovementMethod.getInstance()
+        chatMessageTv.movementMethod = LinkMovementMethod.getInstance()
         // todo use userid for right click options at some point
     }
 }
