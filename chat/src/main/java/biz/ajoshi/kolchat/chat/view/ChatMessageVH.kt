@@ -15,15 +15,12 @@ import com.facebook.drawee.span.DraweeSpan
 import com.facebook.drawee.span.DraweeSpanStringBuilder
 import com.facebook.imagepipeline.request.ImageRequestBuilder
 import kotlinx.android.synthetic.main.chat_message.view.*
-import java.text.DateFormat
-import java.text.SimpleDateFormat
 import java.util.*
 
 /**
  * Created by ajoshi on 7/22/17.
  */
-val chatMessageTimeFormat = SimpleDateFormat.getTimeInstance()
-val chatMessageDateTimeFormat = SimpleDateFormat.getDateTimeInstance()
+
 
 class ChatMessageVH(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
