@@ -11,6 +11,9 @@ import biz.ajoshi.kolchat.persistence.chat.ChatChannel
  */
 class ChatChannelAdapter : RecyclerView.Adapter<ChatChannelVH>() {
 
+    val rowTypeGroup = 1
+    val rowTypePm = 2
+
     /**
      * Called when a Channel name has been tapped on by the user
      */
@@ -18,7 +21,8 @@ class ChatChannelAdapter : RecyclerView.Adapter<ChatChannelVH>() {
         fun onChannelClicked(channel: ChatChannel)
     }
 
-    var channels = mutableListOf<ChatChannel>()
+    var groups = listOf<ChatChannel>()
+    var pms = listOf<ChatChannel>()
     var clickListener: ChannelClickListener? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatChannelVH {
@@ -30,19 +34,36 @@ class ChatChannelAdapter : RecyclerView.Adapter<ChatChannelVH>() {
         })
     }
 
+    // We want Groups and PMs to have slightly different UI so distinguishing them is easier
+    override fun getItemViewType(position: Int): Int {
+        return if (isGroup(position)) rowTypeGroup else rowTypePm
+    }
 
     override fun onBindViewHolder(holder: ChatChannelVH, position: Int) {
-        if (channels.size > position) {
-            holder.bind(channels[position])
+        when (getItemViewType(position)) { // could just use isGroup, but not sure if more types will be added
+            rowTypeGroup ->
+                if (pms.size + groups.size > position) {
+                    holder.bind(groups[position - pms.size])
+                }
+            rowTypePm ->
+                if (pms.size > position) {
+                    // pms come first, then groups
+                    holder.bind(pms[position])
+                }
         }
     }
 
     override fun getItemCount(): Int {
-        return channels.size
+        return groups.size + pms.count()
     }
 
-    fun setList(newList: List<ChatChannel>) {
-        channels = newList.toMutableList()
+    fun setGroupList(newList: List<ChatChannel>) {
+        groups = newList
+        notifyDataSetChanged()
+    }
+
+    fun setPmsList(newList: List<ChatChannel>) {
+        pms = newList
         notifyDataSetChanged()
     }
 
@@ -50,5 +71,8 @@ class ChatChannelAdapter : RecyclerView.Adapter<ChatChannelVH>() {
         clickListener = listener
     }
 
-
+    fun isGroup(position: Int): Boolean {
+        // pms come first, then groups
+        return position >= pms.size
+    }
 }

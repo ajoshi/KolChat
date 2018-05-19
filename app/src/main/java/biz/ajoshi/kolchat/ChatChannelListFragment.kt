@@ -15,13 +15,14 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 
 /**
- * Shows a list of all active chats/channels
+ * Shows a list of all active chats/groups
  * Created by ajoshi on 7/4/2017.
  */
 class ChatChannelListFragment : BaseFragment() { // empty constructor
 
     var chatChannelAdapter: ChatChannelAdapter? = null
-    var channelUpdateSubscriber: Disposable? = null
+    var groupChatUpdateSubscriber: Disposable? = null
+    var pmChatUpdateSubscriber: Disposable? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.channel_list, container, false)
@@ -41,22 +42,30 @@ class ChatChannelListFragment : BaseFragment() { // empty constructor
                 mainActivity.onChannelNameClicked(channel)
             }
         })
-        channelUpdateSubscriber = KolDB.getDb()
+        groupChatUpdateSubscriber = KolDB.getDb()
                 ?.ChannelDao()
                 // TODO pass in the username instead of directly accessing from the singleton
-                ?.getAllChannels(ChatSingleton.network?.currentUser?.player?.name)
+                ?.getAllChatChannels(ChatSingleton.network?.currentUser?.player?.name)
                 ?.subscribeOn(Schedulers.io())
                 ?.observeOn(AndroidSchedulers.mainThread())
                 ?.subscribe { channels ->
-                    chatChannelAdapter!!.setList(channels)
+                    chatChannelAdapter!!.setGroupList(channels)
+                }
+        pmChatUpdateSubscriber = KolDB.getDb()
+                ?.ChannelDao()
+                // TODO pass in the username instead of directly accessing from the singleton
+                ?.getAllPMChannels(ChatSingleton.network?.currentUser?.player?.name)
+                ?.subscribeOn(Schedulers.io())
+                ?.observeOn(AndroidSchedulers.mainThread())
+                ?.subscribe { channels ->
+                    chatChannelAdapter!!.setPmsList(channels)
                 }
         super.onActivityCreated(savedInstanceState)
     }
 
     override fun onDestroy() {
-        if (channelUpdateSubscriber != null && !channelUpdateSubscriber!!.isDisposed) {
-            channelUpdateSubscriber!!.dispose()
-        }
+        pmChatUpdateSubscriber?.takeIf { it.isDisposed }?.dispose()
+        groupChatUpdateSubscriber?.takeIf { it.isDisposed }?.dispose()
         super.onDestroy()
     }
 }
