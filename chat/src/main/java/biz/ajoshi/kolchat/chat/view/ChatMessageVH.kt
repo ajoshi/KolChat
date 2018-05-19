@@ -6,7 +6,6 @@ import android.text.format.DateUtils
 import android.text.method.LinkMovementMethod
 import android.text.style.ImageSpan
 import android.view.View
-import android.widget.TextView
 import biz.ajoshi.commonutils.StringUtilities
 import biz.ajoshi.kolchat.chat.R
 import biz.ajoshi.kolchat.persistence.chat.ChatMessage
@@ -14,7 +13,6 @@ import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.drawee.generic.GenericDraweeHierarchyBuilder
 import com.facebook.drawee.span.DraweeSpan
 import com.facebook.drawee.span.DraweeSpanStringBuilder
-import com.facebook.drawee.span.SimpleDraweeSpanTextView
 import com.facebook.imagepipeline.request.ImageRequestBuilder
 import kotlinx.android.synthetic.main.chat_message.view.*
 import java.util.*
@@ -22,8 +20,6 @@ import java.util.*
 /**
  * Created by ajoshi on 7/22/17.
  */
-
-
 class ChatMessageVH(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
     val date = Date()

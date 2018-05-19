@@ -3,7 +3,6 @@ package biz.ajoshi.kolchat.chat.view
 import android.support.v7.widget.RecyclerView
 import android.text.format.DateUtils
 import android.view.View
-import android.widget.TextView
 import biz.ajoshi.commonutils.StringUtilities
 import biz.ajoshi.kolchat.persistence.chat.ChatChannel
 import kotlinx.android.synthetic.main.channel_list_item.view.*
