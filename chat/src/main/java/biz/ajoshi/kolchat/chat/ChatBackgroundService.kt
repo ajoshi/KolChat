@@ -91,13 +91,16 @@ class ChatBackgroundService : Service(), ChatServiceHandler.ChatService {
         if (shouldStop) {
             stopChatService(startId)
         } else {
-            msg?.obj =
-                    if (chatMessageToSend == null) ChatServiceMessage(MessageType.START, null)
-                    else ChatServiceMessage(MessageType.SEND_CHAT_MESSAGE, chatMessageToSend)
-            msg?.arg2 = serviceHandler?.getAgeIntForNewMessage()
+            if (chatMessageToSend == null) {
+                msg?.obj = ChatServiceMessage(MessageType.START, null)
+                msg?.arg2 = serviceHandler?.getAgeIntForNewMessage()
+            } else {
+                msg?.obj = ChatServiceMessage(MessageType.SEND_CHAT_MESSAGE, chatMessageToSend)
+            }
             serviceHandler?.pollInterval = (interval ?: DEFAULT_POLL_INTERVAL).toLong()
             serviceHandler?.sendMessage(msg)
             startForeground(FOREGROUND_NOTIFICATION_ID, makePersistentNotification(this))
+
         }
         return START_STICKY_COMPATIBILITY
     }
