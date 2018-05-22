@@ -58,8 +58,6 @@ class ChatManager(val network: biz.ajoshi.kolnetwork.Network, internal val share
         /*
          * This seems wrong- chat and chat commands should be separated out
          */
-
-
         if (response.isNullOrEmpty()) {
             network.logout()
             return emptyList()

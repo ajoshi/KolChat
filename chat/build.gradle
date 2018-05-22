@@ -33,6 +33,12 @@ dependencies {
     implementation project(path: ':kolnetwork')
     implementation project(path: ':persistence')
 
+    // use job dispatcher to poll server in a more manageable way
+    implementation 'com.evernote:android-job:1.2.5'
+    implementation "com.google.android.gms:play-services-gcm:15.0.1"
+
+    // or use   implementation 'com.firebase:firebase-jobdispatcher:0.8.5'
+
     // use fresco to load images
     implementation 'com.facebook.fresco:fresco:1.9.0'
     implementation 'com.facebook.fresco:drawee-span:1.9.0'

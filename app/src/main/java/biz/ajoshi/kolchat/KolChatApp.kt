@@ -2,6 +2,7 @@ package biz.ajoshi.kolchat
 
 import android.app.Application
 import android.os.StrictMode
+import biz.ajoshi.kolchat.chat.ChatJob
 import biz.ajoshi.kolchat.persistence.KolDB
 import com.crashlytics.android.Crashlytics
 import com.facebook.drawee.backends.pipeline.Fresco
@@ -19,5 +20,6 @@ class KolChatApp : Application() {
         KolDB.createDb(this)
         Fresco.initialize(this)
         StrictMode.setThreadPolicy(StrictMode.ThreadPolicy.Builder().detectAll().build())
+        ChatJob.addJobCreator(this)
     }
 }

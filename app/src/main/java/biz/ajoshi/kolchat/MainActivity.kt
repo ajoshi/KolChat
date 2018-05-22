@@ -8,10 +8,7 @@ import android.support.v7.widget.Toolbar
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import biz.ajoshi.commonutils.StringUtilities
-import biz.ajoshi.kolchat.chat.ChatBackgroundService
-import biz.ajoshi.kolchat.chat.ChatSingleton
-import biz.ajoshi.kolchat.chat.EXTRA_MAIN_ACTIVITY_COMPONENTNAME
-import biz.ajoshi.kolchat.chat.EXTRA_POLL_INTERVAL_IN_MS
+import biz.ajoshi.kolchat.chat.*
 import biz.ajoshi.kolchat.persistence.chat.ChatChannel
 import com.crashlytics.android.Crashlytics
 import com.crashlytics.android.answers.Answers
@@ -116,7 +113,9 @@ class MainActivity : AppCompatActivity() {
             val increasePollTimeout = Intent(this, ChatBackgroundService::class.java)
             // activity is gone, increase poll interval to 1 minute
             increasePollTimeout.putExtra(EXTRA_POLL_INTERVAL_IN_MS, 60000)
-            startService(increasePollTimeout)
+//            startService(increasePollTimeout)
+            stopService(increasePollTimeout)
+            ChatJob.scheduleJob(ComponentName(this, javaClass))
         }
     }
 
