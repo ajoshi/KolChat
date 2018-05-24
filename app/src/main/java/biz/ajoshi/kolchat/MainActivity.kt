@@ -52,6 +52,7 @@ class MainActivity : AppCompatActivity() {
             supportFragmentManager.beginTransaction().add(R.id.llist, chatMessageFrag, TAG_CHAT_LIST_FRAG)
                     .commit()
         }
+        ChatJob.stopJob()
 //        navController.setGraph(R.navigation.nav_graph)
     }
 

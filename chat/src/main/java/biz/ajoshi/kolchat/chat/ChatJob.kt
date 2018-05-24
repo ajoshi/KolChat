@@ -41,6 +41,7 @@ class ChatJob : Job() {
         val tag = "chat_job_tag"
         val extra_activity_name = "extra_activity_name"
         val extra_package_name = "extra_package_name"
+        var jobId: Int? = 0
 
         /**
          * Schedules the Chat fetching job. Chat will be fetched once every 15 minutes if internet is available
@@ -50,7 +51,7 @@ class ChatJob : Job() {
             bundleCompat.putString(extra_package_name, mainActivityComponentName.packageName)
             bundleCompat.putString(extra_activity_name, mainActivityComponentName.className)
             // schedule a poll once every 15 minutes (might be too slow)
-            JobRequest.Builder(tag)
+            jobId = JobRequest.Builder(tag)
                     .setPeriodic(15*60_000)
                     .setExtras(bundleCompat)
                     .setRequiredNetworkType(JobRequest.NetworkType.CONNECTED)
@@ -63,6 +64,13 @@ class ChatJob : Job() {
          */
         fun addJobCreator(appContext: Context) {
             JobManager.create(appContext).addJobCreator(ChatJobCreator())
+        }
+
+        /**
+         * Stop all ChatJobs in progress/scheduled. Could also use jobid to cancel just one job
+         */
+        fun stopJob() {
+            JobManager.instance().cancelAllForTag(tag)
         }
     }
 
