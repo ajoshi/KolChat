@@ -199,9 +199,9 @@ class LoginActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<List<Ko
      * LOADER CALLBACKS END
      **********************************************************************************/
 
-    override fun onLogin(success: Boolean?, userNameText: String, passwordText: String) {
+    override fun onLogin(success: Boolean, userNameText: String, passwordText: String) {
         mAuthTask = null
-        if (success!!) {
+        if (success) {
             startActivity(Intent(this, MainActivity::class.java))
             val acctMgr = KolAccountManager(this)
             // should i be sending these values in instead of re-finding them?
@@ -249,7 +249,7 @@ class UserLoginTask constructor(private val userName: String, private val passwo
          * @param userNameText user name we tried to log in with
          * @param passwordText password we tried to log in with
          */
-        fun onLogin(success: Boolean?, userNameText: String, passwordText: String)
+        fun onLogin(success: Boolean, userNameText: String, passwordText: String)
 
         /**
          * Called when the login task has been cancelled (not when it fails)
@@ -262,7 +262,7 @@ class UserLoginTask constructor(private val userName: String, private val passwo
         fun getApplicationContext(): Context
     }
 
-    override fun doInBackground(vararg params: Void): Boolean? {
+    override fun doInBackground(vararg params: Void): Boolean {
         val activity = uiWeakRef.get()
         activity?.let {
             return ChatSingleton.login(username = userName, password = password, silent = true, context = activity.getApplicationContext())
@@ -270,7 +270,7 @@ class UserLoginTask constructor(private val userName: String, private val passwo
         return false
     }
 
-    override fun onPostExecute(success: Boolean?) {
+    override fun onPostExecute(success: Boolean) {
         // maybe use rx to notify the activity instead?
         val activity = uiWeakRef.get()
         activity?.let {
