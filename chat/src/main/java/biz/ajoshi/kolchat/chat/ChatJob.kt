@@ -29,7 +29,7 @@ class ChatJob : Job() {
         if (serviceLooper != null) {
             val serviceHandler = ChatServiceHandler(serviceLooper, ServiceImpl())
             val message = serviceHandler.obtainLoopMessage(1)
-            message?.obj = ChatServiceMessage(MessageType.READ_ONCE, null)
+            message?.obj = ChatServiceMessage(MessageType.READ_UNTIL_THRESHOLD, null)
             serviceHandler.sendMessage(message)
             // TODO maybe delay until we know success has happened?
             return Result.SUCCESS

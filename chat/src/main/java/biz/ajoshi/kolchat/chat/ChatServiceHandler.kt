@@ -93,6 +93,11 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
                         // read once and do not send message to read again
                         readChat()
                     }
+                    MessageType.READ_UNTIL_THRESHOLD -> {
+                        Logg.i("ChatServiceHandler", "Reading chat once")
+                        // read  until fewer than 10 messages come from the server
+                        readChat(10)
+                    }
                 }
 
             } else {
@@ -116,6 +121,21 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
      */
     private fun readChat() {
         // TODO add instrumentation here so we can measure fetch and db insertion times
+        val messages = ChatSingleton.readChat(lastFetchedTime)
+        // if we can, read the chat and stick in db
+        insertChatsIntoDb(messages, ChatSingleton.network?.currentUser?.player?.name ?: ERROR_STRING)
+        notifyUserOfPm(messages)
+        lastFetchedTime = ChatSingleton.chatManager!!.lastSeen
+    }
+
+    /**
+     * Reads queued chat messages and inserts them into DB. If there are more than n messages, read again.
+     * The idea is that the server isn't giving us all the messages in one go and so multiple requests are needed.
+     * If user has any direct messages, a notification is also created.
+     * @param threshold min number of messages that should be returned for us to poll the server again
+     */
+    private fun readChat(threshold: Int) {
+        // TODO add instrumentation here so we can measure fetch and db insertion times
         Logg.i("ChatServiceHandler", "Fetching chat data")
         val messages = ChatSingleton.readChat(lastFetchedTime)
         Logg.i("ChatServiceHandler", "chat data fetched " + messages?.size + " messages read")
@@ -124,6 +144,13 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
         Logg.i("ChatServiceHandler", "db insertion complete")
         notifyUserOfPm(messages)
         lastFetchedTime = ChatSingleton.chatManager!!.lastSeen
+        messages?.let {
+            if (it.size > threshold) {
+                // if we got more than n messages in the last read, there might still be a bunch remaining. Poll until
+                // there aren't any left (or we get fewer than n messages)
+                readChat(threshold)
+            }
+        }
     }
 
     fun insertChatsIntoDb(messages: List<ServerChatMessage>?, currentUserName: String) {
@@ -195,19 +222,12 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
      */
     private fun notifyUserOfPm(messages: List<ServerChatMessage>?) {
         messages?.let {
-            val channelList = mutableListOf<String>()
             for (message in messages) {
-                if (BuildConfig.DEBUG) {
-                    //           channelList.add(message.channelNameServer.name)
-                }
                 // it's a PM and not a system message
                 if (message.channelNameServer.isPrivate && message.author.id != "-1") {
                     makeMentionNotification(service.getContext(), StringUtilities.getHtml(message.channelNameServer.name + ": " + message.htmlText), message.author.id)
                 }
             }
-            //      for (chan in channelList) {
-            //        Logg.i(chan)
-            //     }
         }
     }
 }
@@ -216,7 +236,7 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
  * Types of message that can be sent our handler
  */
 enum class MessageType {
-    SEND_CHAT_MESSAGE, STOP, START, READ_ONCE
+    SEND_CHAT_MESSAGE, STOP, START, READ_ONCE, READ_UNTIL_THRESHOLD
 }
 
 /**
