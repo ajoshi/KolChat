@@ -94,9 +94,10 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
                         readChat()
                     }
                     MessageType.READ_UNTIL_THRESHOLD -> {
-                        Logg.i("ChatServiceHandler", "Reading chat once")
+                        val threshold = 10
+                        Logg.i("ChatServiceHandler", "Reading chat until threshold $threshold")
                         // read  until fewer than 10 messages come from the server
-                        readChat(10)
+                        readChat(threshold)
                     }
                 }
 
