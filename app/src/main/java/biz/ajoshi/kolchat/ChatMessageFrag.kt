@@ -116,9 +116,9 @@ class ChatMessageFrag : BaseFragment(), QuickCommandView.CommandClickListener {
      */
     fun makePost(post: CharSequence?): Boolean {
         // log to analytics as well
-        Answers.getInstance().logCustom(CustomEvent("Message Sent")
-                .putCustomAttribute("Recipient", if (isPrivate) "PM" else id)
-                .putCustomAttribute("Message Length", post?.length)
+        Answers.getInstance().logCustom(CustomEvent(EVENT_NAME_CHAT_MESSAGE_SENT)
+                .putCustomAttribute(EVENT_ATTRIBUTE_RECIPIENT, if (isPrivate) "PM" else id)
+                .putCustomAttribute(EVENT_ATTRIBUTE_MESSAGE_LENGTH, post?.length)
         )
 
         return sendChatCommand(ChatManager.getChatString(post, id, isPrivate))
