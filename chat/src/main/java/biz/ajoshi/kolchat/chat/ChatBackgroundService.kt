@@ -26,6 +26,16 @@ const val MENTION_NOTIFICATION_CHANNEL_ID = "kolMention"
  * Needs to be a service so we can get commands even when app isn't in foreground
  */
 class ChatBackgroundService : Service(), ChatServiceHandler.ChatService {
+    override fun getCurrentUsername(): String {
+        // this service doesn't get logged out so this might not be needed
+        return ""
+    }
+
+    override fun getCurrentUserPassword(): String {
+        // TODO implement if needed
+        return ""
+    }
+
     override fun getContext(): Context {
         return this
     }

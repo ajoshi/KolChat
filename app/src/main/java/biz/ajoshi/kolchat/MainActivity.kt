@@ -7,7 +7,9 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
+import biz.ajoshi.commonutils.Logg
 import biz.ajoshi.commonutils.StringUtilities
+import biz.ajoshi.kolchat.accounts.KolAccountManager
 import biz.ajoshi.kolchat.chat.*
 import biz.ajoshi.kolchat.persistence.chat.ChatChannel
 import com.crashlytics.android.Crashlytics
@@ -56,8 +58,7 @@ class MainActivity : AppCompatActivity() {
 //        navController.setGraph(R.navigation.nav_graph)
     }
 
-    override fun onSupportNavigateUp()
-            = findNavController(R.id.llist).navigateUp()
+    override fun onSupportNavigateUp() = findNavController(R.id.llist).navigateUp()
 
     /**
      * Called when a channel name is tapped
@@ -72,7 +73,7 @@ class MainActivity : AppCompatActivity() {
         b.putBoolean(EXTRA_CHANNEL_IS_PRIVATE, channel.isPrivate)
 //        navController.navigate(R.id.nav_chat_message, b)
 
-       // Go back to this if nav arch is as half baked as it seems
+        // Go back to this if nav arch is as half baked as it seems
         val chatDetailFrag = ChatMessageFrag()
         chatDetailFrag.arguments = b
         supportFragmentManager.beginTransaction().replace(R.id.llist, chatDetailFrag, TAG_CHAT_DETAIL_FRAG)
@@ -111,12 +112,23 @@ class MainActivity : AppCompatActivity() {
     public override fun onDestroy() {
         super.onDestroy()
         if (ChatSingleton.isLoggedIn()) {
+            Logg.i("destroying main activity. and triggering background poll service")
             val increasePollTimeout = Intent(this, ChatBackgroundService::class.java)
             // activity is gone, increase poll interval to 1 minute
             increasePollTimeout.putExtra(EXTRA_POLL_INTERVAL_IN_MS, 60000)
-//            startService(increasePollTimeout)
+//            startService(increasePollTimeout)  right now we just stop the service. Play around with options later
             stopService(increasePollTimeout)
-            ChatJob.scheduleJob(ComponentName(this, javaClass))
+            val currentUserName = ChatSingleton.network?.currentUser?.player?.name
+            currentUserName?.let {
+                val account = KolAccountManager(this)
+                val currentUserAcct = account.getAccount(currentUserName)
+                currentUserAcct?.let {
+                    ChatJob.scheduleJob(
+                            ComponentName(this, javaClass),
+                            it.username,
+                            it.password)
+                }
+            }
         }
     }
 

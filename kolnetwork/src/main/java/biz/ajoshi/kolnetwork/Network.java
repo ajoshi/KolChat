@@ -27,6 +27,7 @@ import android.text.TextUtils;
 public class Network {
     private final String username;
     private final String password;
+    private final boolean isQuiet;
     private String playerid;
     private String pwdHash;
     private String phpSessId;
@@ -49,8 +50,7 @@ public class Network {
      * @param password
      */
     public Network(String username, String password) {
-        this.username = username;
-        this.password = password;
+        this(username, password, true);
     }
 
     /**
@@ -60,7 +60,9 @@ public class Network {
      * @param password
      */
     public Network(String username, String password, boolean isQuiet) {
-        this(isQuiet ? String.format(IS_QUIET_MODIFIER, username) : username, password);
+        this.username = username;
+        this.password = password;
+        this.isQuiet = isQuiet;
     }
 
     /**
@@ -115,7 +117,7 @@ public class Network {
                            .addQueryParameter("promo", "")
                            .addQueryParameter("mrstore", "")
                            .addQueryParameter("secure", "1")
-                           .addQueryParameter("loginname", username)
+                           .addQueryParameter("loginname", isQuiet ? String.format(IS_QUIET_MODIFIER, username) : username)
                            .addQueryParameter("password", password)
                            .addQueryParameter("submitbutton", "Log+In")
                            .build();

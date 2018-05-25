@@ -12,7 +12,9 @@ import android.support.v4.app.NotificationManagerCompat
 import biz.ajoshi.commonutils.Logg
 import biz.ajoshi.commonutils.StringUtilities
 import biz.ajoshi.kolchat.chat.persistence.RoomInserter
+import biz.ajoshi.kolnetwork.model.LoggedInUser
 import biz.ajoshi.kolnetwork.model.ServerChatMessage
+import biz.ajoshi.kolnetwork.model.User
 import java.io.IOException
 
 // normally we'll poll every 3 seconds
@@ -30,6 +32,8 @@ const val EXTRA_LAUNCH_TO_CHAT_ID = "biz.ajoshi.kolchat.chat.ChatServiceHandler.
 class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(looper) {
 
     interface ChatService {
+        fun getCurrentUsername(): String
+        fun getCurrentUserPassword(): String
         fun stopChatService(id: Int)
         fun getContext(): Context
         /**
@@ -48,6 +52,9 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
     override fun handleMessage(msg: Message?) {
         try {
             Logg.i("Handler received a message")
+            if (ChatSingleton.chatManager == null || !ChatSingleton.isLoggedIn()) {
+                ChatSingleton.login(service.getCurrentUsername(), service.getCurrentUserPassword(), true, service.getContext())
+            }
             if (ChatSingleton.chatManager == null ||  // chatmgr is null so we have no userinfo to use for login
                     (!ChatSingleton.chatManager!!.network.isLoggedIn  // we're not logged in (but have the ability)
                             && !ChatSingleton.chatManager!!.network.login())) { // tried to login, but couldnt

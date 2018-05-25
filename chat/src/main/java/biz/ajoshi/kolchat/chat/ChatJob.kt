@@ -25,11 +25,11 @@ class ChatJob : Job() {
 
         val thread = HandlerThread("ServiceStartArguments", Process.THREAD_PRIORITY_BACKGROUND)
         thread.start()
-         val serviceLooper = thread.looper
+        val serviceLooper = thread.looper
         if (serviceLooper != null) {
             val serviceHandler = ChatServiceHandler(serviceLooper, ServiceImpl())
             val message = serviceHandler.obtainLoopMessage(1)
-            message?.obj =  ChatServiceMessage(MessageType.READ_ONCE, null)
+            message?.obj = ChatServiceMessage(MessageType.READ_ONCE, null)
             serviceHandler.sendMessage(message)
             // TODO maybe delay until we know success has happened?
             return Result.SUCCESS
@@ -41,18 +41,22 @@ class ChatJob : Job() {
         val tag = "chat_job_tag"
         val extra_activity_name = "extra_activity_name"
         val extra_package_name = "extra_package_name"
+        val extra_username = "extra_username"
+        val extra_password = "extra_password"
         var jobId: Int? = 0
 
         /**
          * Schedules the Chat fetching job. Chat will be fetched once every 15 minutes if internet is available
          */
-        fun scheduleJob(mainActivityComponentName: ComponentName) {
+        fun scheduleJob(mainActivityComponentName: ComponentName, username: String, password: String) {
             val bundleCompat = PersistableBundleCompat()
             bundleCompat.putString(extra_package_name, mainActivityComponentName.packageName)
             bundleCompat.putString(extra_activity_name, mainActivityComponentName.className)
+            bundleCompat.putString(extra_username, username)
+            bundleCompat.putString(extra_password, password)
             // schedule a poll once every 15 minutes (might be too slow)
             jobId = JobRequest.Builder(tag)
-                    .setPeriodic(15*60_000)
+                    .setPeriodic(15 * 60_000)
                     .setExtras(bundleCompat)
                     .setRequiredNetworkType(JobRequest.NetworkType.CONNECTED)
                     .build()
@@ -79,6 +83,14 @@ class ChatJob : Job() {
      * Alternatively, rename getContext and ChatJob can implement the interface directly
      */
     private inner class ServiceImpl : ChatServiceHandler.ChatService {
+        override fun getCurrentUserPassword(): String {
+            return params.extras.getString(extra_password, "")
+        }
+
+        override fun getCurrentUsername(): String {
+            return params.extras.getString(extra_username, "")
+        }
+
         override fun stopChatService(id: Int) {
             // can we do more?
             shouldReschedule = false;
@@ -93,6 +105,7 @@ class ChatJob : Job() {
             val componentName = params.extras.getString(extra_activity_name, "")
             val packageName = params.extras.getString(extra_package_name, "")
             mainActivityIntent.component = ComponentName(packageName, componentName)
+
             return mainActivityIntent
         }
 
