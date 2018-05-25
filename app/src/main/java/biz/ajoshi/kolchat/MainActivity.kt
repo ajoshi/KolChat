@@ -15,6 +15,9 @@ import biz.ajoshi.kolchat.persistence.chat.ChatChannel
 import com.crashlytics.android.Crashlytics
 import com.crashlytics.android.answers.Answers
 import com.crashlytics.android.answers.ContentViewEvent
+import com.crashlytics.android.answers.CustomEvent
+
+const val action_navigate_to_chat_detail = "biz.ajoshi.kolchat.MainActivity.ACTION_NAVIGATE_TO_CHAT_DETAIL"
 
 class MainActivity : AppCompatActivity() {
 
@@ -44,7 +47,20 @@ class MainActivity : AppCompatActivity() {
             startActivity(loginIntent)
             finish()
         }
-
+        when (intent.action) {
+        // launched by os
+            Intent.ACTION_MAIN ->
+                Answers.getInstance().logCustom(CustomEvent("App launch")
+                        .putCustomAttribute("Source", "Launcher"))
+        // launched by the notification for a chat message
+            action_navigate_to_chat_detail ->
+                Answers.getInstance().logCustom(CustomEvent("App launch")
+                        .putCustomAttribute("Source", "Notification: chat detail"))
+        // launched by login screen (or something else?)
+        // this should tell me if users are logging in more than they should
+            else -> Answers.getInstance().logCustom(CustomEvent("App launch")
+                    .putCustomAttribute("Source", "Login/Unknown"))
+        }
         toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
 
@@ -82,6 +98,7 @@ class MainActivity : AppCompatActivity() {
             // should crash on line 66 if this happens, honestly
             toolbar!!.title = getPlaintextForHtml(channel.name)
         }
+        Logg.i("MainActivity", "channel detail opened")
         Answers.getInstance().logContentView(ContentViewEvent()
                 .putContentName("Channel detail opened")
                 .putContentId(if (channel.isPrivate) "PM" else channel.name))
