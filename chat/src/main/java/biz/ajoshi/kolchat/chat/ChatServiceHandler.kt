@@ -12,9 +12,7 @@ import android.support.v4.app.NotificationManagerCompat
 import biz.ajoshi.commonutils.Logg
 import biz.ajoshi.commonutils.StringUtilities
 import biz.ajoshi.kolchat.chat.persistence.RoomInserter
-import biz.ajoshi.kolnetwork.model.LoggedInUser
 import biz.ajoshi.kolnetwork.model.ServerChatMessage
-import biz.ajoshi.kolnetwork.model.User
 import java.io.IOException
 
 // normally we'll poll every 3 seconds
@@ -51,7 +49,7 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
 
     override fun handleMessage(msg: Message?) {
         try {
-            Logg.i("Handler received a message")
+            Logg.i("ChatServiceHandler", "Handler received a message")
             if (ChatSingleton.chatManager == null || !ChatSingleton.isLoggedIn()) {
                 ChatSingleton.login(service.getCurrentUsername(), service.getCurrentUserPassword(), true, service.getContext())
             }
@@ -61,7 +59,7 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
                 // not logged in so exit service. may be premature and a bad idea
                 // we couldn't log in so... stopChatService the service?
                 // TODO maybe notify user that error occurred here?
-                Logg.i("Not logged in. Handler exiting")
+                Logg.i("ChatServiceHandler", "Not logged in. Handler exiting")
                 service.stopChatService(msg?.arg1 ?: -1)
                 return
             }
@@ -73,32 +71,32 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
 
                     MessageType.START -> {
                         // we got told to start. read chat asap and also send a delayed read request
-                        Logg.i("Starting periodic chat read")
+                        Logg.i("ChatServiceHandler", "Starting periodic chat read")
                         readChat()
                         sendMessageDelayed(obtainLoopMessage(msg.arg1), pollInterval)
                     }
                     MessageType.STOP -> {
                         // we got told to quit
-                        Logg.i("Shutting down chat reading")
+                        Logg.i("ChatServiceHandler", "Shutting down chat reading")
                         service.stopChatService(msg.arg1)
                         return
                     }
                     MessageType.SEND_CHAT_MESSAGE -> {
-                        Logg.i("Sending message")
+                        Logg.i("ChatServiceHandler", "Sending message")
                         if (serviceMessage.textmessage != null) {
                             insertChatsIntoDb((ChatSingleton.postChat(serviceMessage.textmessage)), ChatSingleton.network?.currentUser?.player?.name
                                     ?: ERROR_STRING)
                         }
                     }
                     MessageType.READ_ONCE -> {
-                        Logg.i("Reading chat once")
+                        Logg.i("ChatServiceHandler", "Reading chat once")
                         // read once and do not send message to read again
                         readChat()
                     }
                 }
 
             } else {
-                Logg.i("No message, reading chat and scheduling future read")
+                Logg.i("ChatServiceHandler", "No message, reading chat and scheduling future read")
                 // else check for new commands and reschedule to check in a bit
                 if (msg != null && msg.arg2 == inverseAgeOfMessage) {
                     sendMessageDelayed(obtainLoopMessage(msg.arg1), pollInterval)
@@ -117,12 +115,13 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
      * Reads queued chat messages and inserts them into DB. If user has any direct messages, a notification is also created
      */
     private fun readChat() {
-        Logg.i("Fetching chat data")
+        // TODO add instrumentation here so we can measure fetch and db insertion times
+        Logg.i("ChatServiceHandler", "Fetching chat data")
         val messages = ChatSingleton.readChat(lastFetchedTime)
-        Logg.i("chat data fetched " + messages?.size + " messages read")
+        Logg.i("ChatServiceHandler", "chat data fetched " + messages?.size + " messages read")
         // if we can, read the chat and stick in db
         insertChatsIntoDb(messages, ChatSingleton.network?.currentUser?.player?.name ?: ERROR_STRING)
-        Logg.i("db insertion complete")
+        Logg.i("ChatServiceHandler", "db insertion complete")
         notifyUserOfPm(messages)
         lastFetchedTime = ChatSingleton.chatManager!!.lastSeen
     }
@@ -196,19 +195,19 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
      */
     private fun notifyUserOfPm(messages: List<ServerChatMessage>?) {
         messages?.let {
-                val channelList = mutableListOf<String>()
+            val channelList = mutableListOf<String>()
             for (message in messages) {
                 if (BuildConfig.DEBUG) {
-         //           channelList.add(message.channelNameServer.name)
+                    //           channelList.add(message.channelNameServer.name)
                 }
                 // it's a PM and not a system message
                 if (message.channelNameServer.isPrivate && message.author.id != "-1") {
                     makeMentionNotification(service.getContext(), StringUtilities.getHtml(message.channelNameServer.name + ": " + message.htmlText), message.author.id)
                 }
             }
-      //      for (chan in channelList) {
-        //        Logg.i(chan)
-       //     }
+            //      for (chan in channelList) {
+            //        Logg.i(chan)
+            //     }
         }
     }
 }

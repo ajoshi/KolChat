@@ -112,7 +112,7 @@ class MainActivity : AppCompatActivity() {
     public override fun onDestroy() {
         super.onDestroy()
         if (ChatSingleton.isLoggedIn()) {
-            Logg.i("destroying main activity. and triggering background poll service")
+            Logg.i("MainActivity", "destroying activity and triggering background poll service")
             val increasePollTimeout = Intent(this, ChatBackgroundService::class.java)
             // activity is gone, increase poll interval to 1 minute
             increasePollTimeout.putExtra(EXTRA_POLL_INTERVAL_IN_MS, 60000)
