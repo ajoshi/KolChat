@@ -117,7 +117,8 @@ public class Network {
                            .addQueryParameter("promo", "")
                            .addQueryParameter("mrstore", "")
                            .addQueryParameter("secure", "1")
-                           .addQueryParameter("loginname", isQuiet ? String.format(IS_QUIET_MODIFIER, username) : username)
+                           .addQueryParameter("loginname",
+                                              isQuiet ? String.format(IS_QUIET_MODIFIER, username) : username)
                            .addQueryParameter("password", password)
                            .addQueryParameter("submitbutton", "Log+In")
                            .build();
