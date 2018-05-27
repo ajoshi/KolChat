@@ -32,7 +32,7 @@ class MainActivity : AppCompatActivity(), ChatChannelAdapter.ChannelClickListene
         setTheme(themer.getThemeId())
 
         setContentView(R.layout.activity_main)
-        if (ChatSingleton.isLoggedIn()) {
+        if (launchLoginActivityIfLoggedOut()) {
             // getnetwork can not return null if logged in so ignore bad static analysis
             Crashlytics.setUserIdentifier(ChatSingleton.network!!.currentUser.player.name)
             // we're logged in
@@ -42,10 +42,7 @@ class MainActivity : AppCompatActivity(), ChatChannelAdapter.ChannelClickListene
             serviceIntent.putExtra(EXTRA_MAIN_ACTIVITY_COMPONENTNAME, ComponentName(this, javaClass))
             activity.startService(serviceIntent)
         } else {
-            // we're not logged in, so just open up the login activity
-            val loginIntent = Intent(this, LoginActivity::class.java)
-            startActivity(loginIntent)
-            finish()
+            return
         }
         when (intent.action) {
         // launched by os
@@ -72,6 +69,26 @@ class MainActivity : AppCompatActivity(), ChatChannelAdapter.ChannelClickListene
         }
         ChatJob.stopJob()
 //        navController.setGraph(R.navigation.nav_graph)
+    }
+
+    /**
+     * Launches the login activity if the user is logged out
+     * @return true if logged in, else false
+     */
+    fun launchLoginActivityIfLoggedOut(): Boolean {
+        if (!ChatSingleton.isLoggedIn()) {
+            val loginIntent = Intent(this, LoginActivity::class.java)
+            startActivity(loginIntent)
+            finish()
+            return false
+        }
+        return true
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // check to see if we're still logged in (just in case)
+        launchLoginActivityIfLoggedOut()
     }
 
     override fun onSupportNavigateUp() = findNavController(R.id.llist).navigateUp()
@@ -127,6 +144,7 @@ class MainActivity : AppCompatActivity(), ChatChannelAdapter.ChannelClickListene
 
     public override fun onDestroy() {
         super.onDestroy()
+        // launch the background polling service if still logged in
         if (ChatSingleton.isLoggedIn()) {
             Logg.i("MainActivity", "destroying activity and triggering background poll service")
             val increasePollTimeout = Intent(this, ChatBackgroundService::class.java)
@@ -134,6 +152,7 @@ class MainActivity : AppCompatActivity(), ChatChannelAdapter.ChannelClickListene
             increasePollTimeout.putExtra(EXTRA_POLL_INTERVAL_IN_MS, 60000)
 //            startService(increasePollTimeout)  right now we just stop the service. Play around with options later
             stopService(increasePollTimeout)
+
             val currentUserName = ChatSingleton.network?.currentUser?.player?.name
             currentUserName?.let {
                 val account = KolAccountManager(this)
