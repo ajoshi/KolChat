@@ -15,9 +15,14 @@ class ChatChannelAdapter : RecyclerView.Adapter<ChatChannelVH>() {
     val rowTypePm = 2
 
     /**
-     * Called when a Channel name has been tapped on by the user
+     * Defines the different callbacks for click/long press and other touch interactions for a chat channel
      */
     interface ChannelClickListener {
+        /**
+         * Called when a Channel name has been tapped on by the user
+         *
+         * @param channel ChatChannel object describing the channel that was opened
+         */
         fun onChannelClicked(channel: ChatChannel)
     }
 

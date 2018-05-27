@@ -6,7 +6,7 @@
     android:orientation="vertical"
     tools:context="biz.ajoshi.kolchat.MainActivity">
 
-    <android.support.v7.widget.RecyclerView
+    <biz.ajoshi.kolchat.chat.view.ChatChannelList
         android:id="@+id/channel_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

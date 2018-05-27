@@ -12,7 +12,8 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 
 /**
- * Recyclerview that loads all the chat messages for a chat channel/PM. Does not update to show new data by itself
+ * Recyclerview that loads all the chat messages for a chat channel/PM. Does not update to show new data by itself.
+ * Apps using LiveData should handle this themselves
  */
 class ChatDetailList : RecyclerView {
     private var chatAdapter: ChatAdapter? = null

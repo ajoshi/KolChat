@@ -11,6 +11,7 @@ import biz.ajoshi.commonutils.Logg
 import biz.ajoshi.commonutils.StringUtilities
 import biz.ajoshi.kolchat.accounts.KolAccountManager
 import biz.ajoshi.kolchat.chat.*
+import biz.ajoshi.kolchat.chat.view.ChatChannelAdapter
 import biz.ajoshi.kolchat.persistence.chat.ChatChannel
 import com.crashlytics.android.Crashlytics
 import com.crashlytics.android.answers.Answers
@@ -19,8 +20,7 @@ import com.crashlytics.android.answers.CustomEvent
 
 const val action_navigate_to_chat_detail = "biz.ajoshi.kolchat.MainActivity.ACTION_NAVIGATE_TO_CHAT_DETAIL"
 
-class MainActivity : AppCompatActivity() {
-
+class MainActivity : AppCompatActivity(), ChatChannelAdapter.ChannelClickListener {
     internal var toolbar: Toolbar? = null
     internal val navController = NavController(this)
 
@@ -78,11 +78,10 @@ class MainActivity : AppCompatActivity() {
 
     /**
      * Called when a channel name is tapped
-     * TODO extract to an interface
      *
      * @param channel ChatChannel object describing the channel that was opened
      */
-    fun onChannelNameClicked(channel: ChatChannel) {
+    override fun onChannelClicked(channel: ChatChannel) {
         val b = Bundle()
         b.putString(EXTRA_CHANNEL_ID, channel.id)
         b.putString(EXTRA_CHANNEL_NAME, channel.name)
