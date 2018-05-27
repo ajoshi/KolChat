@@ -57,7 +57,7 @@ public class Logg {
     }
 
     /**
-     * Logs a throwable to the logger or logcat 
+     * Logs a throwable to the logger or logcat
      *
      * @param t
      *         throwable to log
