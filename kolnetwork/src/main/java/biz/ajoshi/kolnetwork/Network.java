@@ -71,7 +71,7 @@ public class Network {
      * @return true if login succeeded, else false
      *
      * @throws IOException
-     *         if an exception occured
+     *         if an logThrowable occured
      */
     public boolean login() throws IOException {
         client = new OkHttpClient()

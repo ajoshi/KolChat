@@ -1,6 +1,7 @@
 package biz.ajoshi.kolchat.chat
 
 import android.content.Context
+import biz.ajoshi.commonutils.Logg
 import biz.ajoshi.kolnetwork.model.ServerChatMessage
 import java.io.IOException
 
@@ -10,11 +11,20 @@ import java.io.IOException
 object ChatSingleton {
     var chatManager: ChatManager? = null
     var network: biz.ajoshi.kolnetwork.Network? = null
+    val tag = "ChatSingleton"
 
     fun login(username: String, password: String, silent: Boolean, context: Context): Boolean {
+        Logg.i(tag, "logging in as $username")
         network = biz.ajoshi.kolnetwork.Network(username, password, silent)
-        // TODO this assumes success. Handle failure
-        network!!.login()
+        try {
+            if (!network!!.login()) {
+                Logg.i(tag, "couldn't log in to $username")
+                return false
+            }
+        } catch (exception: IOException) {
+            Logg.logThrowable(tag, exception)
+            return false
+        }
         if (!network!!.isLoggedIn) return false
         chatManager = ChatManager(network!!, context.getSharedPreferences(CHAT_SHARED_PREF_NAME, Context.MODE_PRIVATE))
         return true

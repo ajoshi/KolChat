@@ -57,6 +57,28 @@ public class Logg {
     }
 
     /**
+     * Logs a throwable to the logger or logcat 
+     *
+     * @param t
+     *         throwable to log
+     */
+    public static void logThrowable(Throwable t) {
+        logThrowable("ajoshi", t);
+    }
+
+    /**
+     * Logs a throwable to the logger or logcat
+     *
+     * @param tag
+     *         tag for the message
+     * @param t
+     *         throwable to log
+     */
+    public static void logThrowable(String tag, Throwable t) {
+        Log.w(tag, t);
+    }
+
+    /**
      * Custom logger that will log to a non-logcat location.
      * This lets the app decide where individual modules log data without having the module include dependencies
      */
@@ -90,5 +112,15 @@ public class Logg {
          *         message to log
          */
         void logI(String tag, String message);
+
+        /**
+         * Logs an logThrowable
+         *
+         * @param tag
+         *         tag for the message
+         * @param throwable
+         *         throwable to log
+         */
+        void logException(String tag, Throwable throwable);
     }
 }

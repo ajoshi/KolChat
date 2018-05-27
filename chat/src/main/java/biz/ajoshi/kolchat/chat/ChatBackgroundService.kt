@@ -100,6 +100,7 @@ class ChatBackgroundService : Service(), ChatServiceHandler.ChatService {
         val shouldStop = intent?.getBooleanExtra(EXTRA_STOP, false) ?: false
         if (shouldStop) {
             stopChatService(startId)
+            ChatSingleton.network?.logout()
         } else {
             if (chatMessageToSend == null) {
                 msg?.obj = ChatServiceMessage(MessageType.START, null)
@@ -165,6 +166,5 @@ class ChatBackgroundService : Service(), ChatServiceHandler.ChatService {
         lastFetchedTime?.let {
             sharedPref?.edit()?.putLong(SHARED_PREF_LAST_FETCH_TIME, lastFetchedTime)?.apply()
         }
-        ChatSingleton.network?.logout()
     }
 }
