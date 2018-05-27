@@ -27,15 +27,6 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".chat.ChatBackgroundService"/>
-        <service
-            android:exported="false"
-            android:name=".chat.ChatJob">
-            <intent-filter>
-                <action android:name="com.firebase.jobdispatcher.ACTION_EXECUTE"/>
-            </intent-filter>
-        </service>
-
         <activity
             android:label="@string/title_activity_login"
             android:name=".LoginActivity"
