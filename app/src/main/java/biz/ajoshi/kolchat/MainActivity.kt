@@ -3,6 +3,7 @@ package biz.ajoshi.kolchat
 import android.content.ComponentName
 import android.content.Intent
 import android.os.Bundle
+import android.support.design.widget.FloatingActionButton
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import androidx.navigation.NavController
@@ -44,6 +45,7 @@ class MainActivity : AppCompatActivity(), ChatChannelAdapter.ChannelClickListene
         } else {
             return
         }
+        // analytics- log the source of the launch intent
         when (intent.action) {
         // launched by os
             Intent.ACTION_MAIN ->
@@ -58,15 +60,20 @@ class MainActivity : AppCompatActivity(), ChatChannelAdapter.ChannelClickListene
             else -> Answers.getInstance().logCustom(CustomEvent(EVENT_NAME_APP_LAUNCH)
                     .putCustomAttribute(EVENT_ATTRIBUTE_SOURCE, "Login/Unknown"))
         }
+        // set up toolbar
         toolbar = findViewById(R.id.toolbar)
+        toolbar?.setTitleTextColor(resources.getColor(android.R.color.white))
         setSupportActionBar(toolbar)
 
+        // set up the chat list fragment
         val listFrag = supportFragmentManager.findFragmentByTag(TAG_CHAT_LIST_FRAG)
         if (listFrag == null) {
             val chatMessageFrag = ChatChannelListFragment()
             supportFragmentManager.beginTransaction().add(R.id.llist, chatMessageFrag, TAG_CHAT_LIST_FRAG)
                     .commit()
         }
+
+        // stop the once-every-15-minutes polling job
         ChatJob.stopJob()
 //        navController.setGraph(R.navigation.nav_graph)
     }

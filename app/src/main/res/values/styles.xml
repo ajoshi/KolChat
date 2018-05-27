@@ -5,7 +5,7 @@
         <item name="colorPrimary">@color/kol_blue</item>
         <item name="colorPrimaryDark">@color/kol_theme_dark</item>
         <item name="colorAccent">@color/kol_theme_accent</item>
-        <item name="android:textColorPrimary">@android:color/white</item>
+        <item name="android:textColorPrimary">@android:color/black</item>
     </style>
 
     <style name="ChillOut" parent="KoLTheme">
