@@ -10,6 +10,9 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 
+/**
+ * Shows and updates the list of chat channels with messages. Updates automatically since it uses RxJava
+ */
 class ChatChannelList : RecyclerView {
     var chatChannelAdapter: ChatChannelAdapter? = null
     var groupChatUpdateSubscriber: Disposable? = null
@@ -52,10 +55,16 @@ class ChatChannelList : RecyclerView {
                 }
     }
 
+    /**
+     * Sets the click listener for each element in the list of channels
+     */
     fun setChatChannelClickListener(channelClickListener: ChatChannelAdapter.ChannelClickListener) {
         chatChannelAdapter?.clickListener = channelClickListener
     }
 
+    /**
+     * Must be called by the Activity/Fragment when it is being destroyed so this can dispose of its subscribers
+     */
     fun onDestroy() {
         pmChatUpdateSubscriber?.takeIf { it.isDisposed }?.dispose()
         groupChatUpdateSubscriber?.takeIf { it.isDisposed }?.dispose()
