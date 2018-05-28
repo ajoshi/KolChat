@@ -38,11 +38,10 @@ class MainActivity : AppCompatActivity(), ChatChannelAdapter.ChannelClickListene
             // getnetwork can not return null if logged in so ignore bad static analysis
             Crashlytics.setUserIdentifier(ChatSingleton.network!!.currentUser.player.name)
             // we're logged in
-            val activity = this
-            val serviceIntent = Intent(activity, ChatBackgroundService::class.java)
+            val serviceIntent = Intent(this, ChatBackgroundService::class.java)
             serviceIntent.putExtra(EXTRA_POLL_INTERVAL_IN_MS, 2000)
             serviceIntent.putExtra(EXTRA_MAIN_ACTIVITY_COMPONENTNAME, ComponentName(this, javaClass))
-            activity.startService(serviceIntent)
+            startService(serviceIntent)
         } else {
             return
         }
@@ -76,20 +75,6 @@ class MainActivity : AppCompatActivity(), ChatChannelAdapter.ChannelClickListene
         navController?.currentDestination?.label = getString(R.string.app_name)
     }
 
-    /**
-     * Launches the login activity if the user is logged out
-     * @return true if logged in, else false
-     */
-    fun launchLoginActivityIfLoggedOut(): Boolean {
-        if (!ChatSingleton.isLoggedIn()) {
-            val loginIntent = Intent(this, LoginActivity::class.java)
-            startActivity(loginIntent)
-            finish()
-            return false
-        }
-        return true
-    }
-
     override fun onResume() {
         super.onResume()
         // check to see if we're still logged in (just in case)
@@ -97,47 +82,6 @@ class MainActivity : AppCompatActivity(), ChatChannelAdapter.ChannelClickListene
     }
 
     override fun onSupportNavigateUp() = findNavController(R.id.llist).navigateUp()
-
-    /**
-     * Called when a channel name is tapped
-     *
-     * @param channel ChatChannel object describing the channel that was opened
-     */
-    override fun onChannelClicked(channel: ChatChannel) {
-        val b = Bundle()
-        b.putString(EXTRA_CHANNEL_ID, channel.id)
-        b.putString(EXTRA_CHANNEL_NAME, channel.name)
-        b.putBoolean(EXTRA_CHANNEL_IS_PRIVATE, channel.isPrivate)
-        navController?.navigate(R.id.nav_chat_message, b)
-        navController?.currentDestination?.label = channel.name
-
-        // Go back to this if nav arch is as half baked as it seems
-//        val chatDetailFrag = ChatMessageFrag()
-//        chatDetailFrag.arguments = b
-//        supportFragmentManager.beginTransaction().replace(R.id.llist, chatDetailFrag, TAG_CHAT_DETAIL_FRAG)
-//                .addToBackStack(TAG_CHAT_DETAIL_FRAG).commit()
-        if (toolbar != null) {
-            // should crash on line 66 if this happens, honestly
-            toolbar!!.title = getPlaintextForHtml(channel.name)
-        }
-        Logg.i("MainActivity", "channel detail opened")
-        Answers.getInstance().logContentView(ContentViewEvent()
-                .putContentName("Channel detail opened")
-                .putContentId(if (channel.isPrivate) "PM" else channel.name))
-
-    }
-
-    /**
-     * Returns plaintext representation of html. So "**Hi**" would return "Hi"
-     *
-     * @param html
-     * string containing html
-     *
-     * @return string without html
-     */
-    private fun getPlaintextForHtml(html: String): String {
-        return StringUtilities.getHtml(html).toString()
-    }
 
     override fun onBackPressed() {
         super.onBackPressed()
@@ -168,6 +112,62 @@ class MainActivity : AppCompatActivity(), ChatChannelAdapter.ChannelClickListene
                 }
             }
         }
+    }
+
+    /**
+     * Called when a channel name is tapped
+     *
+     * @param channel ChatChannel object describing the channel that was opened
+     */
+    override fun onChannelClicked(channel: ChatChannel) {
+        val b = Bundle()
+        b.putString(EXTRA_CHANNEL_ID, channel.id)
+        b.putString(EXTRA_CHANNEL_NAME, channel.name)
+        b.putBoolean(EXTRA_CHANNEL_IS_PRIVATE, channel.isPrivate)
+        navController?.navigate(R.id.nav_chat_message, b)
+        navController?.currentDestination?.label = channel.name
+
+        // Go back to this if nav arch is as half baked as it seems
+//        val chatDetailFrag = ChatMessageFrag()
+//        chatDetailFrag.arguments = b
+//        supportFragmentManager.beginTransaction().replace(R.id.llist, chatDetailFrag, TAG_CHAT_DETAIL_FRAG)
+//                .addToBackStack(TAG_CHAT_DETAIL_FRAG).commit()
+        if (toolbar != null) {
+            // should crash on line 66 if this happens, honestly
+            toolbar!!.title = getPlaintextForHtml(channel.name)
+        }
+        Logg.i("MainActivity", "channel detail opened")
+        Answers.getInstance().logContentView(ContentViewEvent()
+                .putContentName("Channel detail opened")
+                .putContentId(if (channel.isPrivate) "PM" else channel.name))
+
+    }
+
+
+    /**
+     * Returns plaintext representation of html. So "**Hi**" would return "Hi"
+     *
+     * @param html
+     * string containing html
+     *
+     * @return string without html
+     */
+    private fun getPlaintextForHtml(html: String): String {
+        return StringUtilities.getHtml(html).toString()
+    }
+
+    /**
+     * Launches the login activity if the user is logged out
+     * @return true if logged in, else false
+     */
+    private fun launchLoginActivityIfLoggedOut(): Boolean {
+        if (!ChatSingleton.isLoggedIn()) {
+            val loginIntent = Intent(this, LoginActivity::class.java)
+            startActivity(loginIntent)
+            finish()
+            return false
+        }
+        return true
     }
 
     fun getMessages() {
