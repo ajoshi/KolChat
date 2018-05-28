@@ -2,19 +2,11 @@ package biz.ajoshi.kolchat
 
 import android.content.Context
 import android.os.Bundle
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import biz.ajoshi.kolchat.persistence.chat.ChatChannel
-import biz.ajoshi.kolchat.persistence.KolDB
 import biz.ajoshi.kolchat.chat.view.ChatChannelAdapter
-import biz.ajoshi.kolchat.chat.ChatSingleton
-import biz.ajoshi.kolchat.chat.view.ChatChannelList
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.Disposable
-import io.reactivex.schedulers.Schedulers
+import biz.ajoshi.kolchat.chat.view.customviews.ChatChannelList
 
 /**
  * Shows a list of all active chats/groups
@@ -41,7 +33,8 @@ class ChatChannelListFragment : BaseFragment() {
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
-        if(context !is ChatChannelAdapter.ChannelClickListener) {
+        if (context !is ChatChannelAdapter.ChannelClickListener) {
+            // maybe this should check parent fragments as well?
             throw ClassCastException("Activity must implement ChatChannelAdapter.ChannelClickListener")
         }
     }

@@ -1,9 +1,10 @@
-package biz.ajoshi.kolchat.chat.view
+package biz.ajoshi.kolchat.chat.view.customviews
 
 import android.content.Context
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.AttributeSet
+import biz.ajoshi.kolchat.chat.view.ChatAdapter
 import biz.ajoshi.kolchat.persistence.KolDB
 import biz.ajoshi.kolchat.persistence.chat.ChatMessage
 import io.reactivex.Observable

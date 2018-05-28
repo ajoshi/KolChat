@@ -3,19 +3,19 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <biz.ajoshi.kolchat.chat.view.ChatDetailList
+    <biz.ajoshi.kolchat.chat.view.customviews.ChatDetailList
         android:id="@+id/messagesList"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:scrollbars="vertical"
         android:layout_above="@+id/quick_commands" />
-    <biz.ajoshi.kolchat.chat.view.QuickCommandView
+    <biz.ajoshi.kolchat.chat.view.customviews.QuickCommandView
         android:id="@+id/quick_commands"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_above="@+id/input_view"
     />
-    <biz.ajoshi.kolchat.chat.view.ChatInputView
+    <biz.ajoshi.kolchat.chat.view.customviews.ChatInputView
         android:id="@+id/input_view"
         android:layout_alignParentBottom="true"
         android:layout_width="match_parent"

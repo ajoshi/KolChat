@@ -1,4 +1,4 @@
-package biz.ajoshi.kolchat.chat.view;
+package biz.ajoshi.kolchat.chat.view.customviews;
 
 import biz.ajoshi.kolchat.chat.R;
 
