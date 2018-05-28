@@ -59,4 +59,7 @@ public interface MessageDao {
 
     @Delete
     void delete(ChatMessage message);
+
+    @Query("DELETE FROM chatmessage WHERE channelId = :channel_id AND localtimeStamp < :localTimestamp")
+    void deleteOlderThan(String channel_id, long localTimestamp);
 }

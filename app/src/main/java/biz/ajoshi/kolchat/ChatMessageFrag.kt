@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import biz.ajoshi.commonutils.Logg
 import biz.ajoshi.kolchat.chat.ChatBackgroundService
 import biz.ajoshi.kolchat.chat.ChatManager
 import biz.ajoshi.kolchat.chat.ChatMessageViewModel
@@ -15,7 +16,9 @@ import biz.ajoshi.kolchat.chat.view.ChatDetailList
 import biz.ajoshi.kolchat.chat.view.ChatInputView
 import biz.ajoshi.kolchat.chat.view.QuickCommand
 import biz.ajoshi.kolchat.chat.view.QuickCommandView
+import com.crashlytics.android.Crashlytics
 import com.crashlytics.android.answers.Answers
+import com.crashlytics.android.answers.ContentViewEvent
 import com.crashlytics.android.answers.CustomEvent
 
 /**
@@ -30,6 +33,7 @@ class ChatMessageFrag : BaseFragment(), QuickCommandView.CommandClickListener, C
     var id = "newbie"
     var name = "newbie"
     var isPrivate = false
+    var chatLoadStartTimestamp = 0L
 
     var chatDetailList: ChatDetailList? = null
     var inputView: ChatInputView? = null
@@ -47,6 +51,8 @@ class ChatMessageFrag : BaseFragment(), QuickCommandView.CommandClickListener, C
         }
 
         chatDetailList = activity?.findViewById(R.id.messagesList) as ChatDetailList
+
+        chatLoadStartTimestamp = System.currentTimeMillis()
         chatDetailList?.loadInitialMessages(id, this)
 
         inputView = activity?.findViewById(R.id.input_view) as ChatInputView
@@ -61,6 +67,7 @@ class ChatMessageFrag : BaseFragment(), QuickCommandView.CommandClickListener, C
      * Listen to new chat commands that are made to this channel and show them. Will also listen for System Announcements
      */
     override fun onInitialMessageListLoaded() {
+        val chatLoadEndTimestamp = System.currentTimeMillis()
         val vm: ChatMessageViewModel = ViewModelProviders.of(this).get(ChatMessageViewModel::class.java)
         vm.getChatListObservable(id, System.currentTimeMillis())?.observe(this, Observer
         { message ->
@@ -68,6 +75,10 @@ class ChatMessageFrag : BaseFragment(), QuickCommandView.CommandClickListener, C
             //add this new message to the bottom (will scroll down if we're at the bottom of the list)
                 chatDetailList?.addMessages(message)
         })
+        Answers.getInstance().logContentView(ContentViewEvent()
+                .putContentName("Channel detail opened")
+                .putContentId(if (isPrivate) "PM" else name)
+                .putCustomAttribute(EVENT_ATTRIBUTE_TIME_TAKEN, (chatLoadEndTimestamp - chatLoadStartTimestamp)))
     }
 
     /**

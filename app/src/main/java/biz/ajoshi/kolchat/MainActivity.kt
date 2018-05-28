@@ -136,11 +136,7 @@ class MainActivity : AppCompatActivity(), ChatChannelAdapter.ChannelClickListene
             // should crash on line 66 if this happens, honestly
             toolbar!!.title = getPlaintextForHtml(channel.name)
         }
-        Logg.i("MainActivity", "channel detail opened")
-        Answers.getInstance().logContentView(ContentViewEvent()
-                .putContentName("Channel detail opened")
-                .putContentId(if (channel.isPrivate) "PM" else channel.name))
-
+        Logg.i("MainActivity", if (channel.isPrivate) {"Channel detail opened"} else {"PM detail opened"})
     }
 
 

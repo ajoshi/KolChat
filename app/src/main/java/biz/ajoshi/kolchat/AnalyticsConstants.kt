@@ -15,3 +15,6 @@ const val EVENT_NAME_CHAT_MESSAGE_SENT = "Message Sent"
 const val EVENT_ATTRIBUTE_RECIPIENT = "Recipient"
 // character count of the message
 const val EVENT_ATTRIBUTE_MESSAGE_LENGTH = "Message Length"
+
+// time taken to load data (for perf measurement)
+const val EVENT_ATTRIBUTE_TIME_TAKEN = "Time to load"
