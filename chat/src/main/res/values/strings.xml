@@ -14,4 +14,11 @@
     <string name="persistent_channel_desc">Shows when the app is running</string>
     <string name="pm_channel_desc">This type of notification is shown when a PM or notification worthy event occurs in KoL</string>
 
+    <!-- New chat message dialog from NewChatFAB -->
+    <string name="cancel">Cancel</string>
+    <string name="new_chat_message_title_user">Send private message to a user</string>
+    <string name="new_chat_message_hint_user">User name</string>
+    <string name="new_chat_message_title_channel">Send message to a channel</string>
+    <string name="new_chat_message_hint_channel">Channel name</string>
+
 </resources>

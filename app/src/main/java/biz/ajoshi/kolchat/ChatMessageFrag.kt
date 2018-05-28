@@ -54,7 +54,7 @@ class ChatMessageFrag : BaseFragment(), QuickCommandView.CommandClickListener, C
         chatDetailList?.loadInitialMessages(id, this)
 
         inputView = activity?.findViewById(R.id.input_view) as ChatInputView
-        inputView?.setSubmitListener { input: CharSequence? -> makePost(input) }
+        inputView?.setSubmitListener { input: CharSequence? -> makePost(input, isPrivate, id) }
 
         val quickCommands = activity?.findViewById(R.id.quick_commands) as QuickCommandView
         quickCommands.setClickListener(this)
@@ -77,29 +77,6 @@ class ChatMessageFrag : BaseFragment(), QuickCommandView.CommandClickListener, C
                 .putContentName("Channel detail opened")
                 .putContentId(if (isPrivate) "PM" else name)
                 .putCustomAttribute(EVENT_ATTRIBUTE_TIME_TAKEN, (chatLoadEndTimestamp - chatLoadStartTimestamp)))
-    }
-
-    /**
-     * Send a chat message to this channel/user
-     */
-    fun makePost(post: CharSequence?): Boolean {
-        // log to analytics as well
-        Answers.getInstance().logCustom(CustomEvent(EVENT_NAME_CHAT_MESSAGE_SENT)
-                .putCustomAttribute(EVENT_ATTRIBUTE_RECIPIENT, if (isPrivate) "PM" else id)
-                .putCustomAttribute(EVENT_ATTRIBUTE_MESSAGE_LENGTH, post?.length)
-        )
-        return sendChatCommand(ChatManager.getChatString(post, id, isPrivate))
-    }
-
-    /**
-     * Send a chat command to the server. Is not scoped to this channel, so scoping should be
-     * done before calling this
-     */
-    fun sendChatCommand(command: String): Boolean {
-        val serviceIntent = Intent(activity, ChatBackgroundService::class.java)
-        serviceIntent.putExtra(EXTRA_CHAT_MESSAGE_TO_SEND, command)
-        activity?.startService(serviceIntent)
-        return true
     }
 
     override fun onCommandClicked(command: QuickCommand) {

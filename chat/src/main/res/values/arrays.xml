@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Options the user sees when tapping the new message FAB -->
+    <string-array name="new_message_options">
+        <item>Send a PM</item>
+        <item>Post in a channel</item>
+    </string-array>
+</resources>

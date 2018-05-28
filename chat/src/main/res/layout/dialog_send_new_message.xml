@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/dialog_recipient_name"
+        android:hint="@string/new_chat_message_hint_user"
+        android:maxLength="@integer/chat_max_characters"
+        android:maxLines="1"
+        android:inputType="textNoSuggestions"
+        android:importantForAutofill="no"/>
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/dialog_text_input"
+        android:hint="@string/input_area_hint"
+        android:maxLength="@integer/chat_max_characters"
+        android:maxLines="5"
+        android:inputType="textAutoComplete|textAutoCorrect"
+        android:importantForAutofill="no"/>
+</LinearLayout>
