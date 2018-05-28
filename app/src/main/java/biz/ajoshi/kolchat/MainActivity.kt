@@ -3,13 +3,14 @@ package biz.ajoshi.kolchat
 import android.content.ComponentName
 import android.content.Intent
 import android.os.Bundle
-import android.support.design.widget.FloatingActionButton
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import biz.ajoshi.commonutils.Logg
 import biz.ajoshi.commonutils.StringUtilities
+import biz.ajoshi.commonutils.getDefaultColor
 import biz.ajoshi.kolchat.accounts.KolAccountManager
 import biz.ajoshi.kolchat.chat.*
 import biz.ajoshi.kolchat.chat.view.ChatChannelAdapter
@@ -23,7 +24,7 @@ const val action_navigate_to_chat_detail = "biz.ajoshi.kolchat.MainActivity.ACTI
 
 class MainActivity : AppCompatActivity(), ChatChannelAdapter.ChannelClickListener {
     internal var toolbar: Toolbar? = null
-    internal val navController = NavController(this)
+    internal var navController: NavController? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,20 +63,17 @@ class MainActivity : AppCompatActivity(), ChatChannelAdapter.ChannelClickListene
         }
         // set up toolbar
         toolbar = findViewById(R.id.toolbar)
-        toolbar?.setTitleTextColor(resources.getColor(android.R.color.white))
+        toolbar?.setTitleTextColor(getDefaultColor(android.R.color.white))
         setSupportActionBar(toolbar)
-
-        // set up the chat list fragment
-        val listFrag = supportFragmentManager.findFragmentByTag(TAG_CHAT_LIST_FRAG)
-        if (listFrag == null) {
-            val chatMessageFrag = ChatChannelListFragment()
-            supportFragmentManager.beginTransaction().add(R.id.llist, chatMessageFrag, TAG_CHAT_LIST_FRAG)
-                    .commit()
-        }
 
         // stop the once-every-15-minutes polling job
         ChatJob.stopJob()
-//        navController.setGraph(R.navigation.nav_graph)
+
+        // set up nav graph
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.llist)
+        navController = navHostFragment.findNavController()
+        navController?.setGraph(R.navigation.nav_graph)
+        navController?.currentDestination?.label = getString(R.string.app_name)
     }
 
     /**
@@ -110,13 +108,14 @@ class MainActivity : AppCompatActivity(), ChatChannelAdapter.ChannelClickListene
         b.putString(EXTRA_CHANNEL_ID, channel.id)
         b.putString(EXTRA_CHANNEL_NAME, channel.name)
         b.putBoolean(EXTRA_CHANNEL_IS_PRIVATE, channel.isPrivate)
-//        navController.navigate(R.id.nav_chat_message, b)
+        navController?.navigate(R.id.nav_chat_message, b)
+        navController?.currentDestination?.label = channel.name
 
         // Go back to this if nav arch is as half baked as it seems
-        val chatDetailFrag = ChatMessageFrag()
-        chatDetailFrag.arguments = b
-        supportFragmentManager.beginTransaction().replace(R.id.llist, chatDetailFrag, TAG_CHAT_DETAIL_FRAG)
-                .addToBackStack(TAG_CHAT_DETAIL_FRAG).commit()
+//        val chatDetailFrag = ChatMessageFrag()
+//        chatDetailFrag.arguments = b
+//        supportFragmentManager.beginTransaction().replace(R.id.llist, chatDetailFrag, TAG_CHAT_DETAIL_FRAG)
+//                .addToBackStack(TAG_CHAT_DETAIL_FRAG).commit()
         if (toolbar != null) {
             // should crash on line 66 if this happens, honestly
             toolbar!!.title = getPlaintextForHtml(channel.name)
@@ -142,11 +141,8 @@ class MainActivity : AppCompatActivity(), ChatChannelAdapter.ChannelClickListene
 
     override fun onBackPressed() {
         super.onBackPressed()
-        val fragment = supportFragmentManager.findFragmentById(R.id.llist) as BaseFragment
-        if (toolbar != null) {
-            toolbar!!.title = getPlaintextForHtml(fragment.getTitle())
-        }
-
+        // val fragment = supportFragmentManager.findFragmentById(R.id.llist) as NavHostFragment
+        toolbar?.title = getPlaintextForHtml("" + navController?.currentDestination?.label)
     }
 
     public override fun onDestroy() {
