@@ -72,6 +72,10 @@ class ChatManager(val network: biz.ajoshi.kolnetwork.Network, internal val share
         who:
         {"output":"<br><table><tr><td class=tiny><center><b>Players in this channel:<\/b><\/center><a target=mainpane href=\"showplayer.php?who=2239681\"><font color=black>Corman<\/font><\/a> (1&nbsp;total)<\/td><\/tr><\/table>","msgs":[]}
          */
+
+
+        // TODO handle failed messages (by showing error?)
+        // {"output":"<font color=green><b>Unknown recipient \"fydjdjsjsjsjsjsjsjshs\".  Message (jxd) not sent.<\/b><\/font>","msgs":[]}
         return parseJsonChat(json)
     }
 

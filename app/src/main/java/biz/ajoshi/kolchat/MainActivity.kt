@@ -17,7 +17,6 @@ import biz.ajoshi.kolchat.chat.view.ChatChannelAdapter
 import biz.ajoshi.kolchat.persistence.chat.ChatChannel
 import com.crashlytics.android.Crashlytics
 import com.crashlytics.android.answers.Answers
-import com.crashlytics.android.answers.ContentViewEvent
 import com.crashlytics.android.answers.CustomEvent
 
 const val action_navigate_to_chat_detail = "biz.ajoshi.kolchat.MainActivity.ACTION_NAVIGATE_TO_CHAT_DETAIL"
@@ -136,7 +135,11 @@ class MainActivity : AppCompatActivity(), ChatChannelAdapter.ChannelClickListene
             // should crash on line 66 if this happens, honestly
             toolbar!!.title = getPlaintextForHtml(channel.name)
         }
-        Logg.i("MainActivity", if (channel.isPrivate) {"Channel detail opened"} else {"PM detail opened"})
+        Logg.i("MainActivity", if (channel.isPrivate) {
+            "Channel detail opened"
+        } else {
+            "PM detail opened"
+        })
     }
 
 
