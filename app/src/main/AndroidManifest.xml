@@ -27,6 +27,8 @@
             </intent-filter>
         </activity>
 
+        <service android:name=".chat.ChatBackgroundService"/>
+
         <activity
             android:label="@string/title_activity_login"
             android:name=".LoginActivity"
