@@ -3,6 +3,7 @@ package biz.ajoshi.kolchat.chat
 import android.content.SharedPreferences
 import android.util.Log
 import biz.ajoshi.kolnetwork.model.ServerChatChannel
+import biz.ajoshi.kolnetwork.model.ServerChatCommandResponse
 import biz.ajoshi.kolnetwork.model.ServerChatMessage
 import biz.ajoshi.kolnetwork.model.User
 import org.json.JSONObject
@@ -49,18 +50,18 @@ class ChatManager(val network: biz.ajoshi.kolnetwork.Network, internal val share
      * Makes a post and also retrieves any unread chat commands
      */
     @Throws(IOException::class)
-    fun post(message: String): List<ServerChatMessage> {
+    fun post(message: String): ServerChatCommandResponse {
         val chatResponse = network.postChat(message)
         return parseSentChat(chatResponse)
     }
 
-    fun parseSentChat(response: String?): List<ServerChatMessage> {
+    fun parseSentChat(response: String?): ServerChatCommandResponse {
         /*
          * This seems wrong- chat and chat commands should be separated out
          */
         if (response.isNullOrEmpty()) {
             network.logout()
-            return emptyList()
+            return ServerChatCommandResponse("", emptyList())
         }
         val json = JSONObject(response)
 
@@ -76,7 +77,24 @@ class ChatManager(val network: biz.ajoshi.kolnetwork.Network, internal val share
 
         // TODO handle failed messages (by showing error?)
         // {"output":"<font color=green><b>Unknown recipient \"fydjdjsjsjsjsjsjsjshs\".  Message (jxd) not sent.<\/b><\/font>","msgs":[]}
-        return parseJsonChat(json)
+        val parsedChat = parseJsonChat(json)
+        /*
+         *  Handle chat command responses (like /who and /count)
+         */
+        val output = json.optString("output")
+        if (!output.isNullOrEmpty()) {
+            // this was a chat command
+            val systemMessageUser = ServerChatChannel(name = SYSTEM_USER_NAME, id = SYSTEM_USER_ID, isPrivate = true)
+            // we want this message to show up in chat, but we also don't want it to look too new.
+            // Since kol time != real time, we use the timestamp of the last received message as this one's timestamp.
+            // Ensures that the next message received will always be seen as newer (wouldn't happen if we used local time)
+            val commandResponseMessage = ServerChatMessage(author = User(id = systemMessageUser.id, name = systemMessageUser.name),
+                    htmlText = output, channelNameServer = systemMessageUser, localTime = System.currentTimeMillis(), hideAuthorName = false, time = lastSeen)
+            parsedChat.add(commandResponseMessage)
+        }
+
+        val chatCommandResponse = json.optString("output")
+        return ServerChatCommandResponse(chatCommandResponse, parsedChat)
     }
 
     /**
@@ -112,7 +130,7 @@ class ChatManager(val network: biz.ajoshi.kolnetwork.Network, internal val share
 
     }
 
-    fun parseJsonChat(response: JSONObject): List<ServerChatMessage> {
+    fun parseJsonChat(response: JSONObject): MutableList<ServerChatMessage> {
         val currentTime = System.currentTimeMillis()
 
         //       does this mean logout?
@@ -162,22 +180,6 @@ class ChatManager(val network: biz.ajoshi.kolnetwork.Network, internal val share
         for (i in 0 until msgCount) {
             val msg = msgs.get(i) as JSONObject
             list.add(parseChatMessageJsonObject(chatMessageJson = msg, currentTime = currentTime))
-        }
-
-
-        /*
-         *  Handle chat command responses (like /who and /count)
-         */
-        val output = response.optString("output")
-        if (!output.isNullOrEmpty()) {
-            // this was a chat command
-            val systemMessageUser = ServerChatChannel(name = SYSTEM_USER_NAME, id = SYSTEM_USER_ID, isPrivate = true)
-            // we want this message to show up in chat, but we also don't want it to look too new.
-            // Since kol time != real time, we use the timestamp of the last receieved message as this one's timestamp.
-            // Ensures that the next message received will always be seen as newer (wouldn' happen if we used local time)
-            val commandResponseMessage = ServerChatMessage(author = User(id = systemMessageUser.id, name = systemMessageUser.name),
-                    htmlText = output, channelNameServer = systemMessageUser, localTime = currentTime, hideAuthorName = false, time = lastSeen)
-            list.add(commandResponseMessage)
         }
 
         return list

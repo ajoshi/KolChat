@@ -9,6 +9,7 @@ import android.os.Looper
 import android.os.Message
 import android.support.v4.app.NotificationCompat
 import android.support.v4.app.NotificationManagerCompat
+import android.support.v4.content.LocalBroadcastManager
 import biz.ajoshi.commonutils.Logg
 import biz.ajoshi.commonutils.StringUtilities
 import biz.ajoshi.kolchat.chat.persistence.RoomInserter
@@ -23,6 +24,9 @@ const val ERROR_STRING = "error"
 
 // if this id is sent in, launch this chat as soon as possible- the user tapped on a notification for this chat
 const val EXTRA_LAUNCH_TO_CHAT_ID = "biz.ajoshi.kolchat.chat.ChatServiceHandler.EXTRA_LAUNCH_TO_CHAT_ID"
+
+const val ACTION_CHAT_COMMAND_FAILED = "biz.ajoshi.kolchat.chat.ChatServiceHandler.ACTION_CHAT_COMMAND_FAILED"
+const val EXTRA_FAILED_CHAT_MESSAGE = "biz.ajoshi.kolchat.chat.ChatServiceHandler.EXTRA_FAILED_CHAT_MESSAGE"
 
 /**
  * A Handler that lets us read chat and insert to DB
@@ -84,8 +88,26 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
                     MessageType.SEND_CHAT_MESSAGE -> {
                         Logg.i("ChatServiceHandler", "Sending message")
                         if (serviceMessage.textmessage != null) {
-                            insertChatsIntoDb((ChatSingleton.postChat(serviceMessage.textmessage)), ChatSingleton.network?.currentUser?.player?.name
-                                    ?: ERROR_STRING)
+                            val response = ChatSingleton.postChat(serviceMessage.textmessage)
+                            response?.let {
+                                insertChatsIntoDb((response.messages), ChatSingleton.network?.currentUser?.player?.name
+                                        ?: ERROR_STRING)
+                                /*
+                                 TODO what do I do with the actual response? Eventbus it over and display as snackbar?
+                                  Stick in DB as System text?
+
+                                  Chat commands (and chat message sends) don't actually end up returning messages- they
+                                  only return an output (if anything)
+                                  There is no contract that specifies this though, and assuming this might cause dropped messages.
+
+                                  So right now just stick output in System chat and ALSO broadcast it out
+                                 */
+                                if (response.output.isNotEmpty()) {
+                                    val broadcastIntent = Intent(ACTION_CHAT_COMMAND_FAILED)
+                                    broadcastIntent.putExtra(EXTRA_FAILED_CHAT_MESSAGE, response.output)
+                                    LocalBroadcastManager.getInstance(service.getContext()).sendBroadcast(broadcastIntent)
+                                }
+                            }
                         }
                     }
                     MessageType.READ_ONCE -> {

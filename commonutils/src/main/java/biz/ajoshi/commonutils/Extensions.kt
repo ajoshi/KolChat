@@ -10,7 +10,7 @@ import android.support.annotation.ColorInt
 @ColorInt
 fun Context.getDefaultColor(id: Int): Int {
     return if (Build.VERSION.SDK_INT >= 23) {
-        this.resources.getColor(id, null)
+        this.getColor(id)
     } else {
         this.resources.getColor(id)
     }

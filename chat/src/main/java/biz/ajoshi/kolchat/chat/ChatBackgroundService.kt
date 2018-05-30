@@ -23,7 +23,8 @@ const val MENTION_NOTIFICATION_CHANNEL_ID = "kolMention"
 
 /**
  * Service that spins bg task to periodically poll for chat commands.
- * Needs to be a service so we can get commands even when app isn't in foreground
+ * Needs to be a service so we can get commands even when app isn't in foreground.
+ * Users should listen for intents with ACTION_CHAT_COMMAND_FAILED action to show errors when sending chat fails
  */
 class ChatBackgroundService : Service(), ChatServiceHandler.ChatService {
     override fun getCurrentUsername(): String {

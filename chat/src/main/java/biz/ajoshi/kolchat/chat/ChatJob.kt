@@ -14,6 +14,8 @@ import com.evernote.android.job.util.support.PersistableBundleCompat
 /**
  * This job will run one in a while. It will read chat once and then go away.
  * The hope is that the user will be using the foreground service enough to not really need this
+ * Users should listen for intents with ACTION_CHAT_COMMAND_FAILED action to show errors when sending chat fails
+ *
  * Alternatives:
  * https://developers.google.com/cloud-messaging/network-manager (deprecated?)
  * https://github.com/firebase/firebase-jobdispatcher-android

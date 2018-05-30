@@ -3,6 +3,7 @@ package biz.ajoshi.kolchat.chat
 import android.content.Context
 import biz.ajoshi.commonutils.Logg
 import biz.ajoshi.kolnetwork.model.ServerChatMessage
+import biz.ajoshi.kolnetwork.model.ServerChatCommandResponse
 import java.io.IOException
 
 /**
@@ -47,7 +48,7 @@ object ChatSingleton {
     }
 
     @Throws(IOException::class)
-    fun postChat(message: String): List<ServerChatMessage>? {
+    fun postChat(message: String): ServerChatCommandResponse? {
         return chatManager?.post(message)
     }
 }

@@ -27,6 +27,12 @@ data class ServerChatMessage(val author: User,
                              val localTime: Long)
 
 /**
+ * The response we get from the server when we make a new post/send a chat command
+ * The messages list seems to be empty each time, but I'd rather be safe
+ */
+data class ServerChatCommandResponse(val output: String, val messages: List<ServerChatMessage>)
+
+/**
  * A user seen in chat (or who or profile view)
  */
 data class User(val id: String,
