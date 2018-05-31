@@ -427,14 +427,14 @@ class ChatManager(val network: biz.ajoshi.kolnetwork.Network, internal val share
                     if (!post.startsWith("/me") && !post.startsWith("/em")) {
                         if (post.toString() == "/who") {
                             // /who commands are scoped to channel, but as "who <channel>" instead of "<channel> who"
-                            return "${post.toString()} ${safeId}"
+                            return "$post $safeId"
                         }
                         return post.toString()
                     }
                 }
                 return when (isPrivate) {
-                    true -> "/w ${safeId} ${post}"
-                    false -> "/${safeId} ${post}"
+                    true -> "/w $safeId $post"
+                    false -> "/$safeId $post"
                 }
             }
             // null chat string, we can't do anything anyway
