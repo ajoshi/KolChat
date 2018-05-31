@@ -415,24 +415,26 @@ class ChatManager(val network: biz.ajoshi.kolnetwork.Network, internal val share
         /**
          * Business logic about how to construct a chat command from individual components
          * @param post Text to be posted. Can be a chat command or chat text
-         * @param id id of the channel or user this is being sent to
+         * @param id id of the channel or user this is being sent to (or the username)
          * @param isPrivate true if this is a private chat, false if this is a channel
          */
         fun getChatString(post: CharSequence?, id: String, isPrivate: Boolean): String {
             post?.takeIf { post.isNotBlank() }?.let {
+                // the user could have sent in a username instead so replace space with _
+                val safeId = id.replace(' ', '_')
                 if (post.isNotBlank() && post[0] == '/') {
                     // this is a command, but /me go in regular chat and should be scoped to channel
                     if (!post.startsWith("/me") && !post.startsWith("/em")) {
                         if (post.toString() == "/who") {
                             // /who commands are scoped to channel, but as "who <channel>" instead of "<channel> who"
-                            return "${post.toString()} ${id}"
+                            return "${post.toString()} ${safeId}"
                         }
                         return post.toString()
                     }
                 }
                 return when (isPrivate) {
-                    true -> "/w ${id} ${post}"
-                    false -> "/${id} ${post}"
+                    true -> "/w ${safeId} ${post}"
+                    false -> "/${safeId} ${post}"
                 }
             }
             // null chat string, we can't do anything anyway
