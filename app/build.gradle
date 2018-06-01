@@ -61,6 +61,7 @@ dependencies {
     implementation "com.android.support:appcompat-v7:$android_support_lib_version"
     implementation "com.android.support:recyclerview-v7:$android_support_lib_version"
     implementation "com.android.support:design:$android_support_lib_version"
+    implementation "com.android.support:preference-v7:$android_support_lib_version"
 
     // use fresco to load images
     implementation "com.facebook.fresco:fresco:$fresco_version"

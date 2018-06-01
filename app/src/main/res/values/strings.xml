@@ -12,6 +12,10 @@
     <string name="error_incorrect_password">This password is incorrect</string>
     <string name="error_field_required">This field is required</string>
 
+    <string name="menu_option_advancedsettings">Advanced</string>
+    <string name="menu_option_logout">Logout</string>
+    <string name="menu_option_send_logs">Send logs</string>
+
     <!-- Arguments for fragments since navgraph wants it to be a string in xml -->
     <string name="argument_chat_message_id" translatable="false">argument_chat_message_id</string>
     <string name="argument_chat_message_name" translatable="false">argument_chat_message_name</string>

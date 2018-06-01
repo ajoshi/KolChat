@@ -17,4 +17,8 @@
         <argument android:name="@string/argument_chat_message_name" android:defaultValue="newbie" app:type="string" />
         <argument android:name="@string/argument_chat_message_is_private" android:defaultValue="false" app:type="boolean"/>
     </fragment>
+    <fragment
+        android:id="@+id/nav_preferences"
+        android:name="biz.ajoshi.kolchat.PreferenceFrag"
+        android:label="@string/title_prefs_screen" />
 </navigation>

@@ -60,7 +60,7 @@ class ChatManager(val network: biz.ajoshi.kolnetwork.Network, internal val share
          * This seems wrong- chat and chat commands should be separated out
          */
         if (response.isNullOrEmpty()) {
-            network.logout()
+    //        network.logout()
             return ServerChatCommandResponse("", emptyList())
         }
         val json = JSONObject(response)
@@ -115,7 +115,7 @@ class ChatManager(val network: biz.ajoshi.kolnetwork.Network, internal val share
         // this will be the list of chats we return. We'll add chats to this list
         // break up the response by the br tag. It's what kol uses to delimit commands
         if (chatResponse.isNullOrEmpty()) {
-            network.logout()
+        //    network.logout()
             return emptyList()//
         }
         val response = JSONObject(chatResponse)

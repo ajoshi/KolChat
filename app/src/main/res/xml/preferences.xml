@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--make a preference list like in https://developer.android.com/guide/topics/ui/settings -->
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="pref_send_logs"
+        android:summary="@string/pref_log_to_crashlytics_summary"
+        android:title="@string/pref_log_to_crashlytics_title"/>
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:dependency="pref_send_logs"
+        android:summary="@string/pref_send_analytics_summary"
+        android:key="pref_track_events"
+        android:title="@string/pref_send_analytics_title"/>
+</PreferenceScreen>

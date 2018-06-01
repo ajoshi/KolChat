@@ -3,14 +3,17 @@ package biz.ajoshi.kolchat
 import android.content.ComponentName
 import android.content.Intent
 import android.os.Bundle
+import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import biz.ajoshi.commonutils.Logg
 import biz.ajoshi.commonutils.StringUtilities
-import biz.ajoshi.commonutils.getDefaultColor
 import biz.ajoshi.kolchat.accounts.KolAccountManager
 import biz.ajoshi.kolchat.chat.*
 import biz.ajoshi.kolchat.chat.view.ChatChannelAdapter
@@ -61,7 +64,6 @@ class MainActivity : AppCompatActivity(), ChatChannelAdapter.ChannelClickListene
         }
         // set up toolbar
         toolbar = findViewById(R.id.toolbar)
-        toolbar?.setTitleTextColor(getDefaultColor(android.R.color.white))
         setSupportActionBar(toolbar)
 
         // stop the once-every-15-minutes polling job
@@ -74,14 +76,6 @@ class MainActivity : AppCompatActivity(), ChatChannelAdapter.ChannelClickListene
         navController?.currentDestination?.label = getString(R.string.app_name)
     }
 
-    override fun onResume() {
-        super.onResume()
-        // check to see if we're still logged in (just in case)
-        launchLoginActivityIfLoggedOut()
-    }
-
-    override fun onSupportNavigateUp() = findNavController(R.id.llist).navigateUp()
-
     override fun onBackPressed() {
         super.onBackPressed()
         // val fragment = supportFragmentManager.findFragmentById(R.id.llist) as NavHostFragment
@@ -93,12 +87,7 @@ class MainActivity : AppCompatActivity(), ChatChannelAdapter.ChannelClickListene
         // launch the background polling service if still logged in
         if (ChatSingleton.isLoggedIn()) {
             Logg.i("MainActivity", "destroying activity and triggering background poll service")
-            val increasePollTimeout = Intent(this, ChatBackgroundService::class.java)
-            // activity is gone, increase poll interval to 1 minute
-            increasePollTimeout.putExtra(EXTRA_POLL_INTERVAL_IN_MS, 60000)
-//            startService(increasePollTimeout)  right now we just stop the service. Play around with options later
-            stopService(increasePollTimeout)
-
+            stopBgChatService()
             val currentUserName = ChatSingleton.network?.currentUser?.player?.name
             currentUserName?.let {
                 val account = KolAccountManager(this)
@@ -112,6 +101,54 @@ class MainActivity : AppCompatActivity(), ChatChannelAdapter.ChannelClickListene
             }
         }
     }
+
+    private fun stopBgChatService() {
+        val increasePollTimeout = Intent(this, ChatBackgroundService::class.java)
+        // activity is gone, increase poll interval to 1 minute
+        increasePollTimeout.putExtra(EXTRA_POLL_INTERVAL_IN_MS, 60000)
+//            startService(increasePollTimeout)  right now we just stop the service. Play around with options later
+        stopService(increasePollTimeout)
+    }
+
+    /*************************************************************   Inflate Toolbar menu   ************************/
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.main_menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
+        R.id.menu_action_advanced_settings -> {
+            // navigate to settings
+            navController?.navigate(R.id.nav_preferences)
+            navController?.currentDestination?.label?.let {
+                toolbar?.title = it
+            }
+            true
+        }
+
+        R.id.menu_action_logout -> {            // log out and jump to login page
+            logoutAndExit()
+            true
+        }
+
+        R.id.menu_action_send_logs -> {
+            // send crashlytics logs
+            Crashlytics.logException(UserSentLogsEvent("User sent logs " + System.currentTimeMillis()))
+            Snackbar.make(findViewById<View>(R.id.llist), "Logs sent!", Snackbar.LENGTH_SHORT).show()
+            true
+        }
+
+        else -> {
+            // If we got here, the user's action was not recognized.
+            // Invoke the superclass to handle it.
+            super.onOptionsItemSelected(item)
+        }
+    }
+
+    /*************************************************************   Handle Navigation   ************************/
+
+    override fun onSupportNavigateUp() = findNavController(R.id.llist).navigateUp()
 
     /**
      * Called when a channel name is tapped
@@ -142,7 +179,6 @@ class MainActivity : AppCompatActivity(), ChatChannelAdapter.ChannelClickListene
         })
     }
 
-
     /**
      * Returns plaintext representation of html. So "**Hi**" would return "Hi"
      *
@@ -153,6 +189,20 @@ class MainActivity : AppCompatActivity(), ChatChannelAdapter.ChannelClickListene
      */
     private fun getPlaintextForHtml(html: String): String {
         return StringUtilities.getHtml(html).toString()
+    }
+
+    /*************************************************************   Handle redirect to login page   ************************/
+
+    /**
+     * Will log out, kill the service, and exit this activity (and launch the login activity)
+     */
+    fun logoutAndExit() {
+        // stop the service
+        stopBgChatService()
+        // log out
+        ChatSingleton.network?.logout()
+        // go to login page
+        launchLoginActivityIfLoggedOut()
     }
 
     /**
@@ -167,6 +217,12 @@ class MainActivity : AppCompatActivity(), ChatChannelAdapter.ChannelClickListene
             return false
         }
         return true
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // check to see if we're still logged in (just in case)
+        launchLoginActivityIfLoggedOut()
     }
 
     fun getMessages() {
