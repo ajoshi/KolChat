@@ -8,6 +8,7 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.EditText
 import android.widget.TextView
 import biz.ajoshi.kolchat.chat.R
@@ -65,7 +66,7 @@ class NewChatFAB : FloatingActionButton, View.OnClickListener {
             val li = LayoutInflater.from(context)
             val view = li.inflate(R.layout.dialog_send_new_message, rootView as ViewGroup, false)
             view.findViewById<TextView>(R.id.dialog_recipient_name).hint = context.getString(R.string.new_chat_message_hint_channel)
-            AlertDialog.Builder(it)
+            val dialog = AlertDialog.Builder(it)
                     .setView(view)
                     .setTitle(R.string.new_chat_message_title_channel)
                     .setPositiveButton(R.string.submit_post, DialogInterface.OnClickListener { dialog: DialogInterface?, _ ->
@@ -78,7 +79,9 @@ class NewChatFAB : FloatingActionButton, View.OnClickListener {
                         }
                     })
                     .setNegativeButton(R.string.cancel, null)
-                    .show()
+                    .create()
+            dialog.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE)
+            dialog.show()
         }
     }
 
@@ -87,7 +90,7 @@ class NewChatFAB : FloatingActionButton, View.OnClickListener {
      */
     fun postToUser() {
         context?.let {
-            AlertDialog.Builder(it)
+            val dialog = AlertDialog.Builder(it)
                     .setView(R.layout.dialog_send_new_message)
                     .setTitle(R.string.new_chat_message_title_user)
                     .setPositiveButton(R.string.submit_post, DialogInterface.OnClickListener { dialog: DialogInterface?, _ ->
@@ -99,8 +102,9 @@ class NewChatFAB : FloatingActionButton, View.OnClickListener {
                             }
                         }
                     })
-                    .setNegativeButton(R.string.cancel, null)
-                    .show()
+                    .setNegativeButton(R.string.cancel, null).create()
+            dialog.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE)
+            dialog.show()
         }
     }
 
