@@ -16,8 +16,8 @@ class Themer {
     }
     fun getThemeId(): Int {
         return when(currentTheme) {
-            Theme.CHILL -> R.style.ChillOut
-            Theme.FRUITS -> R.style.Fruit
+            Theme.CHILL -> R.style.KoLTheme_ChillOut
+            Theme.FRUITS -> R.style.KoLTheme_Fruit
             Theme.KOL -> R.style.KoLTheme
         }
     }

@@ -8,13 +8,13 @@
         <item name="android:textColorPrimary">@android:color/black</item>
     </style>
 
-    <style name="ChillOut" parent="KoLTheme">
+    <style name="KoLTheme.ChillOut" parent="KoLTheme">
         <item name="colorPrimary">@color/chill_green</item>
         <item name="colorPrimaryDark">@color/chill_theme_dark</item>
         <item name="colorAccent">@color/chill_theme_accent</item>
     </style>
 
-    <style name="Fruit" parent="KoLTheme">
+    <style name="KoLTheme.Fruit" parent="KoLTheme">
         <item name="colorPrimary">@color/fruit_blue</item>
         <item name="colorPrimaryDark">@color/fruit_theme_dark</item>
         <item name="colorAccent">@color/fruit_theme_accent</item>
@@ -26,6 +26,15 @@
         <item name="colorPrimary">@color/kol_blue</item>
         <item name="colorPrimaryDark">@color/kol_theme_dark</item>
         <item name="colorAccent">@color/kol_theme_accent</item>
+    </style>
+
+    <style name="KoLTheme.Toolbar" parent="KoLTheme">
+
+        <!-- navigation icon color -->
+        <item name="colorControlNormal">@android:color/white</item>
+
+        <!-- color of the menu overflow icon -->
+        <item name="android:textColorSecondary">@android:color/white</item>
     </style>
 
 </resources>
