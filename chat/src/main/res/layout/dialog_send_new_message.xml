@@ -10,6 +10,7 @@
         android:hint="@string/new_chat_message_hint_user"
         android:maxLength="@integer/chat_max_characters"
         android:maxLines="1"
+        android:focusedByDefault="true"
         android:inputType="textNoSuggestions"
         android:importantForAutofill="no"/>
     <EditText
