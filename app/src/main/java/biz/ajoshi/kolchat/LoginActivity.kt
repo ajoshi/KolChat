@@ -214,6 +214,7 @@ class LoginActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<List<Ko
             password.setText(passwordText)
             password.error = getString(R.string.error_incorrect_password)
             password.requestFocus()
+            showProgress(false)
         }
     }
 
