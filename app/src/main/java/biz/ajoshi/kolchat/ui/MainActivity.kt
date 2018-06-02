@@ -22,7 +22,6 @@ import biz.ajoshi.kolchat.chat.*
 import biz.ajoshi.kolchat.chat.view.ChatChannelAdapter
 import biz.ajoshi.kolchat.persistence.chat.ChatChannel
 import com.crashlytics.android.Crashlytics
-import com.crashlytics.android.answers.Answers
 import com.crashlytics.android.answers.CustomEvent
 
 const val action_navigate_to_chat_detail = "biz.ajoshi.kolchat.ui.MainActivity.ACTION_NAVIGATE_TO_CHAT_DETAIL"
@@ -52,21 +51,6 @@ class MainActivity : AppCompatActivity(), ChatChannelAdapter.ChannelClickListene
         } else {
             return
         }
-        // analytics- log the source of the launch intent
-        when (intent.action) {
-        // launched by os
-            Intent.ACTION_MAIN ->
-                Analytics.getAnswers()?.logCustom(CustomEvent(EVENT_NAME_APP_LAUNCH)
-                        .putCustomAttribute(EVENT_ATTRIBUTE_SOURCE, "Launcher"))
-        // launched by the notification for a chat message
-            action_navigate_to_chat_detail ->
-                Analytics.getAnswers()?.logCustom(CustomEvent(EVENT_NAME_APP_LAUNCH)
-                        .putCustomAttribute(EVENT_ATTRIBUTE_SOURCE, "Notification: chat detail"))
-        // launched by login screen (or something else?)
-        // this should tell me if users are logging in more than they should
-            else -> Analytics.getAnswers()?.logCustom(CustomEvent(EVENT_NAME_APP_LAUNCH)
-                    .putCustomAttribute(EVENT_ATTRIBUTE_SOURCE, "Login/Unknown"))
-        }
         // set up toolbar
         toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
@@ -79,6 +63,19 @@ class MainActivity : AppCompatActivity(), ChatChannelAdapter.ChannelClickListene
         navController = navHostFragment.findNavController()
         navController?.setGraph(R.navigation.nav_graph)
         navController?.currentDestination?.label = getString(R.string.app_name)
+
+        // analytics- log the source of the launch intent
+        when (intent.action) {
+        // launched by os
+            Intent.ACTION_MAIN ->
+                logLaunchEvent("Launcher")
+        // launched by the notification for a chat message
+            action_navigate_to_chat_detail ->
+                logLaunchEvent("Notification: chat detail")
+        // launched by login screen (or something else?)
+        // this should tell me if users are logging in more than they should
+            else -> logLaunchEvent("Login/Unknown")
+        }
     }
 
     override fun onBackPressed() {
@@ -92,27 +89,61 @@ class MainActivity : AppCompatActivity(), ChatChannelAdapter.ChannelClickListene
         // launch the background polling service if still logged in
         if (ChatSingleton.isLoggedIn()) {
             Logg.i("MainActivity", "destroying activity and triggering background poll service")
-            stopBgChatService()
-            val currentUserName = ChatSingleton.network?.currentUser?.player?.name
-            currentUserName?.let {
-                val account = KolAccountManager(this)
-                val currentUserAcct = account.getAccount(currentUserName)
-                currentUserAcct?.let {
-                    ChatJob.scheduleJob(
-                            ComponentName(this, javaClass),
-                            it.username,
-                            it.password)
+            val preferenceManager = PreferenceManager.getDefaultSharedPreferences(this)
+
+            val shouldEnableChatJob = preferenceManager.getBoolean(KEY_PREF_ENABLE_POLL, true)
+            val shouldEnableFrequentBgPoll = preferenceManager.getBoolean(KEY_PREF_SUPER_FAST_POLL, false)
+
+            if (shouldEnableFrequentBgPoll) {
+                // this kills battery, but polls every minute. Probably off.
+                val increasePollTimeout = Intent(this, ChatBackgroundService::class.java)
+                // activity is gone, increase poll interval to 1 minute
+                increasePollTimeout.putExtra(EXTRA_POLL_INTERVAL_IN_MS, 60000)
+                startService(increasePollTimeout)
+            } else {
+                // stop the frequent poller
+                stopBgChatService()
+                if (shouldEnableChatJob) {
+                    // if we wanted the slow poller, then enable that
+                    val currentUserName = ChatSingleton.network?.currentUser?.player?.name
+                    currentUserName?.let {
+                        val account = KolAccountManager(this)
+                        val currentUserAcct = account.getAccount(currentUserName)
+                        currentUserAcct?.let {
+                            ChatJob.scheduleJob(
+                                    ComponentName(this, javaClass),
+                                    it.username,
+                                    it.password)
+                        }
+                    }
                 }
             }
         }
     }
 
+    /**
+     * Logs the 'app launched' event for analytics.
+     * @param source Source of the launch (Launcher, notification, login page, etc)
+     */
+    private fun logLaunchEvent(source: String) {
+        if (Analytics.shouldTrackEvents) {
+            val customEvent = CustomEvent(EVENT_NAME_APP_LAUNCH)
+                    .putCustomAttribute(EVENT_ATTRIBUTE_SOURCE, source)
+            val preferenceManager = PreferenceManager.getDefaultSharedPreferences(this)
+            customEvent.putCustomAttribute(EVENT_ATTRIBUTE_IS_POLLING_ENABLED,
+                    preferenceManager.getBoolean(KEY_PREF_ENABLE_POLL, true).toString())
+            customEvent.putCustomAttribute(EVENT_ATTRIBUTE_IS_FAST_POLLING_ENABLED,
+                    preferenceManager.getBoolean(KEY_PREF_SUPER_FAST_POLL, false).toString())
+            Analytics.getAnswers()?.logCustom(customEvent)
+        }
+    }
+
+    /**
+     * Stops the background service that runs when the app is running
+     */
     private fun stopBgChatService() {
-        val increasePollTimeout = Intent(this, ChatBackgroundService::class.java)
-        // activity is gone, increase poll interval to 1 minute
-        increasePollTimeout.putExtra(EXTRA_POLL_INTERVAL_IN_MS, 60000)
-//            startService(increasePollTimeout)  right now we just stop the service. Play around with options later
-        stopService(increasePollTimeout)
+        val serviceIntent = Intent(this, ChatBackgroundService::class.java)
+        stopService(serviceIntent)
     }
 
     /*************************************************************   Inflate Toolbar menu   ************************/

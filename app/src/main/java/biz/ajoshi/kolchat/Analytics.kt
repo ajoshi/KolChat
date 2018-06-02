@@ -10,6 +10,8 @@ import com.crashlytics.android.answers.Answers
 const val EVENT_NAME_APP_LAUNCH = "App launch"
 // source of the launch
 const val EVENT_ATTRIBUTE_SOURCE = "Source"
+const val EVENT_ATTRIBUTE_IS_POLLING_ENABLED = "Polling enabled"
+const val EVENT_ATTRIBUTE_IS_FAST_POLLING_ENABLED = "Fast polling enabled"
 
 // Chat message sent
 const val EVENT_NAME_CHAT_MESSAGE_SENT = "Message Sent"

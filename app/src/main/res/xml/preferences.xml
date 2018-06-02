@@ -1,15 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <!--make a preference list like in https://developer.android.com/guide/topics/ui/settings -->
-    <CheckBoxPreference
-        android:defaultValue="true"
-        android:key="pref_send_logs"
-        android:summary="@string/pref_log_to_crashlytics_summary"
-        android:title="@string/pref_log_to_crashlytics_title"/>
-    <CheckBoxPreference
-        android:defaultValue="true"
-        android:dependency="pref_send_logs"
-        android:summary="@string/pref_send_analytics_summary"
-        android:key="pref_track_events"
-        android:title="@string/pref_send_analytics_title"/>
+    <PreferenceScreen
+        android:key="screen_privacy"
+        android:persistent="false"
+        android:title="@string/pref_privacy_title">
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="pref_send_logs"
+            android:summary="@string/pref_log_to_crashlytics_summary"
+            android:title="@string/pref_log_to_crashlytics_title"/>
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:dependency="pref_send_logs"
+            android:key="pref_track_events"
+            android:summary="@string/pref_send_analytics_summary"
+            android:title="@string/pref_send_analytics_title"/>
+    </PreferenceScreen>
+
+    <PreferenceScreen
+        android:key="screen_performance"
+        android:persistent="false"
+        android:title="@string/pref_perf_title">
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="pref_enable_poll"
+            android:summary="@string/pref_enable_slow_polling_in_bg_summary"
+            android:title="@string/pref_enable_slow_polling_in_bg_title"/>
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:dependency="pref_enable_poll"
+            android:key="pref_super_fast_poll"
+            android:summary="@string/pref_enable_fast_polling_bg_summary"
+            android:title="@string/pref_enable_fast_polling_bg_title"/>
+    </PreferenceScreen>
+
+    <!-- add a button to allow users to customize quickchat. Maybe a list of 5/6 edittextpreferences? -->
 </PreferenceScreen>
