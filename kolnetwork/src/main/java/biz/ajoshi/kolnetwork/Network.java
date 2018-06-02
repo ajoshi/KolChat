@@ -331,7 +331,7 @@ public class Network {
 
         String redirectLocation = chatResponse.header("location");
         if (redirectLocation != null && redirectLocation.contains(MAINT_POSTFIX)) {
-            // RO time
+            // TODO handle RO time
             return null;
         }
         ResponseBody body = chatResponse.body();

@@ -52,9 +52,9 @@ class ChatMessageVH(itemView: View) : RecyclerView.ViewHolder(itemView) {
                     , false, DraweeSpan.ALIGN_CENTER)
         }
         chatMessageTv.setDraweeSpanStringBuilder(newSpannable)
-
-        date.time = message.localtimeStamp
-        timeStampTv.text = if (DateUtils.isToday(message.localtimeStamp)) {
+        val time = message.timeStamp*1000 //or use message.localtimeStamp
+        date.time = time
+        timeStampTv.text = if (DateUtils.isToday(time)) {
             // if this is today then no need to show date
             chatMessageTimeFormat.format(date)
         } else {
