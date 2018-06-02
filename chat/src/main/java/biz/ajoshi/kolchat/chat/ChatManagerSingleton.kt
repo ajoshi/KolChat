@@ -15,7 +15,7 @@ object ChatSingleton {
     val tag = "ChatSingleton"
 
     fun login(username: String, password: String, silent: Boolean, context: Context): Boolean {
-        Logg.i(tag, "logging in as $username")
+        Logg.i(tag, "logging in as $username") // TODO remove this- no point logging username
         network = biz.ajoshi.kolnetwork.Network(username, password, silent)
         try {
             if (!network!!.login()) {

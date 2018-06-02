@@ -38,6 +38,7 @@ class ChatManager(val network: biz.ajoshi.kolnetwork.Network, internal val share
     /**
      * Log in if necessary and fetch chat
      */
+    @Throws(IOException::class)
     fun start() {
         if (!network.isLoggedIn && !network.login()) {
             throw IOException("Couldn't log in for magic reason")

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
+import biz.ajoshi.commonutils.Logg;
 import biz.ajoshi.commonutils.StringUtilities;
 import biz.ajoshi.kolnetwork.model.LoggedInUser;
 import biz.ajoshi.kolnetwork.model.User;
@@ -189,6 +190,13 @@ public class Network {
             pwdHash = StringUtilities.getBetweenTwoStrings(postResponse, "pwdhash = \"", "\"");
             String mainChannel = StringUtilities.getBetweenTwoStrings(postResponse, "active: \"", "\"");
             chatpwd = StringUtilities.getBetweenTwoStrings(postResponse, "setCookie('chatpwd', winW, ", ",");
+            if (playerid == null) {
+                Logg.e("Network", chatResponse.isSuccessful()? "successful call": "failed call");
+                Logg.e("Network", chatResponse.message());
+                Logg.e("Network", postResponse);
+                Logg.logThrowable(new IllegalStateException("Login id is null"));
+                throw new IOException("");
+            }
             currentUser = new LoggedInUser(new User(playerid, username), pwdHash, mainChannel);
        /* $cw,
                 $inp,

@@ -129,6 +129,7 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
                 }
             }
         } catch (exception: IOException) {
+            Logg.logThrowable(exception)
             // an ioexception occured. This means we're in a bad network location. try again later
             val newMessage = cloneMessage(msg)
             newMessage ?: sendMessageDelayed(newMessage, pollInterval)
