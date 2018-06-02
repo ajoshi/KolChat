@@ -29,6 +29,12 @@ class ChatJob : Job() {
         thread.start()
         val serviceLooper = thread.looper
         if (serviceLooper != null) {
+            // it seems we always want the slow polling job to log in. This is because the OS might not call the job
+            // for a few hours and our session token becomes invalid
+            ChatSingleton.login(username = params.extras.getString(extra_username, ""),
+                    password = params.extras.getString(extra_password, ""),
+                    silent = true,
+                    context = context)
             val serviceHandler = ChatServiceHandler(serviceLooper, ServiceImpl())
             val message = serviceHandler.obtainLoopMessage(1)
             message?.obj = ChatServiceMessage(MessageType.READ_UNTIL_THRESHOLD, null)
@@ -85,14 +91,6 @@ class ChatJob : Job() {
      * Alternatively, rename getContext and ChatJob can implement the interface directly
      */
     private inner class ServiceImpl : ChatServiceHandler.ChatService {
-        override fun getCurrentUserPassword(): String {
-            return params.extras.getString(extra_password, "")
-        }
-
-        override fun getCurrentUsername(): String {
-            return params.extras.getString(extra_username, "")
-        }
-
         override fun stopChatService(id: Int) {
             // can we do more?
             shouldReschedule = false;

@@ -27,16 +27,6 @@ const val MENTION_NOTIFICATION_CHANNEL_ID = "kolMention"
  * Users should listen for intents with ACTION_CHAT_COMMAND_FAILED action to show errors when sending chat fails
  */
 class ChatBackgroundService : Service(), ChatServiceHandler.ChatService {
-    override fun getCurrentUsername(): String {
-        // this service doesn't get logged out so this might not be needed
-        return ""
-    }
-
-    override fun getCurrentUserPassword(): String {
-        // TODO implement if needed
-        return ""
-    }
-
     override fun getContext(): Context {
         return this
     }

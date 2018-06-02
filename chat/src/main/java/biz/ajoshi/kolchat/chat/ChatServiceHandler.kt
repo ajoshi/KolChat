@@ -34,8 +34,6 @@ const val EXTRA_FAILED_CHAT_MESSAGE = "biz.ajoshi.kolchat.chat.ChatServiceHandle
 class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(looper) {
 
     interface ChatService {
-        fun getCurrentUsername(): String
-        fun getCurrentUserPassword(): String
         fun stopChatService(id: Int)
         fun getContext(): Context
         /**
@@ -54,9 +52,6 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
     override fun handleMessage(msg: Message?) {
         try {
             Logg.i("ChatServiceHandler", "Handler received a message")
-            if (ChatSingleton.chatManager == null || !ChatSingleton.isLoggedIn()) {
-                ChatSingleton.login(service.getCurrentUsername(), service.getCurrentUserPassword(), true, service.getContext())
-            }
             if (ChatSingleton.chatManager == null ||  // chatmgr is null so we have no userinfo to use for login
                     (!ChatSingleton.chatManager!!.network.isLoggedIn  // we're not logged in (but have the ability)
                             && !ChatSingleton.chatManager!!.network.login())) { // tried to login, but couldnt
