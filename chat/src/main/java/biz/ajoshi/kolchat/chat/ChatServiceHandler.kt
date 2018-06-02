@@ -93,9 +93,6 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
                                 insertChatsIntoDb((response.messages), ChatSingleton.network?.currentUser?.player?.name
                                         ?: ERROR_STRING)
                                 /*
-                                 TODO what do I do with the actual response? Eventbus it over and display as snackbar?
-                                  Stick in DB as System text?
-
                                   Chat commands (and chat message sends) don't actually end up returning messages- they
                                   only return an output (if anything)
                                   There is no contract that specifies this though, and assuming this might cause dropped messages.
