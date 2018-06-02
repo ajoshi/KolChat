@@ -1,4 +1,4 @@
-package biz.ajoshi.kolchat
+package biz.ajoshi.kolchat.ui
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
@@ -16,6 +16,7 @@ import android.view.inputmethod.EditorInfo
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.TextView
+import biz.ajoshi.kolchat.R
 import biz.ajoshi.kolchat.accounts.AccountLoader
 import biz.ajoshi.kolchat.accounts.KolAccount
 import biz.ajoshi.kolchat.accounts.KolAccountManager

@@ -1,23 +1,20 @@
-package biz.ajoshi.kolchat
+package biz.ajoshi.kolchat.ui
 
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import biz.ajoshi.kolchat.chat.ChatBackgroundService
-import biz.ajoshi.kolchat.chat.ChatManager
+import biz.ajoshi.kolchat.EVENT_ATTRIBUTE_TIME_TAKEN
+import biz.ajoshi.kolchat.R
 import biz.ajoshi.kolchat.chat.ChatMessageViewModel
-import biz.ajoshi.kolchat.chat.EXTRA_CHAT_MESSAGE_TO_SEND
 import biz.ajoshi.kolchat.chat.view.customviews.ChatDetailList
 import biz.ajoshi.kolchat.chat.view.customviews.ChatInputView
 import biz.ajoshi.kolchat.chat.view.customviews.QuickCommand
 import biz.ajoshi.kolchat.chat.view.customviews.QuickCommandView
 import com.crashlytics.android.answers.Answers
 import com.crashlytics.android.answers.ContentViewEvent
-import com.crashlytics.android.answers.CustomEvent
 
 /**
  * Fragment displaying a conversation in a channel or with a user. Uses the arch components instead of rxjava

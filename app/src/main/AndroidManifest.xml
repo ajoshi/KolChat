@@ -19,7 +19,7 @@
         android:name=".KolChatApp"
         android:supportsRtl="true"
         android:theme="@style/KoLTheme">
-        <activity android:name=".MainActivity">
+        <activity android:name=".ui.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -31,7 +31,7 @@
 
         <activity
             android:label="@string/title_activity_login"
-            android:name=".LoginActivity"
+            android:name=".ui.LoginActivity"
             android:theme="@style/LoginKolTheme">
         </activity>
 

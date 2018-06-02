@@ -1,4 +1,4 @@
-package biz.ajoshi.kolchat
+package biz.ajoshi.kolchat.ui
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -12,6 +12,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import biz.ajoshi.commonutils.StringUtilities
+import biz.ajoshi.kolchat.R
 import biz.ajoshi.kolchat.chat.ACTION_CHAT_COMMAND_FAILED
 import biz.ajoshi.kolchat.chat.EXTRA_FAILED_CHAT_MESSAGE
 import biz.ajoshi.kolchat.chat.view.ChatChannelAdapter

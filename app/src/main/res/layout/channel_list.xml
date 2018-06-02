@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="biz.ajoshi.kolchat.MainActivity">
+    tools:context="biz.ajoshi.kolchat.ui.MainActivity">
 
     <biz.ajoshi.kolchat.chat.view.customviews.ChatChannelList
         android:id="@+id/channel_list"

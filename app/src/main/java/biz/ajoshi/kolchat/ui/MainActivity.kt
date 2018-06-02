@@ -1,4 +1,4 @@
-package biz.ajoshi.kolchat
+package biz.ajoshi.kolchat.ui
 
 import android.content.ComponentName
 import android.content.Intent
@@ -15,6 +15,8 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import biz.ajoshi.commonutils.Logg
 import biz.ajoshi.commonutils.StringUtilities
+import biz.ajoshi.kolchat.*
+import biz.ajoshi.kolchat.R
 import biz.ajoshi.kolchat.accounts.KolAccountManager
 import biz.ajoshi.kolchat.chat.*
 import biz.ajoshi.kolchat.chat.view.ChatChannelAdapter
@@ -23,7 +25,7 @@ import com.crashlytics.android.Crashlytics
 import com.crashlytics.android.answers.Answers
 import com.crashlytics.android.answers.CustomEvent
 
-const val action_navigate_to_chat_detail = "biz.ajoshi.kolchat.MainActivity.ACTION_NAVIGATE_TO_CHAT_DETAIL"
+const val action_navigate_to_chat_detail = "biz.ajoshi.kolchat.ui.MainActivity.ACTION_NAVIGATE_TO_CHAT_DETAIL"
 
 class MainActivity : AppCompatActivity(), ChatChannelAdapter.ChannelClickListener {
     internal var toolbar: Toolbar? = null

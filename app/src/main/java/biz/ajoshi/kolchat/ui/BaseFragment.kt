@@ -1,7 +1,11 @@
-package biz.ajoshi.kolchat
+package biz.ajoshi.kolchat.ui
 
 import android.content.Intent
 import android.support.v4.app.Fragment
+import biz.ajoshi.kolchat.EVENT_ATTRIBUTE_MESSAGE_LENGTH
+import biz.ajoshi.kolchat.EVENT_ATTRIBUTE_RECIPIENT
+import biz.ajoshi.kolchat.EVENT_NAME_CHAT_MESSAGE_SENT
+import biz.ajoshi.kolchat.R
 import biz.ajoshi.kolchat.chat.ChatBackgroundService
 import biz.ajoshi.kolchat.chat.ChatManager
 import biz.ajoshi.kolchat.chat.EXTRA_CHAT_MESSAGE_TO_SEND
