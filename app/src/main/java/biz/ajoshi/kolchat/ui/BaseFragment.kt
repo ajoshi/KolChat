@@ -2,10 +2,7 @@ package biz.ajoshi.kolchat.ui
 
 import android.content.Intent
 import android.support.v4.app.Fragment
-import biz.ajoshi.kolchat.EVENT_ATTRIBUTE_MESSAGE_LENGTH
-import biz.ajoshi.kolchat.EVENT_ATTRIBUTE_RECIPIENT
-import biz.ajoshi.kolchat.EVENT_NAME_CHAT_MESSAGE_SENT
-import biz.ajoshi.kolchat.R
+import biz.ajoshi.kolchat.*
 import biz.ajoshi.kolchat.chat.ChatBackgroundService
 import biz.ajoshi.kolchat.chat.ChatManager
 import biz.ajoshi.kolchat.chat.EXTRA_CHAT_MESSAGE_TO_SEND
@@ -25,7 +22,7 @@ abstract class BaseFragment : Fragment() {
      */
     fun makePost(post: CharSequence?, isPrivate: Boolean, id: String): Boolean {
         // log to analytics as well
-        Answers.getInstance().logCustom(CustomEvent(EVENT_NAME_CHAT_MESSAGE_SENT)
+       Analytics.getAnswers()?.logCustom(CustomEvent(EVENT_NAME_CHAT_MESSAGE_SENT)
                 .putCustomAttribute(EVENT_ATTRIBUTE_RECIPIENT, if (isPrivate) "PM" else id)
                 .putCustomAttribute(EVENT_ATTRIBUTE_MESSAGE_LENGTH, post?.length)
         )

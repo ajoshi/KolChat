@@ -7,6 +7,7 @@ import biz.ajoshi.commonutils.Logg
 import biz.ajoshi.kolchat.chat.ChatJob
 import biz.ajoshi.kolchat.persistence.KolDB
 import com.crashlytics.android.Crashlytics
+import com.crashlytics.android.answers.Answers
 import com.facebook.drawee.backends.pipeline.Fresco
 import io.fabric.sdk.android.Fabric
 
@@ -26,6 +27,7 @@ class KolChatApp : Application() {
         if (shouldSendLogs) {
             Logg.setCustomLogger(CrashlyticsLogger())
         }
+        Analytics.shouldTrackEvents = preferenceManager.getBoolean(KEY_PREF_TRACK_EVENTs, true)
         KolDB.createDb(this)
         Fresco.initialize(this)
         StrictMode.setThreadPolicy(StrictMode.ThreadPolicy.Builder().detectAll().build())

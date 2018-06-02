@@ -56,15 +56,15 @@ class MainActivity : AppCompatActivity(), ChatChannelAdapter.ChannelClickListene
         when (intent.action) {
         // launched by os
             Intent.ACTION_MAIN ->
-                Answers.getInstance().logCustom(CustomEvent(EVENT_NAME_APP_LAUNCH)
+                Analytics.getAnswers()?.logCustom(CustomEvent(EVENT_NAME_APP_LAUNCH)
                         .putCustomAttribute(EVENT_ATTRIBUTE_SOURCE, "Launcher"))
         // launched by the notification for a chat message
             action_navigate_to_chat_detail ->
-                Answers.getInstance().logCustom(CustomEvent(EVENT_NAME_APP_LAUNCH)
+                Analytics.getAnswers()?.logCustom(CustomEvent(EVENT_NAME_APP_LAUNCH)
                         .putCustomAttribute(EVENT_ATTRIBUTE_SOURCE, "Notification: chat detail"))
         // launched by login screen (or something else?)
         // this should tell me if users are logging in more than they should
-            else -> Answers.getInstance().logCustom(CustomEvent(EVENT_NAME_APP_LAUNCH)
+            else -> Analytics.getAnswers()?.logCustom(CustomEvent(EVENT_NAME_APP_LAUNCH)
                     .putCustomAttribute(EVENT_ATTRIBUTE_SOURCE, "Login/Unknown"))
         }
         // set up toolbar

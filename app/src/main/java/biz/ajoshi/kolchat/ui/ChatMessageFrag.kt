@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import biz.ajoshi.kolchat.Analytics
 import biz.ajoshi.kolchat.EVENT_ATTRIBUTE_TIME_TAKEN
 import biz.ajoshi.kolchat.R
 import biz.ajoshi.kolchat.chat.ChatMessageViewModel
@@ -70,7 +71,7 @@ class ChatMessageFrag : BaseFragment(), QuickCommandView.CommandClickListener, C
             //add this new message to the bottom (will scroll down if we're at the bottom of the list)
                 chatDetailList?.addMessages(message)
         })
-        Answers.getInstance().logContentView(ContentViewEvent()
+        Analytics.getAnswers()?.logContentView(ContentViewEvent()
                 .putContentName("Channel detail opened")
                 .putContentId(if (isPrivate) "PM" else name)
                 .putCustomAttribute(EVENT_ATTRIBUTE_TIME_TAKEN, (chatLoadEndTimestamp - chatLoadStartTimestamp)))
