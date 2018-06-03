@@ -61,6 +61,7 @@ class ChatManager(val network: biz.ajoshi.kolnetwork.Network, internal val share
          * This seems wrong- chat and chat commands should be separated out
          */
         if (response.isNullOrEmpty()) {
+            // this is sent when we failed to make the network call (RO and maybe general connectivity issues?)
     //        network.logout()
             return ServerChatCommandResponse("", emptyList())
         }

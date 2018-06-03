@@ -258,7 +258,7 @@ public class Network {
      * @throws IOException
      */
     public String postChat(String message) throws IOException {
-        Request readchatRequest = new Request.Builder().get()
+        Request sendChatRequest = new Request.Builder().get()
                                                        .url(String.format(BASE_URL +
                                                                           "/submitnewchat.php?for=ajoshiChatApp&playerid=%s&pwd=%s&graf=%s&j=1&format=php",
                                                                           playerid,
@@ -274,7 +274,7 @@ public class Network {
                                                        .addHeader("Connection", "close")
                                                        .addHeader("X-Requested-With", "XMLHttpRequest")
                                                        .build();
-        Call call = client.newCall(readchatRequest);
+        Call call = client.newCall(sendChatRequest);
         Response chatResponse = call.execute();
         String redirectLocation = chatResponse.header("location");
         if (redirectLocation != null &&
