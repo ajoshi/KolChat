@@ -3,7 +3,6 @@ package biz.ajoshi.kolchat.ui
 import android.content.ComponentName
 import android.content.Intent
 import android.os.Bundle
-import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.preference.PreferenceManager
 import android.support.v7.widget.Toolbar
@@ -13,6 +12,7 @@ import android.view.View
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.ui.NavigationUI
 import biz.ajoshi.commonutils.Logg
 import biz.ajoshi.commonutils.StringUtilities
 import biz.ajoshi.kolchat.*
@@ -21,7 +21,6 @@ import biz.ajoshi.kolchat.accounts.KolAccountManager
 import biz.ajoshi.kolchat.chat.*
 import biz.ajoshi.kolchat.chat.view.ChatChannelAdapter
 import biz.ajoshi.kolchat.chat.view.customviews.ChatDetailList
-import biz.ajoshi.kolchat.chat.view.customviews.ChatDetailList.MessageClickListener
 import biz.ajoshi.kolchat.persistence.chat.ChatChannel
 import biz.ajoshi.kolchat.persistence.chat.ChatMessage
 import com.crashlytics.android.Crashlytics
@@ -29,11 +28,7 @@ import com.crashlytics.android.answers.CustomEvent
 
 const val action_navigate_to_chat_detail = "biz.ajoshi.kolchat.ui.MainActivity.ACTION_NAVIGATE_TO_CHAT_DETAIL"
 
-class MainActivity : AppCompatActivity(), ChatChannelAdapter.ChannelClickListener, MessageClickListener {
-    override fun onMessageLongClicked(message: ChatMessage) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
+class MainActivity : AppCompatActivity(), ChatChannelAdapter.ChannelClickListener, ChatDetailList.MessageClickListener {
     internal var toolbar: Toolbar? = null
     internal var navController: NavController? = null
 
@@ -68,9 +63,13 @@ class MainActivity : AppCompatActivity(), ChatChannelAdapter.ChannelClickListene
         // set up nav graph
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.llist)
         navController = navHostFragment.findNavController()
-        navController?.setGraph(R.navigation.nav_graph)
-        navController?.currentDestination?.label = getString(R.string.app_name)
-
+        navController?.let {
+            it.setGraph(R.navigation.nav_graph)
+            it.currentDestination?.label = getString(R.string.app_name)
+            NavigationUI.setupActionBarWithNavController(this, it)
+            // Nav components don't work correctly (surprise!). Setting labels programmatically seems not to be doable at all
+//            it.addOnNavigatedListener(NavController.OnNavigatedListener { _, destination -> toolbar?.title = getPlaintextForHtml(""+ destination.label)})
+        }
         // analytics- log the source of the launch intent
         when (intent.action) {
         // launched by os
@@ -83,12 +82,6 @@ class MainActivity : AppCompatActivity(), ChatChannelAdapter.ChannelClickListene
         // this should tell me if users are logging in more than they should
             else -> logLaunchEvent("Login/Unknown")
         }
-    }
-
-    override fun onBackPressed() {
-        super.onBackPressed()
-        // val fragment = supportFragmentManager.findFragmentById(R.id.llist) as NavHostFragment
-        toolbar?.title = getPlaintextForHtml("" + navController?.currentDestination?.label)
     }
 
     public override fun onDestroy() {
@@ -128,6 +121,9 @@ class MainActivity : AppCompatActivity(), ChatChannelAdapter.ChannelClickListene
         }
     }
 
+
+    /*************************************************************   General stuff   ************************/
+
     /**
      * Logs the 'app launched' event for analytics.
      * @param source Source of the launch (Launcher, notification, login page, etc)
@@ -153,7 +149,16 @@ class MainActivity : AppCompatActivity(), ChatChannelAdapter.ChannelClickListene
         stopService(serviceIntent)
     }
 
-    /*************************************************************   Inflate Toolbar menu   ************************/
+    /**
+     * show dialog to send crashlytics logs
+     */
+    private fun showSendLogsDialog() {
+        FeedbackDialog(context = this, rootView = findViewById<View>(R.id.llist))
+                .createDialog()
+                .show()
+    }
+
+    /*************************************************************   Toolbar menu   ************************/
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.main_menu, menu)
@@ -164,9 +169,6 @@ class MainActivity : AppCompatActivity(), ChatChannelAdapter.ChannelClickListene
         R.id.menu_action_advanced_settings -> {
             // navigate to settings
             navController?.navigate(R.id.nav_preferences)
-            navController?.currentDestination?.label?.let {
-                toolbar?.title = it
-            }
             true
         }
 
@@ -176,9 +178,7 @@ class MainActivity : AppCompatActivity(), ChatChannelAdapter.ChannelClickListene
         }
 
         R.id.menu_action_send_logs -> {
-            // send crashlytics logs
-            Crashlytics.logException(UserSentLogsEvent("User sent logs " + System.currentTimeMillis()))
-            Snackbar.make(findViewById<View>(R.id.llist), "Logs sent!", Snackbar.LENGTH_SHORT).show()
+            showSendLogsDialog()
             true
         }
 
@@ -189,9 +189,7 @@ class MainActivity : AppCompatActivity(), ChatChannelAdapter.ChannelClickListene
         }
     }
 
-    /*************************************************************   Handle Navigation   ************************/
-
-    override fun onSupportNavigateUp() = findNavController(R.id.llist).navigateUp()
+    /*************************************************************   Click listeners   ************************/
 
     /**
      * Called when a channel name is tapped
@@ -200,12 +198,12 @@ class MainActivity : AppCompatActivity(), ChatChannelAdapter.ChannelClickListene
      */
     override fun onChannelClicked(channel: ChatChannel) {
         val b = Bundle()
+        val plainTextName = getPlaintextForHtml(channel.name)
         b.putString(EXTRA_CHANNEL_ID, channel.id)
-        b.putString(EXTRA_CHANNEL_NAME, channel.name)
+        b.putString(EXTRA_CHANNEL_NAME, plainTextName)
         b.putBoolean(EXTRA_CHANNEL_IS_PRIVATE, channel.isPrivate)
         navController?.navigate(R.id.nav_chat_message, b)
-        navController?.currentDestination?.label = channel.name
-
+        navController?.currentDestination?.label = plainTextName
         // Go back to this if nav arch is as half baked as it seems
 //        val chatDetailFrag = ChatMessageFrag()
 //        chatDetailFrag.arguments = b
@@ -213,7 +211,7 @@ class MainActivity : AppCompatActivity(), ChatChannelAdapter.ChannelClickListene
 //                .addToBackStack(TAG_CHAT_DETAIL_FRAG).commit()
         if (toolbar != null) {
             // should crash on line 66 if this happens, honestly
-            toolbar!!.title = getPlaintextForHtml(channel.name)
+            toolbar!!.title = getPlaintextForHtml(plainTextName)
         }
         Logg.i("MainActivity", if (channel.isPrivate) {
             "Channel detail opened"
@@ -221,6 +219,20 @@ class MainActivity : AppCompatActivity(), ChatChannelAdapter.ChannelClickListene
             "PM detail opened"
         })
     }
+
+    /**
+     * Called when a message is long pressed so we can spin up a chat for this user
+     */
+    override fun onMessageLongClicked(message: ChatMessage) {
+        // trying to open a new chat? Go back to main list first to keep backstack simple
+        // needed because nav components have bad support for programmatic label/toolbar title setting
+        navController?.popBackStack()
+        onChannelClicked(ChatChannel(message.userId, true, message.userName, "", 0, ""))
+    }
+
+    /*************************************************************   Handle Navigation   ************************/
+
+    override fun onSupportNavigateUp() = findNavController(R.id.llist).navigateUp()
 
     /**
      * Returns plaintext representation of html. So "**Hi**" would return "Hi"
