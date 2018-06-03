@@ -6,13 +6,16 @@ import android.text.format.DateUtils
 import android.text.method.LinkMovementMethod
 import android.text.style.ImageSpan
 import android.view.View
+import android.widget.TextView
 import biz.ajoshi.commonutils.StringUtilities
 import biz.ajoshi.kolchat.chat.R
 import biz.ajoshi.kolchat.persistence.chat.ChatMessage
+import biz.ajoshi.kolnetwork.model.User
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.drawee.generic.GenericDraweeHierarchyBuilder
 import com.facebook.drawee.span.DraweeSpan
 import com.facebook.drawee.span.DraweeSpanStringBuilder
+import com.facebook.drawee.span.SimpleDraweeSpanTextView
 import com.facebook.imagepipeline.request.ImageRequestBuilder
 import kotlinx.android.synthetic.main.chat_message.view.*
 import java.util.*
@@ -20,21 +23,39 @@ import java.util.*
 /**
  * Created by ajoshi on 7/22/17.
  */
-class ChatMessageVH(itemView: View) : RecyclerView.ViewHolder(itemView) {
+class ChatMessageVH(itemView: View, val listener: MessageClickListener) : RecyclerView.ViewHolder(itemView) {
+    /**
+     * Called when a chat message is long pressed. Implementor gets the message data and can do whatever it wants
+     */
+    interface MessageClickListener {
+        fun onMessageLongClicked(message: ChatMessage)
+    }
 
     val date = Date()
+    var chatmessage: ChatMessage? = null
 
-    val userNameTv = itemView.user_name
-    val chatMessageTv = itemView.text
-    val timeStampTv = itemView.timestamp
+    val userNameTv: TextView? = itemView.user_name
+    val chatMessageTv: SimpleDraweeSpanTextView? = itemView.text
+    val timeStampTv: TextView? = itemView.timestamp
+
+    init {
+        itemView.setOnLongClickListener(View.OnLongClickListener ()  {
+            chatmessage?.let {
+                listener.onMessageLongClicked(it)
+                return@OnLongClickListener true
+            }
+            false
+        })
+    }
 
     fun bind(message: ChatMessage) {
+        chatmessage = message
         // TODO don't do all this excessive computation on ui thread. maybe use Transform/Map to convert to some ui model
         if (message.shouldHideUsername()) {
-            userNameTv.visibility = View.GONE
+            userNameTv?.visibility = View.GONE
         } else {
-            userNameTv.text = StringUtilities.getHtml(message.userName)
-            userNameTv.visibility = View.VISIBLE
+            userNameTv?.text = StringUtilities.getHtml(message.userName)
+            userNameTv?.visibility = View.VISIBLE
         }
         val oldSpannable = StringUtilities.getHtml(message.text)
         val newSpannable = DraweeSpanStringBuilder(oldSpannable)
@@ -51,10 +72,10 @@ class ChatMessageVH(itemView: View) : RecyclerView.ViewHolder(itemView) {
             newSpannable.setImageSpan(itemView.context, draweeHierarchy, controller, oldSpanStartPosition, embeddedImageSize, embeddedImageSize
                     , false, DraweeSpan.ALIGN_CENTER)
         }
-        chatMessageTv.setDraweeSpanStringBuilder(newSpannable)
-        val time = message.timeStamp*1000 //or use message.localtimeStamp
+        chatMessageTv?.setDraweeSpanStringBuilder(newSpannable)
+        val time = message.timeStamp * 1000 //or use message.localtimeStamp
         date.time = time
-        timeStampTv.text = if (DateUtils.isToday(time)) {
+        timeStampTv?.text = if (DateUtils.isToday(time)) {
             // if this is today then no need to show date
             chatMessageTimeFormat.format(date)
         } else {
@@ -65,7 +86,7 @@ class ChatMessageVH(itemView: View) : RecyclerView.ViewHolder(itemView) {
         htmlText= This is the only link I need! <a target=_blank href="https://www.kingdomofloathing.com/"><font color=blue>[link]</font></a> https:// www.kingdomofloathin g.com/,
         only the 'link' part is clickable with this. Alt solution is to string replace and then enable autolink
         */
-        chatMessageTv.movementMethod = LinkMovementMethod.getInstance()
+        chatMessageTv?.movementMethod = LinkMovementMethod.getInstance()
         // todo use userid for right click options at some point
     }
 }

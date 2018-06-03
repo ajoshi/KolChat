@@ -60,7 +60,7 @@ class ChatChannelList : RecyclerView {
      * Sets the click listener for each element in the list of channels
      */
     fun setChatChannelClickListener(channelClickListener: ChatChannelAdapter.ChannelClickListener) {
-        chatChannelAdapter?.clickListener = channelClickListener
+        chatChannelAdapter?.setOnClickListener(channelClickListener)
     }
 
     /**

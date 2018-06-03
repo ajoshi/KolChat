@@ -26,9 +26,9 @@ class ChatChannelAdapter : RecyclerView.Adapter<ChatChannelVH>() {
         fun onChannelClicked(channel: ChatChannel)
     }
 
-    var groups = listOf<ChatChannel>()
-    var pms = listOf<ChatChannel>()
-    var clickListener: ChannelClickListener? = null
+    private var groups = listOf<ChatChannel>()
+    private var pms = listOf<ChatChannel>()
+    private var clickListener: ChannelClickListener? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatChannelVH {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.channel_list_item, parent, false)

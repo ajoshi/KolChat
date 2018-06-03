@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+ <!--We want users to send logs if there are issues, and they can add in additional text if they want via this dialog-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <EditText android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:id="@+id/feedback_text" android:hint="@string/feedback_dialog_hint" android:importantForAutofill="no"
+        android:inputType="textAutoCorrect|textAutoComplete"
+    />
+</LinearLayout>

@@ -3,6 +3,8 @@
 
     <string name="title_activity_login">Sign in</string>
 
+    <string name="account_type" translatable="false">KoL</string>
+
     <!-- Strings related to login -->
     <string name="prompt_username">Username</string>
     <string name="prompt_password">Password</string>
@@ -21,7 +23,9 @@
     <string name="argument_chat_message_name" translatable="false">argument_chat_message_name</string>
     <string name="argument_chat_message_is_private" translatable="false">argument_chat_message_is_private</string>
 
-    <string name="account_type" translatable="false">KoL</string>
+    <string name="feedback_dialog_hint">Enter any feedback you have</string>
+    <string name="feedback_dialog_submit">Send Feedback</string>
+    <string name="feedback_dialog_cancel">Cancel</string>
 
     <!--Preferences-->
     <string name="title_prefs_screen">Advanced Settings</string>

@@ -10,13 +10,14 @@ import biz.ajoshi.kolchat.persistence.chat.ChatMessage
 /**
  * Adapter for the list of chat messages (inside a given channel)
  */
-class ChatAdapter(val layoutMgr: LinearLayoutManager) : RecyclerView.Adapter<ChatMessageVH>() {
+class ChatAdapter(val layoutMgr: LinearLayoutManager, val listener: ChatMessageVH.MessageClickListener) : RecyclerView.Adapter<ChatMessageVH>() {
+
     var messages = mutableListOf<ChatMessage>()
     var idList = mutableListOf<Int>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatMessageVH {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.chat_message, parent, false)
-        return ChatMessageVH(view)
+        return ChatMessageVH(view, listener)
     }
 
     override fun onBindViewHolder(holder: ChatMessageVH, position: Int) {

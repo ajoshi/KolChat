@@ -5,6 +5,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.AttributeSet
 import biz.ajoshi.kolchat.chat.view.ChatAdapter
+import biz.ajoshi.kolchat.chat.view.ChatMessageVH
 import biz.ajoshi.kolchat.persistence.KolDB
 import biz.ajoshi.kolchat.persistence.chat.ChatMessage
 import io.reactivex.Observable
@@ -19,6 +20,7 @@ import io.reactivex.schedulers.Schedulers
 class ChatDetailList : RecyclerView {
     private var chatAdapter: ChatAdapter? = null
     private var initialChatLoadSubscriber: Disposable? = null
+    private var clickListener: MessageClickListener? = null
 
     constructor(context: Context) : this(context, null)
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
@@ -32,7 +34,11 @@ class ChatDetailList : RecyclerView {
      */
     private fun initializeViews(context: Context) {
         val layoutMgr = LinearLayoutManager(context)
-        chatAdapter = ChatAdapter(layoutMgr)
+        chatAdapter = ChatAdapter(layoutMgr, object : ChatMessageVH.MessageClickListener {
+            override fun onMessageLongClicked(message: ChatMessage) {
+                clickListener?.onMessageLongClicked(message = message)
+            }
+        })
         adapter = chatAdapter
         layoutManager = layoutMgr
         // scroll when the keyboard comes up
@@ -80,9 +86,23 @@ class ChatDetailList : RecyclerView {
     }
 
     /**
-     * A View (as in MVP) likea Fragment/Activity that actually displays this list
+     * Sets the clicklistener for the chat detail list. Tapping/Longpressing a chat post will trigger this
+     */
+    fun setClickListener(listener: MessageClickListener) {
+        clickListener = listener
+    }
+
+    /**
+     * A View (as in MVP) like a Fragment/Activity that actually displays this list
      */
     interface ChatMessagesLoaderView {
         fun onInitialMessageListLoaded()
+    }
+
+    /**
+     * Used when a chat message has been clicked/long pressed
+     */
+    interface MessageClickListener {
+        fun onMessageLongClicked(message: ChatMessage)
     }
 }

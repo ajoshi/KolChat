@@ -14,7 +14,6 @@ import biz.ajoshi.kolchat.chat.view.customviews.ChatDetailList
 import biz.ajoshi.kolchat.chat.view.customviews.ChatInputView
 import biz.ajoshi.kolchat.chat.view.customviews.QuickCommand
 import biz.ajoshi.kolchat.chat.view.customviews.QuickCommandView
-import com.crashlytics.android.answers.Answers
 import com.crashlytics.android.answers.ContentViewEvent
 
 /**
@@ -47,6 +46,12 @@ class ChatMessageFrag : BaseFragment(), QuickCommandView.CommandClickListener, C
         }
 
         chatDetailList = activity?.findViewById(R.id.messagesList) as ChatDetailList
+        activity?.let {
+            if (!isPrivate) {
+                // right now all we do is open up chat, so disable when in PMs
+                chatDetailList?.setClickListener(it as ChatDetailList.MessageClickListener)
+            }
+        }
 
         chatLoadStartTimestamp = System.currentTimeMillis()
         chatDetailList?.loadInitialMessages(id, this)

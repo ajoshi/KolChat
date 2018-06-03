@@ -20,13 +20,20 @@ import biz.ajoshi.kolchat.R
 import biz.ajoshi.kolchat.accounts.KolAccountManager
 import biz.ajoshi.kolchat.chat.*
 import biz.ajoshi.kolchat.chat.view.ChatChannelAdapter
+import biz.ajoshi.kolchat.chat.view.customviews.ChatDetailList
+import biz.ajoshi.kolchat.chat.view.customviews.ChatDetailList.MessageClickListener
 import biz.ajoshi.kolchat.persistence.chat.ChatChannel
+import biz.ajoshi.kolchat.persistence.chat.ChatMessage
 import com.crashlytics.android.Crashlytics
 import com.crashlytics.android.answers.CustomEvent
 
 const val action_navigate_to_chat_detail = "biz.ajoshi.kolchat.ui.MainActivity.ACTION_NAVIGATE_TO_CHAT_DETAIL"
 
-class MainActivity : AppCompatActivity(), ChatChannelAdapter.ChannelClickListener {
+class MainActivity : AppCompatActivity(), ChatChannelAdapter.ChannelClickListener, MessageClickListener {
+    override fun onMessageLongClicked(message: ChatMessage) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     internal var toolbar: Toolbar? = null
     internal var navController: NavController? = null
 
