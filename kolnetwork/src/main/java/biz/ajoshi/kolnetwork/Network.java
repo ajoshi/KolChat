@@ -192,6 +192,14 @@ public class Network {
             chatpwd = StringUtilities.getBetweenTwoStrings(postResponse, "setCookie('chatpwd', winW, ", ",");
             if (playerid == null) {
                 Logg.e("Network", chatResponse.isSuccessful()? "successful call": "failed call");
+                // TODO chat response comes back as null sometimes. concurrent logins are causing issues
+                /*
+                2018-06-03 21:52:28.427 14205-14364/biz.ajoshi.kolchat I/ChatSingleton: logging in as corman
+2018-06-03 21:52:28.707 14205-14320/biz.ajoshi.kolchat I/JobManager: Found pending job request{id=108, tag=chat_job_tag, transient=false}, canceling
+2018-06-03 21:52:28.899 14205-14694/biz.ajoshi.kolchat I/JobExecutor: Executing request{id=108, tag=chat_job_tag, transient=false}, context PlatformJobService
+2018-06-03 21:52:28.915 14205-14695/biz.ajoshi.kolchat I/ChatSingleton: logging in as corman
+2018-06-03 21:52:29.721 14205-14364/biz.ajoshi.kolchat E/Network: failed call
+                 */
                 Logg.e("Network", chatResponse.message());
                 Logg.e("Network", postResponse);
                 Logg.logThrowable(new IllegalStateException("Login id is null"));
