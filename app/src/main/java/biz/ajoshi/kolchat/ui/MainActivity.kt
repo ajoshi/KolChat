@@ -2,7 +2,9 @@ package biz.ajoshi.kolchat.ui
 
 import android.content.ComponentName
 import android.content.Intent
+import android.os.AsyncTask
 import android.os.Bundle
+import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.preference.PreferenceManager
 import android.support.v7.widget.Toolbar
@@ -19,8 +21,9 @@ import biz.ajoshi.kolchat.*
 import biz.ajoshi.kolchat.R
 import biz.ajoshi.kolchat.accounts.KolAccountManager
 import biz.ajoshi.kolchat.chat.*
-import biz.ajoshi.kolchat.chat.view.ChatChannelAdapter
+import biz.ajoshi.kolchat.chat.view.customviews.ChatChannelList
 import biz.ajoshi.kolchat.chat.view.customviews.ChatDetailList
+import biz.ajoshi.kolchat.persistence.KolDB
 import biz.ajoshi.kolchat.persistence.chat.ChatChannel
 import biz.ajoshi.kolchat.persistence.chat.ChatMessage
 import com.crashlytics.android.Crashlytics
@@ -28,7 +31,7 @@ import com.crashlytics.android.answers.CustomEvent
 
 const val action_navigate_to_chat_detail = "biz.ajoshi.kolchat.ui.MainActivity.ACTION_NAVIGATE_TO_CHAT_DETAIL"
 
-class MainActivity : AppCompatActivity(), ChatChannelAdapter.ChannelClickListener, ChatDetailList.MessageClickListener {
+class MainActivity : AppCompatActivity(), ChatChannelList.ChatChannelInteractionListener, ChatDetailList.MessageClickListener {
     internal var toolbar: Toolbar? = null
     internal var navController: NavController? = null
 
@@ -221,6 +224,23 @@ class MainActivity : AppCompatActivity(), ChatChannelAdapter.ChannelClickListene
     }
 
     /**
+     * Called when the user swipes left on a channel. Delete it locally
+     */
+    override fun onChannelSwiped(channel: ChatChannel) {
+        // throw up yet another dialog to confirm that the user wants to delete channel
+        val removeChatMessage = String.format(if (channel.isPrivate) getString(R.string.remove_chat_dialog_message_pm) else getString(R.string.remove_chat_dialog_message_group), channel.name)
+        AlertDialog.Builder(this)
+                .setTitle(R.string.remove_chat_dialog_title)
+                .setMessage(removeChatMessage)
+                .setPositiveButton(R.string.remove_chat_dialog_option_yes, { _, _ ->
+                    // delete the channel
+                    val deleteTask = DeleteChannelTask()
+                    deleteTask.execute(channel)
+                })
+                .setNegativeButton(R.string.remove_chat_dialog_option_no, null).show()
+    }
+
+    /**
      * Called when a message is long pressed so we can spin up a chat for this user
      */
     override fun onMessageLongClicked(message: ChatMessage) {
@@ -305,6 +325,20 @@ class MainActivity : AppCompatActivity(), ChatChannelAdapter.ChannelClickListene
     companion object {
         val TAG_CHAT_DETAIL_FRAG = "chat frag"
         val TAG_CHAT_LIST_FRAG = "list frag"
+    }
+}
+
+class DeleteChannelTask() : AsyncTask<ChatChannel, Unit, Unit>() {
+    override fun doInBackground(vararg params: ChatChannel?) {
+        for (channel in params) {
+            // I'll never send more than one (I think) but whatever
+            channel?.let {
+                // delete the messages in this channel
+                KolDB.getDb()?.MessageDao()?.deleteAllForChannelId(it.id)
+                // delete this channel as well
+                KolDB.getDb()?.ChannelDao()?.delete(it)
+            }
+        }
     }
 }
 

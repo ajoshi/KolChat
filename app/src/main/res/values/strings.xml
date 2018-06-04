@@ -23,6 +23,12 @@
     <string name="argument_chat_message_name" translatable="false">argument_chat_message_name</string>
     <string name="argument_chat_message_is_private" translatable="false">argument_chat_message_is_private</string>
 
+    <string name="remove_chat_dialog_message_group">Do you want to close %s? The chat messages will be removed locally, but this does not leave the room</string>
+    <string name="remove_chat_dialog_message_pm">Do you want to delete your chat with %s? The chat messages will be removed locally, but this does not baleet them</string>
+    <string name="remove_chat_dialog_title">Close this chat?</string>
+    <string name="remove_chat_dialog_option_yes">Close it</string>
+    <string name="remove_chat_dialog_option_no">Cancel</string>
+
     <string name="feedback_dialog_hint">Enter any feedback you have</string>
     <string name="feedback_dialog_submit">Send Feedback</string>
     <string name="feedback_dialog_cancel">Cancel</string>

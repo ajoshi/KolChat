@@ -45,17 +45,7 @@ class ChatChannelAdapter : RecyclerView.Adapter<ChatChannelVH>() {
     }
 
     override fun onBindViewHolder(holder: ChatChannelVH, position: Int) {
-        when (getItemViewType(position)) { // could just use isGroup, but not sure if more types will be added
-            rowTypeGroup ->
-                if (pms.size + groups.size > position) {
-                    holder.bind(groups[position - pms.size])
-                }
-            rowTypePm ->
-                if (pms.size > position) {
-                    // pms come first, then groups
-                    holder.bind(pms[position])
-                }
-        }
+        holder.bind(getChannelAt(position))
     }
 
     override fun getItemCount(): Int {
@@ -74,6 +64,14 @@ class ChatChannelAdapter : RecyclerView.Adapter<ChatChannelVH>() {
 
     fun setOnClickListener(listener: ChannelClickListener) {
         clickListener = listener
+    }
+
+    fun getChannelAt(index: Int): ChatChannel {
+        // pms come first, then groups
+        if (index < pms.size) {
+            return pms[index]
+        }
+        return groups[index - pms.size]
     }
 
     fun isGroup(position: Int): Boolean {

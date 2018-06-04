@@ -15,7 +15,6 @@ import biz.ajoshi.commonutils.StringUtilities
 import biz.ajoshi.kolchat.R
 import biz.ajoshi.kolchat.chat.ACTION_CHAT_COMMAND_FAILED
 import biz.ajoshi.kolchat.chat.EXTRA_FAILED_CHAT_MESSAGE
-import biz.ajoshi.kolchat.chat.view.ChatChannelAdapter
 import biz.ajoshi.kolchat.chat.view.customviews.ChatChannelList
 import biz.ajoshi.kolchat.chat.view.customviews.NewChatFAB
 
@@ -44,7 +43,7 @@ class ChatChannelListFragment : BaseFragment(), NewChatFAB.ChatMessageSender {
         val newMessageFab = activity?.findViewById(R.id.button_compose_new_chat) as NewChatFAB
         newMessageFab.chatMessageSender = this
         // right now just send it all to the activity. We might want to intercept it later on, but probably not
-        channelList?.setChatChannelClickListener(activity as ChatChannelAdapter.ChannelClickListener)
+        channelList?.setChatchannelInteractionListener(activity as ChatChannelList.ChatChannelInteractionListener)
         super.onActivityCreated(savedInstanceState)
     }
 
@@ -65,9 +64,9 @@ class ChatChannelListFragment : BaseFragment(), NewChatFAB.ChatMessageSender {
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
-        if (context !is ChatChannelAdapter.ChannelClickListener) {
+        if (context !is ChatChannelList.ChatChannelInteractionListener) {
             // maybe this should check parent fragments as well?
-            throw ClassCastException("Activity must implement ChatChannelAdapter.ChannelClickListener")
+            throw ClassCastException("Activity must implement ChatChannelList.ChatChannelInteractionListener")
         }
     }
 

@@ -2,6 +2,7 @@ package biz.ajoshi.kolchat.ui
 
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -62,6 +63,14 @@ class ChatMessageFrag : BaseFragment(), QuickCommandView.CommandClickListener, C
         val quickCommands = activity?.findViewById(R.id.quick_commands) as QuickCommandView
         quickCommands.setClickListener(this)
         super.onActivityCreated(savedInstanceState)
+    }
+
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
+        if (context !is ChatDetailList.MessageClickListener) {
+            // maybe this should check parent fragments as well?
+            throw ClassCastException("Activity must implement ChatDetailList.MessageClickListener")
+        }
     }
 
     /*
