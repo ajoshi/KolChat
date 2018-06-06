@@ -183,7 +183,10 @@ class ChatManager(val network: biz.ajoshi.kolnetwork.Network, internal val share
             val msg = msgs.get(i) as JSONObject
             list.add(parseChatMessageJsonObject(chatMessageJson = msg, currentTime = currentTime))
         }
-
+        // 1527977527
+        // 1527977486167
+        // * 1000
+//ServerChatMessage(author=User(id=-1, name=system), htmlText=New message received from <a target=mainpane href='showplayer.php?who=2239681'><font color=green>Corman</font></a>., channelNameServer=ServerChatChannel(name=system, id=-1, isPrivate=true), time=1527977527, hideAuthorName=false, localTime=1527977486167)
         return list
     }
 

@@ -10,8 +10,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.EditText
-import android.widget.TextView
 import biz.ajoshi.kolchat.chat.R
+import kotlinx.android.synthetic.main.dialog_send_new_message.view.*
 
 /**
  * Floating action button that spins up UI flow for starting up a new chat
@@ -65,14 +65,14 @@ class NewChatFAB : FloatingActionButton, View.OnClickListener {
         context?.let {
             val li = LayoutInflater.from(context)
             val view = li.inflate(R.layout.dialog_send_new_message, rootView as ViewGroup, false)
-            view.findViewById<TextView>(R.id.dialog_recipient_name).hint = context.getString(R.string.new_chat_message_hint_channel)
+            view.dialog_recipient_name.hint = context.getString(R.string.new_chat_message_hint_channel)
             val dialog = AlertDialog.Builder(it)
                     .setView(view)
                     .setTitle(R.string.new_chat_message_title_channel)
                     .setPositiveButton(R.string.submit_post, DialogInterface.OnClickListener { dialog: DialogInterface?, _ ->
                         if (dialog is AlertDialog) {
-                            val recipient = "" + dialog.findViewById<EditText>(R.id.dialog_recipient_name)?.text
-                            val message = "" + dialog.findViewById<EditText>(R.id.dialog_text_input)?.text
+                            val recipient = "" + view.dialog_recipient_name.text
+                            val message = "" + view.dialog_text_input.text
                             if (recipient.isNotEmpty() && message.isNotEmpty()) {
                                 chatMessageSender?.sendChatMessage(message = message, isPrivate = false, id = recipient)
                             }

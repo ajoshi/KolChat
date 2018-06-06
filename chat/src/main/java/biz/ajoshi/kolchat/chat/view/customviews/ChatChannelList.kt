@@ -20,10 +20,10 @@ import io.reactivex.schedulers.Schedulers
  * Shows and updates the list of chat channels with messages. Updates automatically since it uses RxJava
  */
 class ChatChannelList : RecyclerView, ChannelClickListener {
-    var chatChannelAdapter: ChatChannelAdapter? = null
-    var groupChatUpdateSubscriber: Disposable? = null
-    var pmChatUpdateSubscriber: Disposable? = null
-    var interactionListener: ChatChannelInteractionListener? = null
+    private lateinit var chatChannelAdapter: ChatChannelAdapter
+    private var groupChatUpdateSubscriber: Disposable? = null
+    private var pmChatUpdateSubscriber: Disposable? = null
+    private var interactionListener: ChatChannelInteractionListener? = null
 
     constructor(context: Context) : this(context, null)
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
@@ -48,7 +48,7 @@ class ChatChannelList : RecyclerView, ChannelClickListener {
                 ?.subscribeOn(Schedulers.io())
                 ?.observeOn(AndroidSchedulers.mainThread())
                 ?.subscribe { channels ->
-                    chatChannelAdapter!!.setGroupList(channels)
+                    chatChannelAdapter.setGroupList(channels)
                 }
         pmChatUpdateSubscriber = KolDB.getDb()
                 ?.ChannelDao()
@@ -57,10 +57,10 @@ class ChatChannelList : RecyclerView, ChannelClickListener {
                 ?.subscribeOn(Schedulers.io())
                 ?.observeOn(AndroidSchedulers.mainThread())
                 ?.subscribe { channels ->
-                    chatChannelAdapter!!.setPmsList(channels)
+                    chatChannelAdapter.setPmsList(channels)
                 }
         ItemTouchHelper(ChannelSwipeCallback()).attachToRecyclerView(this)
-        chatChannelAdapter?.setOnClickListener(this)
+        chatChannelAdapter.setOnClickListener(this)
     }
 
     /**
@@ -74,13 +74,11 @@ class ChatChannelList : RecyclerView, ChannelClickListener {
         override fun onSwiped(viewHolder: RecyclerView.ViewHolder?, direction: Int) {
             val position = viewHolder?.adapterPosition
             position?.let {
-                val channel = chatChannelAdapter?.getChannelAt(position)
-                channel?.let {
-                    interactionListener?.onChannelSwiped(channel = channel)
-                }
+                val channel = chatChannelAdapter.getChannelAt(position)
+                interactionListener?.onChannelSwiped(channel = channel)
                 // We reset the swipe state so the user doesn't see a white space in here if they don't delete
                 // if they delete, then this goes away anyway
-                chatChannelAdapter?.notifyItemChanged(it)
+                chatChannelAdapter.notifyItemChanged(it)
             }
         }
     }
@@ -97,6 +95,7 @@ class ChatChannelList : RecyclerView, ChannelClickListener {
     }
 
     /**
+
      * Must be called by the Activity/Fragment when it is being destroyed so this can dispose of its subscribers
      */
     fun onDestroy() {

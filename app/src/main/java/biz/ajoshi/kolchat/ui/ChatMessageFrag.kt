@@ -16,6 +16,7 @@ import biz.ajoshi.kolchat.chat.view.customviews.ChatInputView
 import biz.ajoshi.kolchat.chat.view.customviews.QuickCommand
 import biz.ajoshi.kolchat.chat.view.customviews.QuickCommandView
 import com.crashlytics.android.answers.ContentViewEvent
+import kotlinx.android.synthetic.main.chat_detail.*
 
 /**
  * Fragment displaying a conversation in a channel or with a user. Uses the arch components instead of rxjava
@@ -46,7 +47,9 @@ class ChatMessageFrag : BaseFragment(), QuickCommandView.CommandClickListener, C
             isPrivate = args.getBoolean((EXTRA_CHANNEL_IS_PRIVATE))
         }
 
-        chatDetailList = activity?.findViewById(R.id.messagesList) as ChatDetailList
+        chatDetailList = messagesList
+        inputView = input_view
+
         activity?.let {
             if (!isPrivate) {
                 // right now all we do is open up chat, so disable when in PMs
@@ -57,10 +60,9 @@ class ChatMessageFrag : BaseFragment(), QuickCommandView.CommandClickListener, C
         chatLoadStartTimestamp = System.currentTimeMillis()
         chatDetailList?.loadInitialMessages(id, this)
 
-        inputView = activity?.findViewById(R.id.input_view) as ChatInputView
         inputView?.setSubmitListener { input: CharSequence? -> makePost(input, isPrivate, id) }
 
-        val quickCommands = activity?.findViewById(R.id.quick_commands) as QuickCommandView
+        val quickCommands = quick_commands
         quickCommands.setClickListener(this)
         super.onActivityCreated(savedInstanceState)
     }

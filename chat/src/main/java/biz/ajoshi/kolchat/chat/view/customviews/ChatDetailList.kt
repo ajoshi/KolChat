@@ -18,7 +18,7 @@ import io.reactivex.schedulers.Schedulers
  * Apps using LiveData should handle this themselves
  */
 class ChatDetailList : RecyclerView {
-    private var chatAdapter: ChatAdapter? = null
+    private lateinit var chatAdapter: ChatAdapter
     private var initialChatLoadSubscriber: Disposable? = null
     private var clickListener: MessageClickListener? = null
 
@@ -44,7 +44,7 @@ class ChatDetailList : RecyclerView {
         // scroll when the keyboard comes up
         addOnLayoutChangeListener({ _, _, _, _, bottom, _, _, _, oldBottom ->
             if (bottom < oldBottom) {
-                post({ chatAdapter?.scrollToBottom(16) })
+                post({ chatAdapter.scrollToBottom(16) })
             }
         })
     }
@@ -64,7 +64,7 @@ class ChatDetailList : RecyclerView {
                 ?.observeOn(AndroidSchedulers.mainThread())
                 ?.subscribe { list ->
                     // we have the list, so set it as the displayed list
-                    chatAdapter?.setList(list)
+                    chatAdapter.setList(list)
                     listener.onInitialMessageListLoaded()
                     initialMessagesLoaded()
                 }
@@ -82,7 +82,7 @@ class ChatDetailList : RecyclerView {
      * Add new messages to the list. Messages are added to the bottom.
      */
     fun addMessages(newMessges: List<ChatMessage>) {
-        chatAdapter?.addToBottom(newMessges)
+        chatAdapter.addToBottom(newMessges)
     }
 
     /**

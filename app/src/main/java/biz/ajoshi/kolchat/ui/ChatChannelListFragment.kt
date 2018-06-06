@@ -17,6 +17,7 @@ import biz.ajoshi.kolchat.chat.ACTION_CHAT_COMMAND_FAILED
 import biz.ajoshi.kolchat.chat.EXTRA_FAILED_CHAT_MESSAGE
 import biz.ajoshi.kolchat.chat.view.customviews.ChatChannelList
 import biz.ajoshi.kolchat.chat.view.customviews.NewChatFAB
+import kotlinx.android.synthetic.main.channel_list.*
 
 
 /**
@@ -39,9 +40,9 @@ class ChatChannelListFragment : BaseFragment(), NewChatFAB.ChatMessageSender {
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
-        channelList = activity?.findViewById(R.id.channel_list) as ChatChannelList
-        val newMessageFab = activity?.findViewById(R.id.button_compose_new_chat) as NewChatFAB
-        newMessageFab.chatMessageSender = this
+        val newMessageFab = button_compose_new_chat
+        newMessageFab?.chatMessageSender = this
+        channelList = channel_list
         // right now just send it all to the activity. We might want to intercept it later on, but probably not
         channelList?.setChatchannelInteractionListener(activity as ChatChannelList.ChatChannelInteractionListener)
         super.onActivityCreated(savedInstanceState)

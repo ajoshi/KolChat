@@ -10,7 +10,6 @@ import android.widget.TextView
 import biz.ajoshi.commonutils.StringUtilities
 import biz.ajoshi.kolchat.chat.R
 import biz.ajoshi.kolchat.persistence.chat.ChatMessage
-import biz.ajoshi.kolnetwork.model.User
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.drawee.generic.GenericDraweeHierarchyBuilder
 import com.facebook.drawee.span.DraweeSpan
@@ -31,20 +30,17 @@ class ChatMessageVH(itemView: View, val listener: MessageClickListener) : Recycl
         fun onMessageLongClicked(message: ChatMessage)
     }
 
-    val date = Date()
-    var chatmessage: ChatMessage? = null
+    private val date = Date()
+    private lateinit var chatmessage: ChatMessage
 
-    val userNameTv: TextView? = itemView.user_name
-    val chatMessageTv: SimpleDraweeSpanTextView? = itemView.text
-    val timeStampTv: TextView? = itemView.timestamp
+    private val userNameTv: TextView? = itemView.user_name
+    private val chatMessageTv: SimpleDraweeSpanTextView? = itemView.text
+    private val timeStampTv: TextView? = itemView.timestamp
 
     init {
-        itemView.setOnLongClickListener(View.OnLongClickListener ()  {
-            chatmessage?.let {
-                listener.onMessageLongClicked(it)
-                return@OnLongClickListener true
-            }
-            false
+        itemView.setOnLongClickListener(View.OnLongClickListener() {
+            listener.onMessageLongClicked(chatmessage)
+            true
         })
     }
 

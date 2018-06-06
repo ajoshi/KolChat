@@ -31,9 +31,9 @@ class ChatBackgroundService : Service(), ChatServiceHandler.ChatService {
         return this
     }
 
-    var serviceLooper: Looper? = null
-    var serviceHandler: ChatServiceHandler? = null
-    var mainActivityComponentName: ComponentName? = null
+    private lateinit var serviceLooper: Looper
+    private lateinit var serviceHandler: ChatServiceHandler
+    private var mainActivityComponentName: ComponentName? = null
 
     var sharedPref: SharedPreferences? = null
 
@@ -67,19 +67,17 @@ class ChatBackgroundService : Service(), ChatServiceHandler.ChatService {
         thread.start()
 
         serviceLooper = thread.looper
-        if (serviceLooper != null) {
-            serviceHandler = ChatServiceHandler(serviceLooper!!, this)
-        }
+        serviceHandler = ChatServiceHandler(serviceLooper, this)
 
         sharedPref = applicationContext.getSharedPreferences(CHAT_SHARED_PREF_NAME, Context.MODE_PRIVATE)
-        serviceHandler?.lastFetchedTime = sharedPref!!.getLong(SHARED_PREF_LAST_FETCH_TIME, 0)
+        serviceHandler.lastFetchedTime = sharedPref!!.getLong(SHARED_PREF_LAST_FETCH_TIME, 0)
     }
 
     /*
      * Called by OS with the given data. Parse input commands and do what needs to be done (start, stopChatService, delay, etc)
      */
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        val msg = serviceHandler?.obtainLoopMessage(startId)
+        val msg = serviceHandler.obtainLoopMessage(startId)
         val interval = intent?.extras?.getInt(EXTRA_POLL_INTERVAL_IN_MS, DEFAULT_POLL_INTERVAL)
         val chatMessageToSend = intent?.extras?.getString(EXTRA_CHAT_MESSAGE_TO_SEND, null)
         intent?.extras?.getParcelable<ComponentName>(EXTRA_MAIN_ACTIVITY_COMPONENTNAME)?.let {
@@ -95,12 +93,12 @@ class ChatBackgroundService : Service(), ChatServiceHandler.ChatService {
         } else {
             if (chatMessageToSend == null) {
                 msg?.obj = ChatServiceMessage(MessageType.START, null)
-                msg?.arg2 = serviceHandler?.getAgeIntForNewMessage()
+                msg?.arg2 = serviceHandler.getAgeIntForNewMessage()
             } else {
                 msg?.obj = ChatServiceMessage(MessageType.SEND_CHAT_MESSAGE, chatMessageToSend)
             }
-            serviceHandler?.pollInterval = (interval ?: DEFAULT_POLL_INTERVAL).toLong()
-            serviceHandler?.sendMessage(msg)
+            serviceHandler.pollInterval = (interval ?: DEFAULT_POLL_INTERVAL).toLong()
+            serviceHandler.sendMessage(msg)
             startForeground(FOREGROUND_NOTIFICATION_ID, makePersistentNotification(this))
 
         }
@@ -151,10 +149,10 @@ class ChatBackgroundService : Service(), ChatServiceHandler.ChatService {
 
     override fun onDestroy() {
         // we got told to quit, so shut down the service looper
-        serviceLooper?.quit()
+        serviceLooper.quit()
         // todo is this safe?
-        val lastFetchedTime = serviceHandler?.lastFetchedTime
-        lastFetchedTime?.let {
+        val lastFetchedTime = serviceHandler.lastFetchedTime
+        lastFetchedTime.let {
             sharedPref?.edit()?.putLong(SHARED_PREF_LAST_FETCH_TIME, lastFetchedTime)?.apply()
         }
     }

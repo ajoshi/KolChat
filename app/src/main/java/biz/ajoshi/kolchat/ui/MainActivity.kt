@@ -32,8 +32,8 @@ import com.crashlytics.android.answers.CustomEvent
 const val action_navigate_to_chat_detail = "biz.ajoshi.kolchat.ui.MainActivity.ACTION_NAVIGATE_TO_CHAT_DETAIL"
 
 class MainActivity : AppCompatActivity(), ChatChannelList.ChatChannelInteractionListener, ChatDetailList.MessageClickListener {
-    internal var toolbar: Toolbar? = null
-    internal var navController: NavController? = null
+    private var toolbar: Toolbar? = null
+    private lateinit var navController: NavController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,13 +66,11 @@ class MainActivity : AppCompatActivity(), ChatChannelList.ChatChannelInteraction
         // set up nav graph
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.llist)
         navController = navHostFragment.findNavController()
-        navController?.let {
-            it.setGraph(R.navigation.nav_graph)
-            it.currentDestination?.label = getString(R.string.app_name)
-            NavigationUI.setupActionBarWithNavController(this, it)
-            // Nav components don't work correctly (surprise!). Setting labels programmatically seems not to be doable at all
+        navController.setGraph(R.navigation.nav_graph)
+        navController.currentDestination?.label = getString(R.string.app_name)
+        NavigationUI.setupActionBarWithNavController(this, navController)
+        // Nav components don't work correctly (surprise!). Setting labels programmatically seems not to be doable at all
 //            it.addOnNavigatedListener(NavController.OnNavigatedListener { _, destination -> toolbar?.title = getPlaintextForHtml(""+ destination.label)})
-        }
         // analytics- log the source of the launch intent
         when (intent.action) {
         // launched by os
@@ -171,7 +169,7 @@ class MainActivity : AppCompatActivity(), ChatChannelList.ChatChannelInteraction
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
         R.id.menu_action_advanced_settings -> {
             // navigate to settings
-            navController?.navigate(R.id.nav_preferences)
+            navController.navigate(R.id.nav_preferences)
             true
         }
 
@@ -205,16 +203,15 @@ class MainActivity : AppCompatActivity(), ChatChannelList.ChatChannelInteraction
         b.putString(EXTRA_CHANNEL_ID, channel.id)
         b.putString(EXTRA_CHANNEL_NAME, plainTextName)
         b.putBoolean(EXTRA_CHANNEL_IS_PRIVATE, channel.isPrivate)
-        navController?.navigate(R.id.nav_chat_message, b)
-        navController?.currentDestination?.label = plainTextName
+        navController.navigate(R.id.nav_chat_message, b)
+        navController.currentDestination?.label = plainTextName
         // Go back to this if nav arch is as half baked as it seems
 //        val chatDetailFrag = ChatMessageFrag()
 //        chatDetailFrag.arguments = b
 //        supportFragmentManager.beginTransaction().replace(R.id.llist, chatDetailFrag, TAG_CHAT_DETAIL_FRAG)
 //                .addToBackStack(TAG_CHAT_DETAIL_FRAG).commit()
-        if (toolbar != null) {
-            // should crash on line 66 if this happens, honestly
-            toolbar!!.title = getPlaintextForHtml(plainTextName)
+        toolbar?.let {
+            it.title = getPlaintextForHtml(plainTextName)
         }
         Logg.i("MainActivity", if (channel.isPrivate) {
             "Channel detail opened"
@@ -246,7 +243,7 @@ class MainActivity : AppCompatActivity(), ChatChannelList.ChatChannelInteraction
     override fun onMessageLongClicked(message: ChatMessage) {
         // trying to open a new chat? Go back to main list first to keep backstack simple
         // needed because nav components have bad support for programmatic label/toolbar title setting
-        navController?.popBackStack()
+        navController.popBackStack()
         onChannelClicked(ChatChannel(message.userId, true, message.userName, "", 0, ""))
     }
 

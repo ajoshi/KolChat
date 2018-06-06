@@ -11,8 +11,8 @@ import biz.ajoshi.kolchat.persistence.chat.ChatChannel
  */
 class ChatChannelAdapter : RecyclerView.Adapter<ChatChannelVH>() {
 
-    val rowTypeGroup = 1
-    val rowTypePm = 2
+    private val rowTypeGroup = 1
+    private val rowTypePm = 2
 
     /**
      * Defines the different callbacks for click/long press and other touch interactions for a chat channel

@@ -20,15 +20,15 @@ class ChatChannelVH(itemView: View, val listener: ChannelRowClickListener?) : Re
         fun onChannelRowClicked(channel: ChatChannel)
     }
 
-    val date = Date()
+    private val date = Date()
 
-    var channelForThisRow: ChatChannel? = null
+    private lateinit var channelForThisRow: ChatChannel
 
-    val nameView = itemView.name
-    val dateView = itemView.last_message_time
+    private val nameView = itemView.name
+    private val dateView = itemView.last_message_time
 
     init {
-        itemView.setOnClickListener { _ -> listener?.onChannelRowClicked(channelForThisRow!!) }
+        itemView.setOnClickListener { _ -> listener?.onChannelRowClicked(channelForThisRow) }
         // TODO longclicklistener so channel can be removed
     }
 
