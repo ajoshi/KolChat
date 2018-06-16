@@ -12,6 +12,7 @@
     <string name="action_sign_in_short">Sign in</string>
     <string name="error_invalid_password">This password is too short</string>
     <string name="error_incorrect_password">This password is incorrect</string>
+    <string name="error_ro_in_progress">Rollover is in progress. Please try again later</string>
     <string name="error_field_required">This field is required</string>
 
     <string name="menu_option_advancedsettings">Advanced</string>

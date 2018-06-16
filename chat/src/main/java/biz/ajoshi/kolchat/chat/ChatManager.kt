@@ -2,10 +2,7 @@ package biz.ajoshi.kolchat.chat
 
 import android.content.SharedPreferences
 import android.util.Log
-import biz.ajoshi.kolnetwork.model.ServerChatChannel
-import biz.ajoshi.kolnetwork.model.ServerChatCommandResponse
-import biz.ajoshi.kolnetwork.model.ServerChatMessage
-import biz.ajoshi.kolnetwork.model.User
+import biz.ajoshi.kolnetwork.model.*
 import org.json.JSONObject
 import java.io.IOException
 
@@ -40,7 +37,7 @@ class ChatManager(val network: biz.ajoshi.kolnetwork.Network, internal val share
      */
     @Throws(IOException::class)
     fun start() {
-        if (!network.isLoggedIn && !network.login()) {
+        if (!network.isLoggedIn && !network.login().isSuccessful()) {
             throw IOException("Couldn't log in for magic reason")
         }
 
@@ -51,21 +48,21 @@ class ChatManager(val network: biz.ajoshi.kolnetwork.Network, internal val share
      * Makes a post and also retrieves any unread chat commands
      */
     @Throws(IOException::class)
-    fun post(message: String): ServerChatCommandResponse {
+    fun post(message: String): ServerChatResponse {
         val chatResponse = network.postChat(message)
         return parseSentChat(chatResponse)
     }
 
-    fun parseSentChat(response: String?): ServerChatCommandResponse {
+    fun parseSentChat(response: NetworkResponse): ServerChatResponse {
         /*
          * This seems wrong- chat and chat commands should be separated out
          */
-        if (response.isNullOrEmpty()) {
+        if (!response.isSuccessful()) {
             // this is sent when we failed to make the network call (RO and maybe general connectivity issues?)
-    //        network.logout()
-            return ServerChatCommandResponse("", emptyList())
+            //        network.logout()
+            return ServerChatResponse("", emptyList(), response.status)
         }
-        val json = JSONObject(response)
+        val json = JSONObject(response.response)
 
         /* TODO support whois
         result of a non-chat command like whois
@@ -96,14 +93,14 @@ class ChatManager(val network: biz.ajoshi.kolnetwork.Network, internal val share
         }
 
         val chatCommandResponse = json.optString("output")
-        return ServerChatCommandResponse(chatCommandResponse, parsedChat)
+        return ServerChatResponse(chatCommandResponse, parsedChat, response.status)
     }
 
     /**
      * Fetches unread chat commands from the server
      */
     @Throws(IOException::class)
-    fun readChat(): List<ServerChatMessage> {
+    fun readChat(): ServerChatResponse {
         return readChat(lastSeen)
     }
 
@@ -111,28 +108,27 @@ class ChatManager(val network: biz.ajoshi.kolnetwork.Network, internal val share
      * Fetches unread chat commands from the server since the given timestamp
      */
     @Throws(IOException::class)
-    fun readChat(lastSeenTime: Long): List<ServerChatMessage> {
+    fun readChat(lastSeenTime: Long): ServerChatResponse {
         // The responsebody we get from the server
         val chatResponse = network.readChat(lastSeenTime)
         // this will be the list of chats we return. We'll add chats to this list
         // break up the response by the br tag. It's what kol uses to delimit commands
-        if (chatResponse.isNullOrEmpty()) {
-        //    network.logout()
-            return emptyList()//
+        if (!chatResponse.isSuccessful()) {
+//            onExpiredHash()
+            return ServerChatResponse("", emptyList(), chatResponse.status)
         }
-        val response = JSONObject(chatResponse)
+        val response = JSONObject(chatResponse.response)
         val timeStampString = response.getLong("last")
         setLastSeenTime(timeStampString)
-        return parseJsonChat(response)
+        return ServerChatResponse("", parseJsonChat(response), chatResponse.status)
     }
 
     private fun setLastSeenTime(newTime: Long) {
         lastSeen = newTime
         sharedPrefs.edit().putLong(SHARED_PREF_LAST_FETCH_TIME, lastSeen).apply()
-
     }
 
-    fun parseJsonChat(response: JSONObject): MutableList<ServerChatMessage> {
+    private fun parseJsonChat(response: JSONObject): MutableList<ServerChatMessage> {
         val currentTime = System.currentTimeMillis()
 
         //       does this mean logout?

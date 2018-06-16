@@ -13,7 +13,9 @@ import android.support.v4.content.LocalBroadcastManager
 import biz.ajoshi.commonutils.Logg
 import biz.ajoshi.commonutils.StringUtilities
 import biz.ajoshi.kolchat.chat.persistence.RoomInserter
+import biz.ajoshi.kolnetwork.model.NetworkStatus
 import biz.ajoshi.kolnetwork.model.ServerChatMessage
+import biz.ajoshi.kolnetwork.model.ServerChatResponse
 import java.io.IOException
 
 // normally we'll poll every 3 seconds
@@ -27,6 +29,8 @@ const val EXTRA_LAUNCH_TO_CHAT_ID = "biz.ajoshi.kolchat.chat.ChatServiceHandler.
 
 const val ACTION_CHAT_COMMAND_FAILED = "biz.ajoshi.kolchat.chat.ChatServiceHandler.ACTION_CHAT_COMMAND_FAILED"
 const val EXTRA_FAILED_CHAT_MESSAGE = "biz.ajoshi.kolchat.chat.ChatServiceHandler.EXTRA_FAILED_CHAT_MESSAGE"
+const val ACTION_CHAT_ROLLOVER = "biz.ajoshi.kolchat.chat.ChatServiceHandler.ACTION_CHAT_ROLLOVER"
+const val ACTION_CHAT_ROLLOVER_OVER = "biz.ajoshi.kolchat.chat.ChatServiceHandler.ACTION_CHAT_ROLLOVER_OVER"
 
 /**
  * A Handler that lets us read chat and insert to DB
@@ -41,27 +45,43 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
          * correctly direct the user to another activity, the 'main' activity must do this.
          */
         fun getMainActivityIntent(): Intent
+
+        fun onRollover()
+
+        fun onRoIsOVer()
     }
 
     val roomInserter = RoomInserter()
     var pollInterval: Long = DEFAULT_POLL_INTERVAL.toLong()
     var lastFetchedTime: Long = 0
 
+    var isItRo: Boolean = false
+
     var inverseAgeOfMessage = 0
+
+    private fun roIsHere() {
+        //   ChatSingleton.network?.logout()
+        service.onRollover()
+        isItRo = true
+    }
 
     override fun handleMessage(msg: Message?) {
         try {
             Logg.i("ChatServiceHandler", "Handler received a message")
-            if (ChatSingleton.chatManager == null ||  // chatmgr is null so we have no userinfo to use for login
-                    (!ChatSingleton.chatManager!!.network.isLoggedIn  // we're not logged in (but have the ability)
-                            && !ChatSingleton.chatManager!!.network.login())) { // tried to login, but couldnt
-                // not logged in so exit service. may be premature and a bad idea
-                // we couldn't log in so... stopChatService the service?
-                // TODO maybe notify user that error occurred here?
-                Logg.i("ChatServiceHandler", "Not logged in. Handler exiting")
-                service.stopChatService(msg?.arg1 ?: -1)
-                return
+
+            if (ChatSingleton.chatManager == null || // chatmgr is null so we have no userinfo to use for login
+                    !ChatSingleton.chatManager!!.network.isLoggedIn) { // we're not logged in (but have the ability)
+                val response = ChatSingleton.chatManager?.network?.login()
+                if (response?.isSuccessful() != true) {
+                    // not logged in so exit service. may be premature and a bad idea
+                    // we couldn't log in so... stopChatService the service?
+                    // TODO maybe notify user that error occurred here?
+                    Logg.i("ChatServiceHandler", "Not logged in. Handler exiting")
+                    service.stopChatService(msg?.arg1 ?: -1)
+                    return
+                }
             }
+
             if (msg?.obj != null) {
                 // if we had a message to send then send it
                 // periodic chat read message has no object
@@ -85,19 +105,28 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
                         if (serviceMessage.textmessage != null) {
                             val response = ChatSingleton.postChat(serviceMessage.textmessage)
                             response?.let {
-                                insertChatsIntoDb((response.messages), ChatSingleton.network?.currentUser?.player?.name
-                                        ?: ERROR_STRING)
-                                /*
-                                  Chat commands (and chat message sends) don't actually end up returning messages- they
-                                  only return an output (if anything)
-                                  There is no contract that specifies this though, and assuming this might cause dropped messages.
+                                if (response.status == NetworkStatus.SUCCESS) {
+                                    insertChatsIntoDb((response.messages), ChatSingleton.network?.currentUser?.player?.name
+                                            ?: ERROR_STRING)
+                                    /*
+                              Chat commands (and chat message sends) don't actually end up returning messages- they
+                              only return an output (if anything)
+                              There is no contract that specifies this though, and assuming this might cause dropped messages.
 
-                                  So right now just stick output in System chat and ALSO broadcast it out
-                                 */
-                                if (response.output.isNotEmpty()) {
-                                    val broadcastIntent = Intent(ACTION_CHAT_COMMAND_FAILED)
-                                    broadcastIntent.putExtra(EXTRA_FAILED_CHAT_MESSAGE, response.output)
-                                    LocalBroadcastManager.getInstance(service.getContext()).sendBroadcast(broadcastIntent)
+                              So right now just stick output in System chat and ALSO broadcast it out
+                             */
+                                    if (response.output.isNotEmpty()) {
+                                        val broadcastIntent = Intent(ACTION_CHAT_COMMAND_FAILED)
+                                        broadcastIntent.putExtra(EXTRA_FAILED_CHAT_MESSAGE, response.output)
+                                        LocalBroadcastManager.getInstance(service.getContext()).sendBroadcast(broadcastIntent)
+                                    }
+                                    if (isItRo) {
+                                        service.onRoIsOVer()
+                                        isItRo = false
+                                    }
+                                } else if (response.status == NetworkStatus.ROLLOVER) { // what about expired hash?
+                                    // TODO save sent message so it can be sent after RO. Probably v2
+                                    roIsHere()
                                 }
                             }
                         }
@@ -119,7 +148,12 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
                 Logg.i("ChatServiceHandler", "No message, reading chat and scheduling future read")
                 // else check for new commands and reschedule to check in a bit
                 if (msg != null && msg.arg2 == inverseAgeOfMessage) {
-                    sendMessageDelayed(obtainLoopMessage(msg.arg1), pollInterval)
+                    if (isItRo) {
+                        // ups the poll time to once every 3 minutes until RO is over
+                        sendMessageDelayed(obtainLoopMessage(msg.arg1), DEFAULT_POLL_INTERVAL * 60L)
+                    } else {
+                        sendMessageDelayed(obtainLoopMessage(msg.arg1), pollInterval)
+                    }
                     readChat()
                 }
             }
@@ -127,7 +161,12 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
             Logg.logThrowable(exception)
             // an ioexception occured. This means we're in a bad network location. try again later
             val newMessage = cloneMessage(msg)
-            newMessage ?: sendMessageDelayed(newMessage, pollInterval)
+            if (isItRo) {
+                // ups the poll time to once every 3 minutes until RO is over
+                newMessage ?: sendMessageDelayed(newMessage, DEFAULT_POLL_INTERVAL * 60L)
+            } else {
+                newMessage ?: sendMessageDelayed(newMessage, pollInterval)
+            }
 
         }
     }
@@ -135,13 +174,22 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
     /**
      * Reads queued chat messages and inserts them into DB. If user has any direct messages, a notification is also created
      */
-    private fun readChat() {
+    private fun readChat(): ServerChatResponse? {
         // TODO add instrumentation here so we can measure fetch and db insertion times
-        val messages = ChatSingleton.readChat(lastFetchedTime)
+        val response = ChatSingleton.readChat(lastFetchedTime)
         // if we can, read the chat and stick in db
-        insertChatsIntoDb(messages, ChatSingleton.network?.currentUser?.player?.name ?: ERROR_STRING)
-        notifyUserOfPm(messages)
-        lastFetchedTime = ChatSingleton.chatManager!!.lastSeen
+        if (response?.status == NetworkStatus.SUCCESS) {
+            insertChatsIntoDb(response.messages, ChatSingleton.network?.currentUser?.player?.name ?: ERROR_STRING)
+            notifyUserOfPm(response.messages)
+            lastFetchedTime = ChatSingleton.chatManager!!.lastSeen
+            if (isItRo) {
+                service.onRoIsOVer()
+            }
+            isItRo = false
+        } else {
+            roIsHere()
+        }
+        return response
     }
 
     /**
@@ -152,15 +200,8 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
      */
     private fun readChat(threshold: Int) {
         // TODO add instrumentation here so we can measure fetch and db insertion times
-        Logg.i("ChatServiceHandler", "Fetching chat data")
-        val messages = ChatSingleton.readChat(lastFetchedTime)
-        Logg.i("ChatServiceHandler", "chat data fetched " + messages?.size + " messages read")
-        // if we can, read the chat and stick in db
-        insertChatsIntoDb(messages, ChatSingleton.network?.currentUser?.player?.name ?: ERROR_STRING)
-        Logg.i("ChatServiceHandler", "db insertion complete")
-        notifyUserOfPm(messages)
-        lastFetchedTime = ChatSingleton.chatManager!!.lastSeen
-        messages?.let {
+        val response = readChat()
+        response?.messages?.let {
             if (it.size > threshold) {
                 // if we got more than n messages in the last read, there might still be a bunch remaining. Poll until
                 // there aren't any left (or we get fewer than n messages)

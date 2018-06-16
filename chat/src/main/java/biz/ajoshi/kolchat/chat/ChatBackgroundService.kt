@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.os.*
 import android.support.v4.app.NotificationCompat
+import android.support.v4.content.LocalBroadcastManager
 import biz.ajoshi.commonutils.Logg
 
 
@@ -27,6 +28,17 @@ const val MENTION_NOTIFICATION_CHANNEL_ID = "kolMention"
  * Users should listen for intents with ACTION_CHAT_COMMAND_FAILED action to show errors when sending chat fails
  */
 class ChatBackgroundService : Service(), ChatServiceHandler.ChatService {
+    override fun onRoIsOVer() {
+        val broadcastIntent = Intent(ACTION_CHAT_ROLLOVER_OVER)
+        LocalBroadcastManager.getInstance(getContext()).sendBroadcast(broadcastIntent)
+    }
+
+    override fun onRollover() {
+        val broadcastIntent = Intent(ACTION_CHAT_ROLLOVER)
+        broadcastIntent.putExtra(EXTRA_FAILED_CHAT_MESSAGE, "Rollover in progress, restart in 5 minutes")
+        LocalBroadcastManager.getInstance(getContext()).sendBroadcast(broadcastIntent)
+    }
+
     override fun getContext(): Context {
         return this
     }

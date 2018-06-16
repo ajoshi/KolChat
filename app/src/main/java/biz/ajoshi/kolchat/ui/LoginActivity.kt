@@ -21,6 +21,7 @@ import biz.ajoshi.kolchat.accounts.AccountLoader
 import biz.ajoshi.kolchat.accounts.KolAccount
 import biz.ajoshi.kolchat.accounts.KolAccountManager
 import biz.ajoshi.kolchat.chat.ChatSingleton
+import biz.ajoshi.kolnetwork.model.NetworkStatus
 import kotlinx.android.synthetic.main.activity_login.*
 import java.lang.ref.WeakReference
 
@@ -200,9 +201,9 @@ class LoginActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<List<Ko
      * LOADER CALLBACKS END
      **********************************************************************************/
 
-    override fun onLogin(success: Boolean, userNameText: String, passwordText: String) {
+    override fun onLogin(networkStatus: NetworkStatus, userNameText: String, passwordText: String) {
         mAuthTask = null
-        if (success) {
+        if (networkStatus == NetworkStatus.SUCCESS) {
             startActivity(Intent(this, MainActivity::class.java))
             val acctMgr = KolAccountManager(this)
             // should i be sending these values in instead of re-finding them?
@@ -213,7 +214,12 @@ class LoginActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<List<Ko
         } else {
             // failed login, so highlight the password field in the UI
             password.setText(passwordText)
-            password.error = getString(R.string.error_incorrect_password)
+            if (networkStatus == NetworkStatus.ROLLOVER) {
+                // login will fail when server is down. Show error and hope for the best
+                password.error = getString(R.string.error_ro_in_progress)
+            } else {
+                password.error = getString(R.string.error_incorrect_password)
+            }
             password.requestFocus()
             showProgress(false)
         }
@@ -239,7 +245,7 @@ class LoginActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<List<Ko
  * Represents an asynchronous login/registration task used to authenticate
  * the user.
  */
-class UserLoginTask constructor(private val userName: String, private val password: String, private val uiWeakRef: WeakReference<LoginFieldContainer>) : AsyncTask<Void, Void, Boolean>() {
+class UserLoginTask constructor(private val userName: String, private val password: String, private val uiWeakRef: WeakReference<LoginFieldContainer>) : AsyncTask<Void, Void, NetworkStatus>() {
 
     /**
      * Defines the requirements for the UI component that displays updates for this login task
@@ -247,11 +253,11 @@ class UserLoginTask constructor(private val userName: String, private val passwo
     interface LoginFieldContainer {
         /**
          * Called when the login task has either succeeded or failed
-         * @param success true if login was successful. False if password was wrong or some other error
+         * @param networkStatus status of the network call
          * @param userNameText user name we tried to log in with
          * @param passwordText password we tried to log in with
          */
-        fun onLogin(success: Boolean, userNameText: String, passwordText: String)
+        fun onLogin(networkStatus: NetworkStatus, userNameText: String, passwordText: String)
 
         /**
          * Called when the login task has been cancelled (not when it fails)
@@ -264,19 +270,21 @@ class UserLoginTask constructor(private val userName: String, private val passwo
         fun getApplicationContext(): Context
     }
 
-    override fun doInBackground(vararg params: Void): Boolean {
+    data class LoginResponse(val reason: String, val success: Boolean)
+
+    override fun doInBackground(vararg params: Void): NetworkStatus {
         val activity = uiWeakRef.get()
         activity?.let {
             return ChatSingleton.login(username = userName, password = password, silent = true, context = activity.getApplicationContext())
         }
-        return false
+        return NetworkStatus.UNKNOWN
     }
 
-    override fun onPostExecute(success: Boolean) {
+    override fun onPostExecute(status: NetworkStatus) {
         // maybe use rx to notify the activity instead?
         val activity = uiWeakRef.get()
         activity?.let {
-            activity.onLogin(success = success, userNameText = userName, passwordText = password)
+            activity.onLogin(networkStatus = status, userNameText = userName, passwordText = password)
         }
     }
 

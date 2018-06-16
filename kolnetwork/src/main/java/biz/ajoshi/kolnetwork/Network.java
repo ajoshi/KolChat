@@ -9,6 +9,8 @@ import java.util.concurrent.TimeUnit;
 import biz.ajoshi.commonutils.Logg;
 import biz.ajoshi.commonutils.StringUtilities;
 import biz.ajoshi.kolnetwork.model.LoggedInUser;
+import biz.ajoshi.kolnetwork.model.NetworkResponse;
+import biz.ajoshi.kolnetwork.model.NetworkStatus;
 import biz.ajoshi.kolnetwork.model.User;
 import okhttp3.Call;
 import okhttp3.HttpUrl;
@@ -34,6 +36,7 @@ public class Network {
     private String phpSessId;
     private String awsCookie;
     private boolean loggedIn = false;
+    private boolean isRollover = false;
     private String chatpwd;
     private LoggedInUser currentUser;
     OkHttpClient client;
@@ -72,9 +75,9 @@ public class Network {
      * @return true if login succeeded, else false
      *
      * @throws IOException
-     *         if an logThrowable occured
+     *         if a exception occured
      */
-    public boolean login() throws IOException {
+    public NetworkResponse login() throws IOException {
         client = new OkHttpClient()
                 .newBuilder()
                 .followRedirects(false)
@@ -103,15 +106,14 @@ public class Network {
         String redirectLocation = response.header("location");
         if (redirectLocation != null && !redirectLocation.startsWith("/")) {
             // this seems to only happen during RO
-            redirectLocation = '/' + redirectLocation;
-            loggedIn = false;
-            return false;
+            //  redirectLocation = '/' + redirectLocation;
+            return onRollover();
         }
 
         HttpUrl loginUrl = HttpUrl.parse(BASE_URL + redirectLocation);
 
         if (loginUrl == null) {
-            return false;
+            return new NetworkResponse("Redirected to invalid url", NetworkStatus.FAILURE);
         }
         loginUrl = loginUrl.newBuilder()
                            .addQueryParameter("loggingin", "Yup.")
@@ -131,7 +133,7 @@ public class Network {
         Response loginResponse = client.newCall(loginrequest).execute();
 
         if (loginResponse.networkResponse() == null) {
-            return false;
+            return new NetworkResponse("Maybe RO, not sure. login response null", NetworkStatus.FAILURE);
         } else {
             List<String> cookies = loginResponse.networkResponse().headers("set-cookie");
             int cookieCount = cookies.size();
@@ -152,18 +154,26 @@ public class Network {
                 if (playerData != null && pwdHash != null && playerid != null) {
                     // I guess we must have logged in!
                     loggedIn = true;
+                    isRollover = false;
                 }
             }
-            return loggedIn;
+            return loggedIn ? new NetworkResponse("") : new NetworkResponse(NetworkStatus.FAILURE);
         }
     }
 
     public void logout() {
         // right now just clear local state
         loggedIn = false;
+        playerid = null;
+        halfLogout();
+    }
+
+    /**
+     * Resets some local state so it can be refetched if stale
+     */
+    private void halfLogout() {
         awsCookie = null;
         phpSessId = null;
-        playerid = null;
         pwdHash = null;
     }
 
@@ -174,7 +184,7 @@ public class Network {
      *
      * @throws IOException
      */
-    public String fetchPlayerData() throws IOException {
+    private String fetchPlayerData() throws IOException {
         Request readchatRequest = new Request.Builder()
                 .url(BASE_URL + "/mchat.php?for=ajoshiChatApp")
                 .header("cookie", String.format("PHPSESSID=%s; AWSALB=%s", phpSessId, awsCookie))
@@ -190,9 +200,15 @@ public class Network {
             pwdHash = StringUtilities.getBetweenTwoStrings(postResponse, "pwdhash = \"", "\"");
             String mainChannel = StringUtilities.getBetweenTwoStrings(postResponse, "active: \"", "\"");
             chatpwd = StringUtilities.getBetweenTwoStrings(postResponse, "setCookie('chatpwd', winW, ", ",");
-            if (playerid == null) {
-                Logg.e("Network", chatResponse.isSuccessful()? "successful call": "failed call");
+            if (postResponse.isEmpty() || playerid == null) {
                 // TODO chat response comes back as null sometimes. concurrent logins are causing issues
+                if (login().isSuccessful()) {
+                    // if we can log in again to refresh the hash then do so and try again
+                    return fetchPlayerData();
+                }
+                onExpiredHash();
+                return null;
+            }
                 /*
                 2018-06-03 21:52:28.427 14205-14364/biz.ajoshi.kolchat I/ChatSingleton: logging in as corman
 2018-06-03 21:52:28.707 14205-14320/biz.ajoshi.kolchat I/JobManager: Found pending job request{id=108, tag=chat_job_tag, transient=false}, canceling
@@ -200,11 +216,7 @@ public class Network {
 2018-06-03 21:52:28.915 14205-14695/biz.ajoshi.kolchat I/ChatSingleton: logging in as corman
 2018-06-03 21:52:29.721 14205-14364/biz.ajoshi.kolchat E/Network: failed call
                  */
-                Logg.e("Network", chatResponse.message());
-                Logg.e("Network", postResponse);
-                Logg.logThrowable(new IllegalStateException("Login id is null"));
-                throw new IOException("");
-            }
+
             currentUser = new LoggedInUser(new User(playerid, username), pwdHash, mainChannel);
        /* $cw,
                 $inp,
@@ -247,6 +259,7 @@ public class Network {
         playerid = 2239681,
                 pwdhash = "8060f6a";
                 */
+            isRollover = false;
             return postResponse;
         }
     }
@@ -265,7 +278,7 @@ public class Network {
      *
      * @throws IOException
      */
-    public String postChat(String message) throws IOException {
+    public NetworkResponse postChat(String message) throws IOException {
         Request sendChatRequest = new Request.Builder().get()
                                                        .url(String.format(BASE_URL +
                                                                           "/submitnewchat.php?for=ajoshiChatApp&playerid=%s&pwd=%s&graf=%s&j=1&format=php",
@@ -288,7 +301,7 @@ public class Network {
         if (redirectLocation != null &&
             (redirectLocation.contains(MAINT_POSTFIX) || (redirectLocation.contains("login.php")))) {
             // RO time or we got logged out
-            return null;
+            return onRollover();
         }
         String response = null;
         ResponseBody body = chatResponse.body();
@@ -296,7 +309,15 @@ public class Network {
             response = body.source().readUtf8();
         }
         chatResponse.close();
-        return response;
+        if (response == null) {
+            if (login().isSuccessful()) {
+                // if we can log in again to refresh the hash then do so and try again
+                return postChat(message);
+            }
+            return onExpiredHash();
+        }
+        isRollover = false;
+        return new NetworkResponse(response);
     }
 
     /**
@@ -308,7 +329,7 @@ public class Network {
      *
      * @throws IOException
      */
-    public String readChat(long timeStamp) throws IOException {
+    public NetworkResponse readChat(long timeStamp) throws IOException {
         // chat response is always html
         // chat command response (which is returned from the GET) is json containing html
         Request readchatRequest = new Request.Builder()
@@ -338,16 +359,41 @@ public class Network {
                      */
 
         String redirectLocation = chatResponse.header("location");
-        if (redirectLocation != null && redirectLocation.contains(MAINT_POSTFIX)) {
-            // TODO handle RO time
-            return null;
+        if (redirectLocation != null) {
+            return onRollover();
         }
         ResponseBody body = chatResponse.body();
         if (body != null) {
-            return body.string();
+            String bodyString = body.string();
+            if (bodyString != null && !bodyString.isEmpty()) {
+                isRollover = false;
+                return new NetworkResponse(bodyString);
+            }
         }
-        return null;
+        if (login().isSuccessful()) {
+            // if we can log in again to refresh the hash then do so and try again
+            return readChat(timeStamp);
+        }
+        // we always get a response, even when chat is empty. So if response is empty, something has gone awry
+        return onExpiredHash();
     }
+
+    private NetworkResponse onExpiredHash() {
+        // pwdhash is no longer valid. Either web login happened or RO
+        Logg.w("Network", "Pwdhash expired, logging out");
+        halfLogout();
+        return new NetworkResponse(NetworkStatus.INVALID_HASH);
+    }
+
+
+    private NetworkResponse onRollover() {
+        Logg.w("Network", "Rollover time!");
+        // semi-logout so we can log back in automatically
+        halfLogout();
+        isRollover = true;
+        return new NetworkResponse(NetworkStatus.ROLLOVER);
+    }
+
 
     public boolean isLoggedIn() {
         return loggedIn;

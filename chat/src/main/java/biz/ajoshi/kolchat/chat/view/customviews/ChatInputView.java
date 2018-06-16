@@ -110,6 +110,13 @@ public class ChatInputView extends RelativeLayout {
 
     }
 
+    @Override
+    public void setEnabled(boolean enabled) {
+        super.setEnabled(enabled);
+        shouldEnableSubmitButton(enabled);
+        inputField.setEnabled(enabled);
+    }
+
     /**
      * Enabled and disabled the submit button.
      *

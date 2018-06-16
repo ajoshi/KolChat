@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.HandlerThread
 import android.os.Process
+import biz.ajoshi.kolnetwork.model.NetworkStatus
 import com.evernote.android.job.Job
 import com.evernote.android.job.JobCreator
 import com.evernote.android.job.JobManager
@@ -29,18 +30,21 @@ class ChatJob : Job() {
         thread.start()
         val serviceLooper = thread.looper
         if (serviceLooper != null) {
-            // it seems we always want the slow polling job to log in. This is because the OS might not call the job
+            // it seems we sometimes want the slow polling job to log in. This is because the OS might not call the job
             // for a few hours and our session token becomes invalid
-            ChatSingleton.login(username = params.extras.getString(extra_username, ""),
-                    password = params.extras.getString(extra_password, ""),
-                    silent = true,
-                    context = context)
-            val serviceHandler = ChatServiceHandler(serviceLooper, ServiceImpl())
-            val message = serviceHandler.obtainLoopMessage(1)
-            message?.obj = ChatServiceMessage(MessageType.READ_UNTIL_THRESHOLD, null)
-            serviceHandler.sendMessage(message)
-            // TODO maybe delay until we know success has happened?
-            return Result.SUCCESS
+            if (ChatSingleton.loginIfNeeded(username = params.extras.getString(extra_username, ""),
+                            password = params.extras.getString(extra_password, ""),
+                            silent = true,
+                            context = context) == NetworkStatus.SUCCESS) {
+                val serviceHandler = ChatServiceHandler(serviceLooper, ServiceImpl())
+                val message = serviceHandler.obtainLoopMessage(1)
+                message?.obj = ChatServiceMessage(MessageType.READ_UNTIL_THRESHOLD, null)
+                serviceHandler.sendMessage(message)
+                // TODO maybe delay until we know success has happened?
+                return Result.SUCCESS
+            }
+            // do nothing- the next run will run fine
+            return Result.FAILURE
         }
         return Result.FAILURE
     }
@@ -91,6 +95,14 @@ class ChatJob : Job() {
      * Alternatively, rename getContext and ChatJob can implement the interface directly
      */
     private inner class ServiceImpl : ChatServiceHandler.ChatService {
+        override fun onRoIsOVer() {
+            // do nothing
+        }
+
+        override fun onRollover() {
+            // we don't care about RO. The next read by this service will happen way later and RO should be over by then
+        }
+
         override fun stopChatService(id: Int) {
             // can we do more?
             shouldReschedule = false;

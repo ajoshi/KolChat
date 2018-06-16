@@ -25,12 +25,15 @@ import kotlinx.android.synthetic.main.chat_detail.*
 const val EXTRA_CHANNEL_ID = "biz.ajoshi.kolchat.ExtraChannelId"
 const val EXTRA_CHANNEL_NAME = "biz.ajoshi.kolchat.ExtraChannelName"
 const val EXTRA_CHANNEL_IS_PRIVATE = "biz.ajoshi.kolchat.ExtraChannelPrivate"
+// lets the app disable the input view if it wants. doesn't let it disable when the fragment is already up, but nbd
+const val EXTRA_CHANNEL_IS_COMPOSER_DISABLED = "biz.ajoshi.kolchat.ExtraChannelIsComposerDisabled"
 
 class ChatMessageFrag : BaseFragment(), QuickCommandView.CommandClickListener, ChatDetailList.ChatMessagesLoaderView {
     var id = "newbie"
     var name = "newbie"
     var isPrivate = false
     var chatLoadStartTimestamp = 0L
+    var isComposerDisabled = true
 
     var chatDetailList: ChatDetailList? = null
     var inputView: ChatInputView? = null
@@ -45,6 +48,7 @@ class ChatMessageFrag : BaseFragment(), QuickCommandView.CommandClickListener, C
             id = args.getString(EXTRA_CHANNEL_ID)
             name = args.getString(EXTRA_CHANNEL_NAME)
             isPrivate = args.getBoolean((EXTRA_CHANNEL_IS_PRIVATE))
+            isComposerDisabled = args.getBoolean(EXTRA_CHANNEL_IS_COMPOSER_DISABLED)
         }
 
         chatDetailList = messagesList
@@ -60,6 +64,7 @@ class ChatMessageFrag : BaseFragment(), QuickCommandView.CommandClickListener, C
         chatLoadStartTimestamp = System.currentTimeMillis()
         chatDetailList?.loadInitialMessages(id, this)
 
+        inputView?.isEnabled = !isComposerDisabled
         inputView?.setSubmitListener { input: CharSequence? -> makePost(input, isPrivate, id) }
 
         val quickCommands = quick_commands

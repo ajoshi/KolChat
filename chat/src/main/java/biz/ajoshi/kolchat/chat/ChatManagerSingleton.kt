@@ -2,8 +2,8 @@ package biz.ajoshi.kolchat.chat
 
 import android.content.Context
 import biz.ajoshi.commonutils.Logg
-import biz.ajoshi.kolnetwork.model.ServerChatMessage
-import biz.ajoshi.kolnetwork.model.ServerChatCommandResponse
+import biz.ajoshi.kolnetwork.model.NetworkStatus
+import biz.ajoshi.kolnetwork.model.ServerChatResponse
 import java.io.IOException
 
 /**
@@ -14,28 +14,29 @@ object ChatSingleton {
     var network: biz.ajoshi.kolnetwork.Network? = null
     val tag = "ChatSingleton"
 
-    fun login(username: String, password: String, silent: Boolean, context: Context): Boolean {
-        Logg.i(tag, "logging in as $username") // TODO remove this- no point logging username
+    fun login(username: String, password: String, silent: Boolean, context: Context): NetworkStatus {
         network = biz.ajoshi.kolnetwork.Network(username, password, silent)
-        try {
-            if (!network!!.login()) {
-                Logg.i(tag, "couldn't log in to $username")
-                return false
+        network?.let {
+            val status: NetworkStatus
+            try {
+                status = it.login().status
+            } catch (exception: IOException) {
+                Logg.logThrowable(tag, exception)
+                return NetworkStatus.FAILURE
             }
-        } catch (exception: IOException) {
-            Logg.logThrowable(tag, exception)
-            return false
+            // return whatever the failure status was
+            if (!it.isLoggedIn) return status
+            chatManager = ChatManager(it, context.getSharedPreferences(CHAT_SHARED_PREF_NAME, Context.MODE_PRIVATE))
+            return status
         }
-        if (!network!!.isLoggedIn) return false
-        chatManager = ChatManager(network!!, context.getSharedPreferences(CHAT_SHARED_PREF_NAME, Context.MODE_PRIVATE))
-        return true
+        return NetworkStatus.FAILURE
     }
 
-    fun loginIfNeeded(username: String, password: String, silent: Boolean, context: Context): Boolean {
+    fun loginIfNeeded(username: String, password: String, silent: Boolean, context: Context): NetworkStatus {
         if (network == null) {
             return login(username, password, silent, context)
         }
-        return true
+        return NetworkStatus.SUCCESS
     }
 
     fun isLoggedIn(): Boolean {
@@ -43,12 +44,12 @@ object ChatSingleton {
     }
 
     @Throws(IOException::class)
-    fun readChat(timeStamp: Long): List<ServerChatMessage>? {
+    fun readChat(timeStamp: Long): ServerChatResponse? {
         return chatManager?.readChat(timeStamp)
     }
 
     @Throws(IOException::class)
-    fun postChat(message: String): ServerChatCommandResponse? {
+    fun postChat(message: String): ServerChatResponse? {
         return chatManager?.post(message)
     }
 }

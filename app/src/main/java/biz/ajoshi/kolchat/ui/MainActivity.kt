@@ -34,6 +34,7 @@ const val action_navigate_to_chat_detail = "biz.ajoshi.kolchat.ui.MainActivity.A
 class MainActivity : AppCompatActivity(), ChatChannelList.ChatChannelInteractionListener, ChatDetailList.MessageClickListener {
     private var toolbar: Toolbar? = null
     private lateinit var navController: NavController
+    private val rolloverBroadcastReceiver = biz.ajoshi.kolchat.accounts.RolloverBroadcastReceiver()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -83,10 +84,12 @@ class MainActivity : AppCompatActivity(), ChatChannelList.ChatChannelInteraction
         // this should tell me if users are logging in more than they should
             else -> logLaunchEvent("Login/Unknown")
         }
+        rolloverBroadcastReceiver.register(this, findViewById(R.id.llist))
     }
 
     public override fun onDestroy() {
         super.onDestroy()
+        rolloverBroadcastReceiver.unregister(this)
         // launch the background polling service if still logged in
         if (ChatSingleton.isLoggedIn()) {
             Logg.i("MainActivity", "destroying activity and triggering background poll service")
@@ -203,6 +206,7 @@ class MainActivity : AppCompatActivity(), ChatChannelList.ChatChannelInteraction
         b.putString(EXTRA_CHANNEL_ID, channel.id)
         b.putString(EXTRA_CHANNEL_NAME, plainTextName)
         b.putBoolean(EXTRA_CHANNEL_IS_PRIVATE, channel.isPrivate)
+        b.putBoolean(EXTRA_CHANNEL_IS_COMPOSER_DISABLED, rolloverBroadcastReceiver.isRollover)
         navController.navigate(R.id.nav_chat_message, b)
         navController.currentDestination?.label = plainTextName
         // Go back to this if nav arch is as half baked as it seems
