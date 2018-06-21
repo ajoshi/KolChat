@@ -48,8 +48,10 @@ class MainActivity : AppCompatActivity(), ChatChannelList.ChatChannelInteraction
         setContentView(R.layout.activity_main)
         if (launchLoginActivityIfLoggedOut()) {
             // getnetwork can not return null if logged in so ignore bad static analysis
-            // TODO dont' log username unconditionally
-            Crashlytics.setUserIdentifier(ChatSingleton.network!!.currentUser.player.name)
+            if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean(KEY_PREF_SEND_USERNAME, true)) {
+                // dont' log username unconditionally, but if the user has allowed it, then set it
+                Crashlytics.setUserIdentifier(ChatSingleton.network!!.currentUser.player.name)
+            }
             // we're logged in
             val serviceIntent = Intent(this, ChatBackgroundService::class.java)
             serviceIntent.putExtra(EXTRA_POLL_INTERVAL_IN_MS, 2000L)

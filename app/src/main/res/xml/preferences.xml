@@ -7,6 +7,11 @@
         android:title="@string/pref_privacy_title">
         <CheckBoxPreference
             android:defaultValue="true"
+            android:key="pref_send_username"
+            android:summary="@string/pref_send_username_summary"
+            android:title="@string/pref_send_username_title"/>
+        <CheckBoxPreference
+            android:defaultValue="true"
             android:key="pref_send_logs"
             android:summary="@string/pref_log_to_crashlytics_summary"
             android:title="@string/pref_log_to_crashlytics_title"/>

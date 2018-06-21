@@ -37,6 +37,8 @@
     <!--Preferences-->
     <string name="title_prefs_screen">Advanced Settings</string>
     <string name="pref_privacy_title">Data &amp; Privacy</string>
+    <string name="pref_send_username_title">Send username with crash reports</string>
+    <string name="pref_send_username_summary">Sends your username (if logged in) with crash reports in case more information is needed</string>
     <string name="pref_log_to_crashlytics_title">Log anomalous behavior</string>
     <string name="pref_log_to_crashlytics_summary">Anonymized user data is logged to help fix crashes. Makes fixing bugs easier</string>
     <string name="pref_send_analytics_summary">Aggregated analytics and performance data is used to figure out what features are being used and should be worked on next</string>

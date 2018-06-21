@@ -5,6 +5,7 @@ import android.support.v7.preference.PreferenceFragmentCompat
 import android.support.v7.preference.PreferenceScreen
 import androidx.navigation.fragment.findNavController
 
+const val KEY_PREF_SEND_USERNAME = "pref_send_username"
 const val KEY_PREF_SEND_LOGS = "pref_send_logs"
 const val KEY_PREF_TRACK_EVENTs = "pref_track_events"
 const val KEY_PREF_ENABLE_POLL = "pref_enable_poll"
