@@ -90,7 +90,7 @@ class ChatBackgroundService : Service(), ChatServiceHandler.ChatService {
      */
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val msg = serviceHandler.obtainLoopMessage(startId)
-        val interval = intent?.extras?.getInt(EXTRA_POLL_INTERVAL_IN_MS, DEFAULT_POLL_INTERVAL)
+        val interval = intent?.extras?.getLong(EXTRA_POLL_INTERVAL_IN_MS, DEFAULT_POLL_INTERVAL)
         val chatMessageToSend = intent?.extras?.getString(EXTRA_CHAT_MESSAGE_TO_SEND, null)
         intent?.extras?.getParcelable<ComponentName>(EXTRA_MAIN_ACTIVITY_COMPONENTNAME)?.let {
             mainActivityComponentName = intent.extras.getParcelable(EXTRA_MAIN_ACTIVITY_COMPONENTNAME)
@@ -109,7 +109,7 @@ class ChatBackgroundService : Service(), ChatServiceHandler.ChatService {
             } else {
                 msg?.obj = ChatServiceMessage(MessageType.SEND_CHAT_MESSAGE, chatMessageToSend)
             }
-            serviceHandler.pollInterval = (interval ?: DEFAULT_POLL_INTERVAL).toLong()
+            serviceHandler.pollInterval = (interval ?: DEFAULT_POLL_INTERVAL)
             serviceHandler.sendMessage(msg)
             startForeground(FOREGROUND_NOTIFICATION_ID, makePersistentNotification(this))
 

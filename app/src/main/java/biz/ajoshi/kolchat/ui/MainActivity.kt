@@ -48,10 +48,11 @@ class MainActivity : AppCompatActivity(), ChatChannelList.ChatChannelInteraction
         setContentView(R.layout.activity_main)
         if (launchLoginActivityIfLoggedOut()) {
             // getnetwork can not return null if logged in so ignore bad static analysis
+            // TODO dont' log username unconditionally
             Crashlytics.setUserIdentifier(ChatSingleton.network!!.currentUser.player.name)
             // we're logged in
             val serviceIntent = Intent(this, ChatBackgroundService::class.java)
-            serviceIntent.putExtra(EXTRA_POLL_INTERVAL_IN_MS, 2000)
+            serviceIntent.putExtra(EXTRA_POLL_INTERVAL_IN_MS, 2000L)
             serviceIntent.putExtra(EXTRA_MAIN_ACTIVITY_COMPONENTNAME, ComponentName(this, javaClass))
             startService(serviceIntent)
         } else {
@@ -102,7 +103,7 @@ class MainActivity : AppCompatActivity(), ChatChannelList.ChatChannelInteraction
                 // this kills battery, but polls every minute. Probably off.
                 val increasePollTimeout = Intent(this, ChatBackgroundService::class.java)
                 // activity is gone, increase poll interval to 1 minute
-                increasePollTimeout.putExtra(EXTRA_POLL_INTERVAL_IN_MS, 60000)
+                increasePollTimeout.putExtra(EXTRA_POLL_INTERVAL_IN_MS, 60000L)
                 startService(increasePollTimeout)
             } else {
                 // stop the frequent poller
