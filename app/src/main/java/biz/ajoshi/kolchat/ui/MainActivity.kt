@@ -248,7 +248,7 @@ class MainActivity : AppCompatActivity(), ChatChannelList.ChatChannelInteraction
         // trying to open a new chat? Go back to main list first to keep backstack simple
         // needed because nav components have bad support for programmatic label/toolbar title setting
         navController.popBackStack()
-        onChannelClicked(ChatChannel(message.userId, true, message.userName, "", 0, ""))
+        onChannelClicked(ChatChannel(message.userId, true, message.userName, "", 0, "", 0))
     }
 
     /*************************************************************   Handle Navigation   ************************/

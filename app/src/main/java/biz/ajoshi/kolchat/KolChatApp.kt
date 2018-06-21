@@ -18,7 +18,6 @@ class KolChatApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        // migrations are probably dags to allow db upgrades from one version to another?
         Fabric.with(this, Crashlytics())
         val preferenceManager = PreferenceManager.getDefaultSharedPreferences(this)
 

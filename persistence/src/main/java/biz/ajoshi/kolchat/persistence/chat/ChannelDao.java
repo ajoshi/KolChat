@@ -14,7 +14,7 @@ import android.arch.persistence.room.Update;
 @Dao
 public interface ChannelDao {
     // Name of the chat channel. not sure if I can use it in the @query one line below it
-    String CHANNEL_DB_NAME = "ChatChannel";
+    String CHANNEL_DB_NAME = "chatchannel";
 
     // Get groups ordered by name and ALSO the System chat
     @Query("SELECT * FROM chatchannel WHERE currentUserName=:userName AND (NOT isPrivate OR id == -1) ORDER BY name ASC")
