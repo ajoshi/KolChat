@@ -19,7 +19,8 @@ import biz.ajoshi.kolnetwork.model.ServerChatResponse
 import java.io.IOException
 
 // normally we'll poll every 3 seconds
-const val DEFAULT_POLL_INTERVAL = 3000
+const val DEFAULT_POLL_INTERVAL = 3000L
+const val RO_POLL_INTERVAL = 3000 * 60L
 const val FOREGROUND_NOTIFICATION_ID = 666
 const val PM_NOTIFICATION_ID = 667
 const val ERROR_STRING = "error"
@@ -59,16 +60,8 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
 
     var inverseAgeOfMessage = 0
 
-    private fun roIsHere() {
-        //   ChatSingleton.network?.logout()
-        service.onRollover()
-        isItRo = true
-    }
-
     override fun handleMessage(msg: Message?) {
         try {
-            Logg.i("ChatServiceHandler", "Handler received a message")
-
             if (ChatSingleton.chatManager == null || // chatmgr is null so we have no userinfo to use for login
                     !ChatSingleton.chatManager!!.network.isLoggedIn) { // we're not logged in (but have the ability)
                 val response = ChatSingleton.chatManager?.network?.login()
@@ -145,12 +138,12 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
                 }
 
             } else {
-                Logg.i("ChatServiceHandler", "No message, reading chat and scheduling future read")
+                Logg.i("ChatServiceHandler", "No msg, reading chat + scheduling read")
                 // else check for new commands and reschedule to check in a bit
                 if (msg != null && msg.arg2 == inverseAgeOfMessage) {
                     if (isItRo) {
                         // ups the poll time to once every 3 minutes until RO is over
-                        sendMessageDelayed(obtainLoopMessage(msg.arg1), DEFAULT_POLL_INTERVAL * 60L)
+                        sendMessageDelayed(obtainLoopMessage(msg.arg1), RO_POLL_INTERVAL)
                     } else {
                         sendMessageDelayed(obtainLoopMessage(msg.arg1), pollInterval)
                     }
@@ -163,7 +156,7 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
             val newMessage = cloneMessage(msg)
             if (isItRo) {
                 // ups the poll time to once every 3 minutes until RO is over
-                newMessage ?: sendMessageDelayed(newMessage, DEFAULT_POLL_INTERVAL * 60L)
+                newMessage ?: sendMessageDelayed(newMessage, RO_POLL_INTERVAL)
             } else {
                 newMessage ?: sendMessageDelayed(newMessage, pollInterval)
             }
@@ -183,13 +176,25 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
             notifyUserOfPm(response.messages)
             lastFetchedTime = ChatSingleton.chatManager!!.lastSeen
             if (isItRo) {
-                service.onRoIsOVer()
+                roIsOver()
             }
             isItRo = false
         } else {
             roIsHere()
         }
         return response
+    }
+
+    private fun roIsHere() {
+        //   ChatSingleton.network?.logout()
+        Logg.i("ChatServiceHandler", "It's rollover!")
+        service.onRollover()
+        isItRo = true
+    }
+
+    private fun roIsOver() {
+        Logg.i("ChatServiceHandler", "Rollover is over")
+        service.onRoIsOVer()
     }
 
     /**
