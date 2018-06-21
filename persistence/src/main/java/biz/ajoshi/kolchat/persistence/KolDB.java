@@ -24,7 +24,8 @@ public abstract class KolDB extends RoomDatabase {
         return DATABASE;
     }
 
-    public static Migration MIGRATION_4_5 = new Migration(4, 5) {
+    // anon inner class- is this a problem? I doubt it since the db is already a singleton
+    /* package */ static Migration MIGRATION_4_5 = new Migration(4, 5) {
         public void migrate(SupportSQLiteDatabase database) {
             // added new column for last viewed timestamp (for "you have read up to here" bar)
             database.execSQL("ALTER TABLE chatchannel "
