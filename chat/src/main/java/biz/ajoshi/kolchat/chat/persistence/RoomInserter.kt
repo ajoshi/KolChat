@@ -1,5 +1,6 @@
 package biz.ajoshi.kolchat.chat.persistence
 
+import android.arch.persistence.room.EmptyResultSetException
 import biz.ajoshi.kolchat.persistence.KolDB
 import biz.ajoshi.kolchat.persistence.chat.ChatChannel
 import biz.ajoshi.kolchat.persistence.chat.ChatMessage
@@ -31,6 +32,8 @@ class RoomInserter {
 
     fun insertAllMessages(messages: List<ServerChatMessage>, currentUserName: String) {
         val listOfMessages = mutableListOf<ChatMessage>()
+        val channels = mutableSetOf<ChatChannel>()
+
         for (serverMessage in messages) {
             val dbMessage = ChatMessage(0,
                     serverMessage.author.id,
@@ -48,7 +51,19 @@ class RoomInserter {
                     dbMessage.localtimeStamp, currentUserName, 0L)
             listOfMessages.add(dbMessage)
             // maybe we can use a set here so we don't try to insert the same channel too many times?
-            KolDB.getDb()?.ChannelDao()?.insert(dbChannel)
+            channels.add(dbChannel)
+            //   KolDB.getDb()?.ChannelDao()?.insert(dbChannel)
+        }
+
+        for (chatChannel in channels) {
+            try {
+                // TODO use this rxjava-ish way or just have getChannel return a nullable? The latter seems more reasonable
+                KolDB.getDb().ChannelDao().getChannel(chatChannel.id).blockingGet()
+                KolDB.getDb()?.ChannelDao()?.updateChannelWithNewMessage(chatChannel.id, chatChannel.lastMessage, chatChannel.lastMessageTime)
+            } catch (e: EmptyResultSetException) {
+                // the channel wasn't in the db, but this seems to never get thrown?
+                KolDB.getDb()?.ChannelDao()?.insert(chatChannel)
+            }
         }
 
         // hopefully bulk insert is faster than one by one insertion

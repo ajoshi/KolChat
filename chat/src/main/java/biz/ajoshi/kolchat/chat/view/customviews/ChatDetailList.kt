@@ -1,12 +1,14 @@
 package biz.ajoshi.kolchat.chat.view.customviews
 
 import android.content.Context
+import android.os.AsyncTask
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.AttributeSet
 import biz.ajoshi.kolchat.chat.view.ChatAdapter
 import biz.ajoshi.kolchat.chat.view.ChatMessageVH
 import biz.ajoshi.kolchat.persistence.KolDB
+import biz.ajoshi.kolchat.persistence.chat.ChatChannel
 import biz.ajoshi.kolchat.persistence.chat.ChatMessage
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -21,6 +23,8 @@ class ChatDetailList : RecyclerView {
     private lateinit var chatAdapter: ChatAdapter
     private var initialChatLoadSubscriber: Disposable? = null
     private var clickListener: MessageClickListener? = null
+    private var lastTimeSeen: Long? = 0
+    private lateinit var channelId: String
 
     constructor(context: Context) : this(context, null)
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
@@ -55,12 +59,25 @@ class ChatDetailList : RecyclerView {
      * @param listener listener to be called when initial chat has been loaded
      */
     fun loadInitialMessages(channelId: String, listener: ChatMessagesLoaderView) {
+        this.channelId = channelId
         initialChatLoadSubscriber = Observable.fromCallable {
             KolDB.getDb()
-                    ?.MessageDao()
-                    ?.getMessagesForChannel(channelId)
-            // get n commands for this channel (n is a limit we set in the data source (100 right now))
+                    ?.ChannelDao()
+                    ?.getChannel(channelId)
+            // get the channel object for this channel
         }?.subscribeOn(Schedulers.io())
+                // get the messages for this channel
+                ?.map { singleChannel ->
+                    // Or should I be using a normal (non-Single) Channel object?
+                    val channel = singleChannel.blockingGet()
+                    lastTimeSeen = channel.lastTimeUserViewedChannel
+                    getMessagesForChannel(channel)
+                }
+
+                ?.observeOn(Schedulers.computation())
+                ?.map { list -> makeFakeRow(list) }  // add the 'new messages row' in the correct place
+
+
                 ?.observeOn(AndroidSchedulers.mainThread())
                 ?.subscribe { list ->
                     // we have the list, so set it as the displayed list
@@ -70,12 +87,37 @@ class ChatDetailList : RecyclerView {
                 }
     }
 
+    private fun makeFakeRow(list: List<ChatMessage>?): List<ChatMessage>? {
+        list?.let {
+            if (it.isEmpty()) return list // no point showing the row if the chat is empty
+            val indexOfRow = findPlaceFor(lastTimeSeen!!, it)
+            if (indexOfRow == -1 || indexOfRow == it.size - 1) return list
+            val oldText = it[indexOfRow].text
+            it[indexOfRow].text = oldText + "<br><br><font color=\"red\">New messages!</font>"
+        }
+        return list
+    }
+
+    private fun findPlaceFor(timestamp: Long, list: List<ChatMessage>): Int {
+        return list.indexOfLast { it.localtimeStamp < timestamp }
+    }
+
+    /**
+     * Make a DB query to fetch stored messages for a given chat channel
+     */
+    private fun getMessagesForChannel(channel: ChatChannel): List<ChatMessage>? {
+        return KolDB.getDb()
+                ?.MessageDao()
+                ?.getMessagesForChannel(channel.id)
+    }
+
     /**
      * Do whatever needs to be done after the inital list is loaded
      */
     private fun initialMessagesLoaded() {
         // get rid of this observer now that we've loaded the initial list
         initialChatLoadSubscriber?.dispose()
+        UpdateChatTimeTask(System.currentTimeMillis()).execute(channelId)
     }
 
     /**
@@ -83,6 +125,7 @@ class ChatDetailList : RecyclerView {
      */
     fun addMessages(newMessges: List<ChatMessage>) {
         chatAdapter.addToBottom(newMessges)
+        UpdateChatTimeTask(System.currentTimeMillis()).execute(channelId)
     }
 
     /**
@@ -105,4 +148,15 @@ class ChatDetailList : RecyclerView {
     interface MessageClickListener {
         fun onMessageLongClicked(message: ChatMessage)
     }
+}
+
+class UpdateChatTimeTask(val time: Long) : AsyncTask<String, Unit, Unit>() {
+    override fun doInBackground(vararg params: String?): Unit {
+        params[0]?.let {
+            KolDB.getDb()
+                    ?.ChannelDao()
+                    ?.setChannelLastTime(it, time)
+        }
+    }
+
 }
