@@ -149,7 +149,7 @@ class MainActivity : AppCompatActivity(), ChatChannelList.ChatChannelInteraction
     }
 
     /**
-     * Stops the background service that runs when the app is running
+     * Stops the background service that runs when the app is running (but do not log out)
      */
     private fun stopBgChatService() {
         val serviceIntent = Intent(this, ChatBackgroundService::class.java)
@@ -213,7 +213,7 @@ class MainActivity : AppCompatActivity(), ChatChannelList.ChatChannelInteraction
         navController.navigate(R.id.nav_chat_message, b)
         navController.currentDestination?.label = plainTextName
         // Go back to this if nav arch is as half baked as it seems
-//        val chatDetailFrag = ChatMessageFrag()
+//        val chatDetailFrag = ChatMessageFragment()
 //        chatDetailFrag.arguments = b
 //        supportFragmentManager.beginTransaction().replace(R.id.llist, chatDetailFrag, TAG_CHAT_DETAIL_FRAG)
 //                .addToBackStack(TAG_CHAT_DETAIL_FRAG).commit()

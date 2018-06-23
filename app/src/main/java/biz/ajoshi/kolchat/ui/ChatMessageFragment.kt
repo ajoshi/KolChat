@@ -28,7 +28,7 @@ const val EXTRA_CHANNEL_IS_PRIVATE = "biz.ajoshi.kolchat.ExtraChannelPrivate"
 // lets the app disable the input view if it wants. doesn't let it disable when the fragment is already up, but nbd
 const val EXTRA_CHANNEL_IS_COMPOSER_DISABLED = "biz.ajoshi.kolchat.ExtraChannelIsComposerDisabled"
 
-class ChatMessageFrag : BaseFragment(), QuickCommandView.CommandClickListener, ChatDetailList.ChatMessagesLoaderView {
+class ChatMessageFragment : BaseFragment(), QuickCommandView.CommandClickListener, ChatDetailList.ChatMessagesLoaderView {
     var id = "newbie"
     var name = "newbie"
     var isPrivate = false

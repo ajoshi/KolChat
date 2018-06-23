@@ -10,7 +10,7 @@
         tools:layout="@layout/channel_list" />
     <fragment
         android:id="@+id/nav_chat_message"
-        android:name="biz.ajoshi.kolchat.ui.ChatMessageFrag"
+        android:name="biz.ajoshi.kolchat.ui.ChatMessageFragment"
         android:label="Blank"
         tools:layout="@layout/chat_message">
         <argument android:name="@string/argument_chat_message_id" android:defaultValue="newbie" app:type="string"/>
