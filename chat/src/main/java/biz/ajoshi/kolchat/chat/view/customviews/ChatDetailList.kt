@@ -92,6 +92,11 @@ class ChatDetailList : RecyclerView {
                 }
     }
 
+    /**
+     * TODO Make this do something better where it's not just appending text
+     *
+     * Changes the list of chat messages to indicate what the last seen message was
+     */
     private fun makeFakeRow(list: List<ChatMessage>?): List<ChatMessage>? {
         list?.let {
             if (it.isEmpty()) return list // no point showing the row if the chat is empty
@@ -103,6 +108,10 @@ class ChatDetailList : RecyclerView {
         return list
     }
 
+    /**
+     * Finds a chat message that was made after the passed in timestamp.
+     * This lets us know where to show a 'new messages' message after the last read message.
+     */
     private fun findPlaceFor(timestamp: Long, list: List<ChatMessage>): Int {
         return list.indexOfLast { it.localtimeStamp < timestamp }
     }
