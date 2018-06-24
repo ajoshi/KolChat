@@ -1,5 +1,6 @@
 package biz.ajoshi.kolchat.chat.view.customviews
 
+import android.arch.persistence.room.EmptyResultSetException
 import android.content.Context
 import android.os.AsyncTask
 import android.support.v7.widget.LinearLayoutManager
@@ -69,9 +70,13 @@ class ChatDetailList : RecyclerView {
                 // get the messages for this channel
                 ?.map { singleChannel ->
                     // Or should I be using a normal (non-Single) Channel object?
-                    val channel = singleChannel.blockingGet()
-                    lastTimeSeen = channel.lastTimeUserViewedChannel
-                    getMessagesForChannel(channel)
+                    try {
+                        val channel = singleChannel.blockingGet()
+                        lastTimeSeen = channel.lastTimeUserViewedChannel
+                    } catch (e: EmptyResultSetException) {
+                        // we've never chatted in this room/with this person before. Hardly an issue
+                    }
+                    getMessagesForChannel(channelId)
                 }
 
                 ?.observeOn(Schedulers.computation())
@@ -105,10 +110,10 @@ class ChatDetailList : RecyclerView {
     /**
      * Make a DB query to fetch stored messages for a given chat channel
      */
-    private fun getMessagesForChannel(channel: ChatChannel): List<ChatMessage>? {
+    private fun getMessagesForChannel(channelId: String): List<ChatMessage>? {
         return KolDB.getDb()
                 ?.MessageDao()
-                ?.getMessagesForChannel(channel.id)
+                ?.getMessagesForChannel(channelId)
     }
 
     /**
