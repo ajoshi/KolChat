@@ -5,6 +5,10 @@
     <dimen name="channel_list_padding">15dp</dimen>
     <dimen name="channel_name_size">19sp</dimen>
 
+    <!-- Size of the person icon in channel list. Tells user this is a pm -->
+    <dimen name="channel_list_pm_indicator_size">12dp</dimen>
+    <dimen name="channel_list_pm_indicator_top_margin">7dp</dimen>
+
     <!-- padding between name and timestamp -->
     <dimen name="timestamp_name_padding">5dp</dimen>
 

@@ -32,11 +32,16 @@ class ChatChannelAdapter : RecyclerView.Adapter<ChatChannelVH>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatChannelVH {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.channel_list_item, parent, false)
-        return ChatChannelVH(view, object : ChatChannelVH.ChannelRowClickListener {
+        val rowClickListener = object : ChatChannelVH.ChannelRowClickListener {
             override fun onChannelRowClicked(channel: ChatChannel) {
                 clickListener?.onChannelClicked(channel)
             }
-        })
+        }
+        return if(viewType == rowTypeGroup){
+            ChatChannelVH(view, rowClickListener)
+        } else {
+            ChatUserVH(view, rowClickListener)
+        }
     }
 
     // We want Groups and PMs to have slightly different UI so distinguishing them is easier

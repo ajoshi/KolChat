@@ -9,9 +9,9 @@ import kotlinx.android.synthetic.main.channel_list_item.view.*
 import java.util.*
 
 /**
- * Viewholder for an entry in the chat channel list
+ * Viewholder for an entry in the chat channel list for a public channel
  */
-class ChatChannelVH(itemView: View, val listener: ChannelRowClickListener?) : RecyclerView.ViewHolder(itemView) {
+open class ChatChannelVH(itemView: View, val listener: ChannelRowClickListener?) : RecyclerView.ViewHolder(itemView) {
 
     /**
      * Called when a channel is tapped on. Implementor gets the channel data and can do whatever it wants
@@ -43,5 +43,17 @@ class ChatChannelVH(itemView: View, val listener: ChannelRowClickListener?) : Re
             chatMessageDateFormat.format(date)
         }
         channelForThisRow = channel
+    }
+}
+
+
+/**
+ * Viewholder for an entry in the chat channel list for a private message
+ */
+// TODO use composition instead of inheritance?
+class ChatUserVH(itemView: View, listener: ChatChannelVH.ChannelRowClickListener?) : ChatChannelVH(itemView = itemView, listener = listener) {
+    init {
+        // this is a PM, so show the PM icon
+        itemView.pm_indicator?.visibility = View.VISIBLE
     }
 }
