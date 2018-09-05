@@ -286,13 +286,11 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
      * Notify the user if a private message was received
      */
     private fun notifyUserOfPm(messages: List<ServerChatMessage>?) {
-        messages?.let {
-            for (message in messages) {
-                // it's a PM and not a system message
-                if (message.channelNameServer.isPrivate && message.author.id != "-1") {
-                    makeMentionNotification(service.getContext(), StringUtilities.getHtml(message.channelNameServer.name + ": " + message.htmlText), message.author.id)
-                }
-            }
+        val relevantMessages = messages?.filter { message ->
+            message.channelNameServer.isPrivate && message.author.id != "-1"
+        }
+        relevantMessages?.forEach { message ->
+            makeMentionNotification(service.getContext(), StringUtilities.getHtml(message.channelNameServer.name + ": " + message.htmlText), message.author.id)
         }
     }
 }
