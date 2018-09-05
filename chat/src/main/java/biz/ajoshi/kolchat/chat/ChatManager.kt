@@ -16,6 +16,7 @@ import java.io.IOException
 // https://github.com/stfalcon-studio/ChatKit
 // https://github.com/bassaer/ChatMessageView
 // https://github.com/Slyce-Inc/SlyceMessaging
+// TODO use https://github.com/Kotlin/kotlinx.serialization for json
 
 const val SYSTEM_USER_ID = "-1"
 const val SYSTEM_USER_NAME = "system"
@@ -243,9 +244,9 @@ class ChatManager(val network: biz.ajoshi.kolnetwork.Network, internal val share
         } else {
             if (id == currentUser.id) {
                 // this was a pm from me to someone else so ensure the channel name is right
-                val pmReceiver = chatMessageJson.getJSONObject("for")
+                val pmReceiver: JSONObject? = chatMessageJson.optJSONObject("for")
 
-                ServerChatChannel(name = pmReceiver.getString("name"), id = pmReceiver.getString("id"), isPrivate = channelIsPrivate)
+                ServerChatChannel(name = pmReceiver?.getString("name") ?: name, id = pmReceiver?.getString("id") ?: id, isPrivate = channelIsPrivate)
             } else {
                 ServerChatChannel(name = name, id = id, isPrivate = channelIsPrivate)
             }
