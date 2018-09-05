@@ -38,10 +38,18 @@ class ChatMessageVH(itemView: View, val listener: MessageClickListener) : Recycl
     private val timeStampTv: TextView? = itemView.timestamp
 
     init {
-        itemView.setOnLongClickListener(View.OnLongClickListener() {
+        val longClickListener = View.OnLongClickListener() {
             listener.onMessageLongClicked(chatmessage)
             true
-        })
+        }
+        itemView.setOnLongClickListener(longClickListener)
+        /* allow links to be clicked
+          htmlText= This is the only link I need! <a target=_blank href="https://www.kingdomofloathing.com/"><font color=blue>[link]</font></a> https:// www.kingdomofloathin g.com/,
+          only the 'link' part is clickable with this. Alt solution is to string replace and then enable autolink
+        */
+        chatMessageTv?.movementMethod = LinkMovementMethod.getInstance()
+        // todo use userid for right click options at some point
+        chatMessageTv?.setOnLongClickListener(longClickListener)
     }
 
     fun bind(message: ChatMessage) {
@@ -78,11 +86,5 @@ class ChatMessageVH(itemView: View, val listener: MessageClickListener) : Recycl
             // this isn't from today, so show the date
             chatMessageDateTimeFormat.format(date)
         }
-        /* allow links to be clicked
-        htmlText= This is the only link I need! <a target=_blank href="https://www.kingdomofloathing.com/"><font color=blue>[link]</font></a> https:// www.kingdomofloathin g.com/,
-        only the 'link' part is clickable with this. Alt solution is to string replace and then enable autolink
-        */
-        chatMessageTv?.movementMethod = LinkMovementMethod.getInstance()
-        // todo use userid for right click options at some point
     }
 }
