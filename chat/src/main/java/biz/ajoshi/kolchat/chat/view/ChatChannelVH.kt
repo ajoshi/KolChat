@@ -29,7 +29,6 @@ class ChatChannelVH(itemView: View, val listener: ChannelRowClickListener?) : Re
 
     init {
         itemView.setOnClickListener { _ -> listener?.onChannelRowClicked(channelForThisRow) }
-        // TODO longclicklistener so channel can be removed
     }
 
     fun bind(channel: ChatChannel) {
