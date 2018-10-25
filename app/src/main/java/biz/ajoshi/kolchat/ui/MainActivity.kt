@@ -33,7 +33,7 @@ const val action_navigate_to_chat_detail = "biz.ajoshi.kolchat.ui.MainActivity.A
 
 class MainActivity : AppCompatActivity(), ChatChannelList.ChatChannelInteractionListener, ChatDetailList.MessageClickListener {
     private var toolbar: Toolbar? = null
-    private lateinit var navController: NavController
+    private var navController: NavController? = null
     private val rolloverBroadcastReceiver = biz.ajoshi.kolchat.accounts.RolloverBroadcastReceiver()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -69,22 +69,24 @@ class MainActivity : AppCompatActivity(), ChatChannelList.ChatChannelInteraction
 
         // set up nav graph
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.llist)
-        navController = navHostFragment.findNavController()
-        navController.setGraph(R.navigation.nav_graph)
-        navController.currentDestination?.label = getString(R.string.app_name)
-        NavigationUI.setupActionBarWithNavController(this, navController)
-        // Nav components don't work correctly (surprise!). Setting labels programmatically seems not to be doable at all
+        navController = navHostFragment?.findNavController()
+        navController?.let {
+            it.setGraph(R.navigation.nav_graph)
+            it.currentDestination?.label = getString(R.string.app_name)
+            NavigationUI.setupActionBarWithNavController(this, it)
+            // Nav components don't work correctly (surprise!). Setting labels programmatically seems not to be doable at all
 //            it.addOnNavigatedListener(NavController.OnNavigatedListener { _, destination -> toolbar?.title = getPlaintextForHtml(""+ destination.label)})
+        }
         // analytics- log the source of the launch intent
         when (intent.action) {
-        // launched by os
+            // launched by os
             Intent.ACTION_MAIN ->
                 logLaunchEvent("Launcher")
-        // launched by the notification for a chat message
+            // launched by the notification for a chat message
             action_navigate_to_chat_detail ->
                 logLaunchEvent("Notification: chat detail")
-        // launched by login screen (or something else?)
-        // this should tell me if users are logging in more than they should
+            // launched by login screen (or something else?)
+            // this should tell me if users are logging in more than they should
             else -> logLaunchEvent("Login/Unknown")
         }
         rolloverBroadcastReceiver.register(this, findViewById(R.id.llist))
@@ -114,13 +116,13 @@ class MainActivity : AppCompatActivity(), ChatChannelList.ChatChannelInteraction
                     // if we wanted the slow poller, then enable that
                     val currentUserName = ChatSingleton.network?.currentUser?.player?.name
                     currentUserName?.let {
-                        val account = KolAccountManager(this)
-                        val currentUserAcct = account.getAccount(currentUserName)
-                        currentUserAcct?.let {
+                        val accountMgr = KolAccountManager(this)
+                        val account = accountMgr.getAccount(it)
+                        account?.let { currentAccount ->
                             ChatJob.scheduleJob(
                                     ComponentName(this, javaClass),
-                                    it.username,
-                                    it.password)
+                                    currentAccount.username,
+                                    currentAccount.password)
                         }
                     }
                 }
@@ -175,7 +177,7 @@ class MainActivity : AppCompatActivity(), ChatChannelList.ChatChannelInteraction
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
         R.id.menu_action_advanced_settings -> {
             // navigate to settings
-            navController.navigate(R.id.nav_preferences)
+            navController?.navigate(R.id.nav_preferences)
             true
         }
 
@@ -210,21 +212,23 @@ class MainActivity : AppCompatActivity(), ChatChannelList.ChatChannelInteraction
         b.putString(EXTRA_CHANNEL_NAME, plainTextName)
         b.putBoolean(EXTRA_CHANNEL_IS_PRIVATE, channel.isPrivate)
         b.putBoolean(EXTRA_CHANNEL_IS_COMPOSER_DISABLED, rolloverBroadcastReceiver.isRollover)
-        navController.navigate(R.id.nav_chat_message, b)
-        navController.currentDestination?.label = plainTextName
-        // Go back to this if nav arch is as half baked as it seems
+        navController?.let { controller ->
+            controller.navigate(R.id.nav_chat_message, b)
+            controller.currentDestination?.label = plainTextName
+            // Go back to this if nav arch is as half baked as it seems
 //        val chatDetailFrag = ChatMessageFragment()
 //        chatDetailFrag.arguments = b
 //        supportFragmentManager.beginTransaction().replace(R.id.llist, chatDetailFrag, TAG_CHAT_DETAIL_FRAG)
 //                .addToBackStack(TAG_CHAT_DETAIL_FRAG).commit()
-        toolbar?.let {
-            it.title = getPlaintextForHtml(plainTextName)
+            toolbar?.let {
+                it.title = getPlaintextForHtml(plainTextName)
+            }
+            Logg.i("MainActivity", if (channel.isPrivate) {
+                "Channel detail opened"
+            } else {
+                "PM detail opened"
+            })
         }
-        Logg.i("MainActivity", if (channel.isPrivate) {
-            "Channel detail opened"
-        } else {
-            "PM detail opened"
-        })
     }
 
     /**
@@ -250,7 +254,7 @@ class MainActivity : AppCompatActivity(), ChatChannelList.ChatChannelInteraction
     override fun onMessageLongClicked(message: ChatMessage) {
         // trying to open a new chat? Go back to main list first to keep backstack simple
         // needed because nav components have bad support for programmatic label/toolbar title setting
-        navController.popBackStack()
+        navController?.popBackStack()
         onChannelClicked(ChatChannel(message.userId, true, message.userName, "", 0, "", 0))
     }
 
@@ -289,6 +293,12 @@ class MainActivity : AppCompatActivity(), ChatChannelList.ChatChannelInteraction
      * @return true if logged in, else false
      */
     private fun launchLoginActivityIfLoggedOut(): Boolean {
+        if (ChatSingleton.network == null) {
+            Logg.e("network is null- app was killed?")
+        } else if (ChatSingleton.network != null && !ChatSingleton.network!!.isLoggedIn) {
+            Logg.e("network not null, but logged out. something happened")
+        }
+        Crashlytics.logException(UserSentLogsEvent("why am i logged out?"))
         if (!ChatSingleton.isLoggedIn()) {
             val loginIntent = Intent(this, LoginActivity::class.java)
             startActivity(loginIntent)

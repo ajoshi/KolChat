@@ -45,8 +45,8 @@ class ChatMessageFragment : BaseFragment(), QuickCommandView.CommandClickListene
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         val args = arguments
         if (args != null) {
-            id = args.getString(EXTRA_CHANNEL_ID)
-            name = args.getString(EXTRA_CHANNEL_NAME)
+            id = args.getString(EXTRA_CHANNEL_ID)!!
+            name = args.getString(EXTRA_CHANNEL_NAME)!!
             isPrivate = args.getBoolean((EXTRA_CHANNEL_IS_PRIVATE))
             isComposerDisabled = args.getBoolean(EXTRA_CHANNEL_IS_COMPOSER_DISABLED)
         }

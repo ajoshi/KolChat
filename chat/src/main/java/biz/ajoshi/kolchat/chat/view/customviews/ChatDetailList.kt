@@ -9,7 +9,6 @@ import android.util.AttributeSet
 import biz.ajoshi.kolchat.chat.view.ChatAdapter
 import biz.ajoshi.kolchat.chat.view.ChatMessageVH
 import biz.ajoshi.kolchat.persistence.KolDB
-import biz.ajoshi.kolchat.persistence.chat.ChatChannel
 import biz.ajoshi.kolchat.persistence.chat.ChatMessage
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers

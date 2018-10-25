@@ -67,19 +67,18 @@ class ChatChannelList : RecyclerView, ChannelClickListener {
      * We want people to delete channels by swiping on them. We do not want them to reorder them yet
      */
     inner class ChannelSwipeCallback() : SimpleCallback(0, LEFT) {
-        override fun onMove(recyclerView: RecyclerView?, viewHolder: RecyclerView.ViewHolder?, target: RecyclerView.ViewHolder?): Boolean {
+        override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
             return false
         }
 
-        override fun onSwiped(viewHolder: RecyclerView.ViewHolder?, direction: Int) {
-            val position = viewHolder?.adapterPosition
-            position?.let {
-                val channel = chatChannelAdapter.getChannelAt(position)
-                interactionListener?.onChannelSwiped(channel = channel)
-                // We reset the swipe state so the user doesn't see a white space in here if they don't delete
-                // if they delete, then this goes away anyway
-                chatChannelAdapter.notifyItemChanged(it)
-            }
+        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+            val position = viewHolder.adapterPosition
+            val channel = chatChannelAdapter.getChannelAt(position)
+            interactionListener?.onChannelSwiped(channel = channel)
+            // We reset the swipe state so the user doesn't see a white space in here if they don't delete
+            // if they delete, then this goes away anyway
+            chatChannelAdapter.notifyItemChanged(position)
+
         }
     }
 
