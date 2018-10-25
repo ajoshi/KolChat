@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.navigation.fragment.findNavController
 import biz.ajoshi.kolchat.Analytics
 import biz.ajoshi.kolchat.EVENT_ATTRIBUTE_TIME_TAKEN
 import biz.ajoshi.kolchat.R
@@ -40,6 +41,14 @@ class ChatMessageFragment : BaseFragment(), QuickCommandView.CommandClickListene
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.chat_detail, container, false)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // only set the label if the destination is a chat list as well
+        if (findNavController().currentDestination?.id == R.id.nav_chat_message) {
+            findNavController().currentDestination?.label = getTitle()
+        }
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {

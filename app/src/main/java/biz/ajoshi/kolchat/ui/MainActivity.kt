@@ -12,9 +12,9 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import androidx.navigation.NavController
+import androidx.navigation.NavDestination
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.ui.NavigationUI
 import biz.ajoshi.commonutils.Logg
 import biz.ajoshi.commonutils.StringUtilities
 import biz.ajoshi.kolchat.*
@@ -31,7 +31,7 @@ import com.crashlytics.android.answers.CustomEvent
 
 const val action_navigate_to_chat_detail = "biz.ajoshi.kolchat.ui.MainActivity.ACTION_NAVIGATE_TO_CHAT_DETAIL"
 
-class MainActivity : AppCompatActivity(), ChatChannelList.ChatChannelInteractionListener, ChatDetailList.MessageClickListener {
+class MainActivity : AppCompatActivity(), ChatChannelList.ChatChannelInteractionListener, ChatDetailList.MessageClickListener, NavController.OnNavigatedListener {
     private var toolbar: Toolbar? = null
     private var navController: NavController? = null
     private val rolloverBroadcastReceiver = biz.ajoshi.kolchat.accounts.RolloverBroadcastReceiver()
@@ -73,9 +73,10 @@ class MainActivity : AppCompatActivity(), ChatChannelList.ChatChannelInteraction
         navController?.let {
             it.setGraph(R.navigation.nav_graph)
             it.currentDestination?.label = getString(R.string.app_name)
-            NavigationUI.setupActionBarWithNavController(this, it)
+            //         NavigationUI.setupActionBarWithNavController(this, it)
+
             // Nav components don't work correctly (surprise!). Setting labels programmatically seems not to be doable at all
-//            it.addOnNavigatedListener(NavController.OnNavigatedListener { _, destination -> toolbar?.title = getPlaintextForHtml(""+ destination.label)})
+            it.addOnNavigatedListener(this)
         }
         // analytics- log the source of the launch intent
         when (intent.action) {
@@ -90,6 +91,10 @@ class MainActivity : AppCompatActivity(), ChatChannelList.ChatChannelInteraction
             else -> logLaunchEvent("Login/Unknown")
         }
         rolloverBroadcastReceiver.register(this, findViewById(R.id.llist))
+    }
+
+    override fun onNavigated(controller: NavController, destination: NavDestination) {
+        toolbar?.title = getPlaintextForHtml("" + destination.label)
     }
 
     public override fun onDestroy() {
@@ -214,7 +219,9 @@ class MainActivity : AppCompatActivity(), ChatChannelList.ChatChannelInteraction
         b.putBoolean(EXTRA_CHANNEL_IS_COMPOSER_DISABLED, rolloverBroadcastReceiver.isRollover)
         navController?.let { controller ->
             controller.navigate(R.id.nav_chat_message, b)
-            controller.currentDestination?.label = plainTextName
+            // not setting the label here because 'currentDestination' is still the old page
+            //     controller.currentDestination?.label = plainTextName
+
             // Go back to this if nav arch is as half baked as it seems
 //        val chatDetailFrag = ChatMessageFragment()
 //        chatDetailFrag.arguments = b
@@ -254,7 +261,7 @@ class MainActivity : AppCompatActivity(), ChatChannelList.ChatChannelInteraction
     override fun onMessageLongClicked(message: ChatMessage) {
         // trying to open a new chat? Go back to main list first to keep backstack simple
         // needed because nav components have bad support for programmatic label/toolbar title setting
-        navController?.popBackStack()
+        //    navController?.popBackStack()
         onChannelClicked(ChatChannel(message.userId, true, message.userName, "", 0, "", 0))
     }
 

@@ -6,7 +6,6 @@ import biz.ajoshi.kolchat.*
 import biz.ajoshi.kolchat.chat.ChatBackgroundService
 import biz.ajoshi.kolchat.chat.ChatManager
 import biz.ajoshi.kolchat.chat.EXTRA_CHAT_MESSAGE_TO_SEND
-import com.crashlytics.android.answers.Answers
 import com.crashlytics.android.answers.CustomEvent
 
 /**
@@ -22,7 +21,7 @@ abstract class BaseFragment : Fragment() {
      */
     fun makePost(post: CharSequence?, isPrivate: Boolean, id: String): Boolean {
         // log to analytics as well
-       Analytics.getAnswers()?.logCustom(CustomEvent(EVENT_NAME_CHAT_MESSAGE_SENT)
+        Analytics.getAnswers()?.logCustom(CustomEvent(EVENT_NAME_CHAT_MESSAGE_SENT)
                 .putCustomAttribute(EVENT_ATTRIBUTE_RECIPIENT, if (isPrivate) "PM" else id)
                 .putCustomAttribute(EVENT_ATTRIBUTE_MESSAGE_LENGTH, post?.length)
         )
