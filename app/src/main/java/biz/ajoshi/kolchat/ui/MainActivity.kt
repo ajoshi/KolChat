@@ -291,6 +291,7 @@ class MainActivity : AppCompatActivity(), ChatChannelList.ChatChannelInteraction
         stopBgChatService()
         // log out
         ChatSingleton.network?.logout()
+        KolAccountManager(this).logout()
         // go to login page
         launchLoginActivityIfLoggedOut()
     }

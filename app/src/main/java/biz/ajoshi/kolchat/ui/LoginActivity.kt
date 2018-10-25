@@ -44,6 +44,14 @@ class LoginActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<List<Ko
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
+        val acctMgr = KolAccountManager(this)
+        val currentAcct = acctMgr.getCurrentAccount()
+        currentAcct?.let {
+            attemptLogin(userNameText = it.username,
+                    passwordText = it.password,
+                    weakReference = WeakReference(this@LoginActivity))
+            return
+        }
         // Set up the login form.
         populateAutoComplete()
         password.setOnEditorActionListener(TextView.OnEditorActionListener { _, id, _ ->
@@ -209,6 +217,8 @@ class LoginActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<List<Ko
             // should i be sending these values in instead of re-finding them?
             if (acctMgr.getAccount(username = userNameText) == null) {
                 acctMgr.addAccount(username = userNameText, password = passwordText)
+            } else {
+                acctMgr.setCurrentAccount(userNameText)
             }
             finish()
         } else {
