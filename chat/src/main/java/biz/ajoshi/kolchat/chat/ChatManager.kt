@@ -2,6 +2,7 @@ package biz.ajoshi.kolchat.chat
 
 import android.content.SharedPreferences
 import android.util.Log
+import biz.ajoshi.commonutils.StringUtilities
 import biz.ajoshi.kolnetwork.model.*
 import org.json.JSONObject
 import java.io.IOException
@@ -32,6 +33,7 @@ class ChatManager(val network: biz.ajoshi.kolnetwork.Network, internal val share
     // channelServer name regex. Channels might have numbers in them (talkie?)
     private val channelNameRegex = Regex("\\[(\\S+)\\]")
     private val userIdRegex = Regex("showplayer\\.php\\?who=(\\d+)['\"]")
+    private val chatCmdRedirectPrefix = "js(dojax("
 
     /**
      * Log in if necessary and fetch chat
@@ -84,6 +86,11 @@ class ChatManager(val network: biz.ajoshi.kolnetwork.Network, internal val share
         val output = json.optString("output")
         if (!output.isNullOrEmpty()) {
             // this was a chat command
+            if (output.contains(chatCmdRedirectPrefix)) {
+                val redirectUrl = StringUtilities.getBetweenTwoStrings(output, chatCmdRedirectPrefix, "');)");
+                // this chat command was a redirect, so go to the actual php page (oh god), but ignore that one's response
+                network.getUrl(redirectUrl);
+            }
             val systemMessageUser = ServerChatChannel(name = SYSTEM_USER_NAME, id = SYSTEM_USER_ID, isPrivate = true)
             // we want this message to show up in chat, but we also don't want it to look too new.
             // Since kol time != real time, we use the timestamp of the last received message as this one's timestamp.
@@ -246,7 +253,8 @@ class ChatManager(val network: biz.ajoshi.kolnetwork.Network, internal val share
                 // this was a pm from me to someone else so ensure the channel name is right
                 val pmReceiver: JSONObject? = chatMessageJson.optJSONObject("for")
 
-                ServerChatChannel(name = pmReceiver?.getString("name") ?: name, id = pmReceiver?.getString("id") ?: id, isPrivate = channelIsPrivate)
+                ServerChatChannel(name = pmReceiver?.getString("name") ?: name, id = pmReceiver?.getString("id")
+                        ?: id, isPrivate = channelIsPrivate)
             } else {
                 ServerChatChannel(name = name, id = id, isPrivate = channelIsPrivate)
             }
@@ -262,7 +270,7 @@ class ChatManager(val network: biz.ajoshi.kolnetwork.Network, internal val share
         val temptext = chatMessageJson.getString("msg")
         val text: String
         text = when (format) {
-        // Mod warnings need to be colored correctly. 3 is a red warning, 4 is a green announcement
+            // Mod warnings need to be colored correctly. 3 is a red warning, 4 is a green announcement
             3 -> "<font color=\"red\">" + replaceChatEffectImagesWithEmojis(temptext) + "</font>"
             4 -> "<font color=\"#117A65\">" + replaceChatEffectImagesWithEmojis(temptext) + "</font>"
             else -> {

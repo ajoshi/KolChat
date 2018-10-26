@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
+import org.jetbrains.annotations.NotNull;
+
 import biz.ajoshi.commonutils.Logg;
 import biz.ajoshi.commonutils.StringUtilities;
 import biz.ajoshi.kolnetwork.model.LoggedInUser;
@@ -19,6 +21,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 /**
@@ -28,6 +31,9 @@ import android.text.TextUtils;
  * Created by ajoshi on 5/9/2017.
  */
 public class Network {
+    public static final String APP_NAME = "ajoshiChatApp";
+    private static final String APP_NAME_QUERYPARAM = "for="+APP_NAME;
+
     private final String username;
     private final String password;
     private final boolean isQuiet;
@@ -177,6 +183,12 @@ public class Network {
         pwdHash = null;
     }
 
+    private void loginIfNeeded() throws IOException {
+        if (phpSessId == null) {
+            login();
+        }
+    }
+
     /**
      * Fetches the passwordhash and the playerid for the current user. Maybe current channel as well?
      *
@@ -279,45 +291,8 @@ public class Network {
      * @throws IOException
      */
     public NetworkResponse postChat(String message) throws IOException {
-        Request sendChatRequest = new Request.Builder().get()
-                                                       .url(String.format(BASE_URL +
-                                                                          "/submitnewchat.php?for=ajoshiChatApp&playerid=%s&pwd=%s&graf=%s&j=1&format=php",
-                                                                          playerid,
-                                                                          pwdHash,
-                                                                          URLEncoder.encode(message, "UTF-8")))
-                                                       .addHeader("cookie",
-                                                                  String.format("PHPSESSID=%s; AWSALB=%s; chatpwd=%s",
-                                                                                phpSessId,
-                                                                                awsCookie,
-                                                                                chatpwd))
-                                                       .addHeader("referer",
-                                                                  "https://www.kingdomofloathing.com/mchat.php")
-                                                       .addHeader("Connection", "close")
-                                                       .addHeader("X-Requested-With", "XMLHttpRequest")
-                                                       .build();
-        Call call = client.newCall(sendChatRequest);
-        Response chatResponse = call.execute();
-        String redirectLocation = chatResponse.header("location");
-        if (redirectLocation != null &&
-            (redirectLocation.contains(MAINT_POSTFIX) || (redirectLocation.contains("login.php")))) {
-            // RO time or we got logged out
-            return onRollover();
-        }
-        String response = null;
-        ResponseBody body = chatResponse.body();
-        if (body != null) {
-            response = body.source().readUtf8();
-        }
-        chatResponse.close();
-        if (response == null) {
-            if (login().isSuccessful()) {
-                // if we can log in again to refresh the hash then do so and try again
-                return postChat(message);
-            }
-            return onExpiredHash();
-        }
-        isRollover = false;
-        return new NetworkResponse(response);
+        return postUrl(BASE_URL +
+                       "/submitnewchat.php?playerid=%s&pwd=%s&graf=%s&j=1&format=php", message);
     }
 
     /**
@@ -330,15 +305,47 @@ public class Network {
      * @throws IOException
      */
     public NetworkResponse readChat(long timeStamp) throws IOException {
+        return getUrl(String.format(Locale.US,
+                                    // <a target=mainpane href="showplayer.php?who=2129446">
+                                    // <font color=blue><b>ajoshi (private):</b></font></a>
+                                    // <font color="blue">yolo</font><br><!--lastseen:1442257857-->
+                                    BASE_URL +
+                                    "/newchatmessages.php?lasttime=%d&j=1&aa=0.5901808745871704&format=json",
+                                    timeStamp));
+    }
+
+    private NetworkResponse onExpiredHash() {
+        // pwdhash is no longer valid. Either web login happened or RO
+        Logg.w("Network", "Pwdhash expired, logging out");
+        halfLogout();
+        return new NetworkResponse(NetworkStatus.INVALID_HASH);
+    }
+
+
+    private NetworkResponse onRollover() {
+        Logg.w("Network", "Rollover time!");
+        // semi-logout so we can log back in automatically
+        halfLogout();
+        isRollover = true;
+        return new NetworkResponse(NetworkStatus.ROLLOVER);
+    }
+
+
+    public boolean isLoggedIn() {
+        return loggedIn;
+    }
+
+    /**
+     * Makes an arbitrary KoL related network call (GET) and returns the response
+     * @param url full url (https) to get data from
+     * @return the server response
+     */
+    public NetworkResponse getUrl(@NotNull String url) throws IOException {
+        loginIfNeeded();
         // chat response is always html
         // chat command response (which is returned from the GET) is json containing html
         Request readchatRequest = new Request.Builder()
-                .url(String.format(Locale.US,
-                                   // <a target=mainpane href="showplayer.php?who=2129446">
-                                   // <font color=blue><b>ajoshi (private):</b></font></a>
-                                   // <font color="blue">yolo</font><br><!--lastseen:1442257857-->
-                                   "https://www.kingdomofloathing.com/newchatmessages.php?lasttime=%d&j=1&aa=0.5901808745871704&format=json",
-                                   timeStamp))
+                .url(sanitizeUrlForKol(url))
                 .header("cookie", String.format("PHPSESSID=%s; AWSALB=%s", phpSessId, awsCookie))
                 .header("referer", "https://www.kingdomofloathing.com/mchat.php")
                 .build();
@@ -371,31 +378,91 @@ public class Network {
             }
         }
         if (login().isSuccessful()) {
+            Logg.w("Network", "Pwdhash expired; reloggedin");
             // if we can log in again to refresh the hash then do so and try again
-            return readChat(timeStamp);
+            return getUrl(url);
         }
         // we always get a response, even when chat is empty. So if response is empty, something has gone awry
         return onExpiredHash();
     }
 
-    private NetworkResponse onExpiredHash() {
-        // pwdhash is no longer valid. Either web login happened or RO
-        Logg.w("Network", "Pwdhash expired, logging out");
-        halfLogout();
-        return new NetworkResponse(NetworkStatus.INVALID_HASH);
+    /**
+     * Makes an arbitrary kol related POST and returns the response
+     * @param url url to make the post to
+     * @param body post needs a body (non null)
+     * @return network response resulting from this call
+     * @throws IOException
+     */
+    public NetworkResponse postUrl(String url, @NonNull String body) throws IOException {
+        loginIfNeeded();
+        Request sendChatRequest = new Request.Builder().get()
+                                                       .url(String.format(sanitizeUrlForKol(url),
+                                                                          playerid,
+                                                                          pwdHash,
+                                                                          URLEncoder.encode(body, "UTF-8")))
+                                                       .addHeader("cookie",
+                                                                  String.format("PHPSESSID=%s; AWSALB=%s; chatpwd=%s",
+                                                                                phpSessId,
+                                                                                awsCookie,
+                                                                                chatpwd))
+                                                       .addHeader("referer",
+                                                                  "https://www.kingdomofloathing.com/mchat.php")
+                                                       .addHeader("Connection", "close")
+                                                       .addHeader("X-Requested-With", "XMLHttpRequest")
+                                                       .build();
+        Call call = client.newCall(sendChatRequest);
+        Response chatResponse = call.execute();
+        String redirectLocation = chatResponse.header("location");
+        if (redirectLocation != null &&
+            (redirectLocation.contains(MAINT_POSTFIX) || (redirectLocation.contains("login.php")))) {
+            // RO time or we got logged out
+            return onRollover();
+        }
+        String response = null;
+        ResponseBody responseBody = chatResponse.body();
+        if (responseBody != null) {
+            response = responseBody.source().readUtf8();
+        }
+        chatResponse.close();
+        if (response == null) {
+            if (login().isSuccessful()) {
+                // if we can log in again to refresh the hash then do so and try again
+                return postUrl(url, body);
+            }
+            return onExpiredHash();
+        }
+        isRollover = false;
+        return new NetworkResponse(response);
     }
 
-
-    private NetworkResponse onRollover() {
-        Logg.w("Network", "Rollover time!");
-        // semi-logout so we can log back in automatically
-        halfLogout();
-        isRollover = true;
-        return new NetworkResponse(NetworkStatus.ROLLOVER);
+    /**
+     * Adds the AjoshiChatApp param to all network calls so it's easy to isolate
+     * @param url url we're making the network call for
+     * @return url with "for=ajoshichatapp" added to the end
+     */
+    private String addAppIdToUrl(String url) {
+        if (url.contains("?")) {
+            url = url + "?" + APP_NAME_QUERYPARAM;
+        } else {
+            url = url + "&" + APP_NAME_QUERYPARAM;
+        }
+        return url;
     }
 
-
-    public boolean isLoggedIn() {
-        return loggedIn;
+    /**
+     * Ensures that urls sent in are absolute URLs (will convert relative to absolute) and they have the app Id appended
+     * @param url url to send in to kol servers (relative or absolute)
+     * @return absolute url that's absolutely correct
+     */
+    private String sanitizeUrlForKol(String url) {
+        url = addAppIdToUrl(url);
+        if (!url.startsWith("http")){
+            if (url.startsWith("/")) {
+                url = BASE_URL + url;
+            } else {
+                url = BASE_URL + "/" + url;
+            }
+        }
+        return url;
     }
 }
