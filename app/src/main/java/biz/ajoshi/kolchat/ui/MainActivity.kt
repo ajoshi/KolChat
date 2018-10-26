@@ -306,7 +306,7 @@ class MainActivity : AppCompatActivity(), ChatChannelList.ChatChannelInteraction
         } else if (ChatSingleton.network != null && !ChatSingleton.network!!.isLoggedIn) {
             Logg.e("network not null, but logged out. something happened")
         }
-        Crashlytics.logException(UserSentLogsEvent("why am i logged out?"))
+//        Crashlytics.logException(UserSentLogsEvent("why am i logged out?"))
         if (!ChatSingleton.isLoggedIn()) {
             val loginIntent = Intent(this, LoginActivity::class.java)
             startActivity(loginIntent)
