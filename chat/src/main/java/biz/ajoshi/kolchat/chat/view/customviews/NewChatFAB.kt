@@ -65,11 +65,11 @@ class NewChatFAB : FloatingActionButton, View.OnClickListener {
         context?.let {
             val li = LayoutInflater.from(context)
             val view = li.inflate(R.layout.dialog_send_new_message, rootView as ViewGroup, false)
-            view.dialog_recipient_name.hint = context.getString(R.string.new_chat_message_hint_channel)
+            view.dialog_recipient_name.hint = context.getString(R.string.aj_chat_new_chat_message_hint_channel)
             val dialog = AlertDialog.Builder(it)
                     .setView(view)
-                    .setTitle(R.string.new_chat_message_title_channel)
-                    .setPositiveButton(R.string.submit_post, DialogInterface.OnClickListener { dialog: DialogInterface?, _ ->
+                    .setTitle(R.string.aj_chat_new_chat_message_title_channel)
+                    .setPositiveButton(R.string.aj_chat_submit_post, DialogInterface.OnClickListener { dialog: DialogInterface?, _ ->
                         if (dialog is AlertDialog) {
                             val recipient = "" + view.dialog_recipient_name.text
                             val message = "" + view.dialog_text_input.text
@@ -78,7 +78,7 @@ class NewChatFAB : FloatingActionButton, View.OnClickListener {
                             }
                         }
                     })
-                    .setNegativeButton(R.string.cancel, null)
+                    .setNegativeButton(R.string.aj_chat_cancel, null)
                     .create()
             dialog.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE)
             dialog.show()
@@ -92,8 +92,8 @@ class NewChatFAB : FloatingActionButton, View.OnClickListener {
         context?.let {
             val dialog = AlertDialog.Builder(it)
                     .setView(R.layout.dialog_send_new_message)
-                    .setTitle(R.string.new_chat_message_title_user)
-                    .setPositiveButton(R.string.submit_post, DialogInterface.OnClickListener { dialog: DialogInterface?, _ ->
+                    .setTitle(R.string.aj_chat_new_chat_message_title_user)
+                    .setPositiveButton(R.string.aj_chat_submit_post, DialogInterface.OnClickListener { dialog: DialogInterface?, _ ->
                         if (dialog is AlertDialog) {
                             val recipient = "" + dialog.findViewById<EditText>(R.id.dialog_recipient_name)?.text
                             val message = "" + dialog.findViewById<EditText>(R.id.dialog_text_input)?.text
@@ -102,7 +102,7 @@ class NewChatFAB : FloatingActionButton, View.OnClickListener {
                             }
                         }
                     })
-                    .setNegativeButton(R.string.cancel, null).create()
+                    .setNegativeButton(R.string.aj_chat_cancel, null).create()
             dialog.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE)
             dialog.show()
         }

@@ -3,22 +3,24 @@
 
     <!--delete-->
 
-    <string name="input_area_hint">Words go here</string>
-    <string name="submit_post">Submit</string>
+    <string name="aj_chat_input_area_hint">Words go here</string>
+    <string name="aj_chat_submit_post">Submit</string>
 
-    <string name="notification_description">Pull down for options</string>
+    <string name="aj_chat_notification_description">Pull down for options</string>
 
     <!-- Notification channel strings -->
-    <string name="persistent_channel_name">KoL Persistent Notification</string>
-    <string name="pm_channel_name">KoL Private Messages</string>
-    <string name="persistent_channel_desc">Shows when the app is running</string>
-    <string name="pm_channel_desc">This type of notification is shown when a PM or notification worthy event occurs in KoL</string>
+    <string name="aj_chat_persistent_channel_name">KoL Persistent Notification</string>
+    <string name="aj_chat_pm_channel_name">KoL Private Messages</string>
+    <string name="aj_chat_persistent_channel_desc">Shows when the app is running</string>
+    <string name="aj_chat_pm_channel_desc">This type of notification is shown when a PM or notification worthy event occurs in KoL</string>
 
     <!-- New chat message dialog from NewChatFAB -->
-    <string name="cancel">Cancel</string>
-    <string name="new_chat_message_title_user">Send private message to a user</string>
-    <string name="new_chat_message_hint_user">User name</string>
-    <string name="new_chat_message_title_channel">Send message to a channel</string>
-    <string name="new_chat_message_hint_channel">Channel name</string>
-    <string name="accessbility_pm_indicator">Private Message</string>
+    <string name="aj_chat_cancel">Cancel</string>
+    <string name="aj_chat_new_chat_message_title_user">Send private message to a user</string>
+    <string name="aj_chat_new_chat_message_hint_user">User name</string>
+    <string name="aj_chat_new_chat_message_title_channel">Send message to a channel</string>
+    <string name="aj_chat_new_chat_message_hint_channel">Channel name</string>
+    <string name="aj_chat_accessbility_pm_indicator">Private Message</string>
+
+    <string name="aj_chat_loading_more">Loading…</string>
 </resources>

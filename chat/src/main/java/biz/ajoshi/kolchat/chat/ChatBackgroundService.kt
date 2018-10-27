@@ -63,15 +63,15 @@ class ChatBackgroundService : Service(), ChatServiceHandler.ChatService {
             // The persistent notification to tell people we're running and provide a logout button
             // This gets auto-collapsed so it doesn't eat up too much space
             val persistentChannel = NotificationChannel(PERSISTENT_NOTIFICATION_CHANNEL_ID,
-                    getContext().getString(R.string.persistent_channel_name), NotificationManager.IMPORTANCE_MIN)
-            persistentChannel.description = getContext().getString(R.string.persistent_channel_desc)
+                    getContext().getString(R.string.aj_chat_persistent_channel_name), NotificationManager.IMPORTANCE_MIN)
+            persistentChannel.description = getContext().getString(R.string.aj_chat_persistent_channel_desc)
             notificationMgr.createNotificationChannel(persistentChannel)
 
             // notification that only shows up when a PM is sent
             val mentionChannel = NotificationChannel(MENTION_NOTIFICATION_CHANNEL_ID,
-                    getContext().getString(R.string.pm_channel_name),
+                    getContext().getString(R.string.aj_chat_pm_channel_name),
                     NotificationManager.IMPORTANCE_HIGH)
-            mentionChannel.description = getContext().getString(R.string.pm_channel_desc)
+            mentionChannel.description = getContext().getString(R.string.aj_chat_pm_channel_desc)
             notificationMgr.createNotificationChannel(mentionChannel)
         }
 
@@ -151,7 +151,7 @@ class ChatBackgroundService : Service(), ChatServiceHandler.ChatService {
         val notificationBuilder = NotificationCompat.Builder(ctx, NotificationCompat.CATEGORY_PROGRESS)
         notificationBuilder
                 .setContentTitle("KolChat is running")
-                .setContentText(ctx.getString(R.string.notification_description))
+                .setContentText(ctx.getString(R.string.aj_chat_notification_description))
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setContentIntent(mainActivityPintent)
                 .setChannelId(PERSISTENT_NOTIFICATION_CHANNEL_ID)
