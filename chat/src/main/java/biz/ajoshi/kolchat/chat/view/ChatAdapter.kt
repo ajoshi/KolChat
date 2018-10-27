@@ -10,24 +10,61 @@ import biz.ajoshi.kolchat.persistence.chat.ChatMessage
 /**
  * Adapter for the list of chat messages (inside a given channel)
  */
-class ChatAdapter(val layoutMgr: LinearLayoutManager, val listener: ChatMessageVH.MessageClickListener) : RecyclerView.Adapter<ChatMessageVH>() {
+class ChatAdapter(val layoutMgr: LinearLayoutManager, val listener: ChatMessageVH.MessageClickListener, val supportsPaging: Boolean = false) : RecyclerView.Adapter<ChatMessageVH>() {
 
     var messages = mutableListOf<ChatMessage>()
     var idList = mutableListOf<Int>()
 
+    private val viewtypeMessage = 1
+    private val viewtypeLoadMore = 2
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatMessageVH {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.chat_message, parent, false)
-        return ChatMessageVH(view, listener)
+        when (viewType) {
+            viewtypeLoadMore -> {
+                // TODO replace with more row
+                val view = LayoutInflater.from(parent.context).inflate(R.layout.chat_message, parent, false)
+                return ChatMessageVH(view, listener)
+            }
+            //viewtypeMessage -> // fallthrough
+            else -> {
+                val view = LayoutInflater.from(parent.context).inflate(R.layout.chat_message, parent, false)
+                return ChatMessageVH(view, listener)
+            }
+        }
     }
 
     override fun onBindViewHolder(holder: ChatMessageVH, position: Int) {
-        if (messages.size > position) {
-            holder.bind(messages[position])
+        var positionInArray = position
+        if (supportsPaging) {
+            if (positionInArray == 0) {
+                // TODO bind loading row
+            }
+            // since the 0th row shows the more row, the 1st row will show the 0th item in the backing array
+            positionInArray--
+        }
+        if (messages.size > positionInArray) {
+            holder.bind(messages[positionInArray])
         }
     }
 
     override fun getItemCount(): Int {
-        return messages.size
+        if (supportsPaging) {
+            return messages.size + 1
+        } else {
+            return messages.size
+        }
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        if (supportsPaging) {
+            if (position == 0) {
+                return viewtypeLoadMore
+            } else {
+                return viewtypeMessage
+            }
+        } else {
+            return viewtypeMessage
+        }
     }
 
     /**
@@ -91,6 +128,22 @@ class ChatAdapter(val layoutMgr: LinearLayoutManager, val listener: ChatMessageV
             }
         }
         notifyItemRangeInserted(messages.size - insertedCount, insertedCount)
+        scrollToBottom()
+    }
+
+    /**
+     * Appends a list of messages to the bottom of the chat list (new messages)
+     */
+    fun addToTop(newMessges: List<ChatMessage>) {
+        var insertedCount = 0
+        for (message in newMessges) {
+            if (!idList.contains(message.id)) {
+                messages.add(0, message)
+                idList.add(0, message.id)
+                insertedCount++
+            }
+        }
+        notifyItemRangeInserted(0, insertedCount)
         scrollToBottom()
     }
 }

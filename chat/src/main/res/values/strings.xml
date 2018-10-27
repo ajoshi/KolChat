@@ -22,5 +22,5 @@
     <string name="aj_chat_new_chat_message_hint_channel">Channel name</string>
     <string name="aj_chat_accessbility_pm_indicator">Private Message</string>
 
-    <string name="aj_chat_loading_more">Loading…</string>
+    <string name="aj_chat_loading_more">Loading more rows…</string>
 </resources>
