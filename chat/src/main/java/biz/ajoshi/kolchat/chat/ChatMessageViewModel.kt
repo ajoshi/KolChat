@@ -16,9 +16,9 @@ class ChatMessageViewModel(application: Application) : AndroidViewModel(applicat
     /**
      * We want a livedata that only gives us data for this channel. We never want to share data streams across channels
      */
-    fun getLastChatObservable(channelId: String): LiveData<ChatMessage>? {
+    fun getLastChatObservable(channelId: String, userId: String): LiveData<ChatMessage>? {
         if (chatMessageObservable == null) {
-            chatMessageObservable = ChatRepository().getLastChatStreamForChannel(channelId = channelId)
+            chatMessageObservable = ChatRepository().getLastChatStreamForChannel(channelId = channelId, userId = userId)
         }
         return chatMessageObservable
     }
@@ -26,9 +26,9 @@ class ChatMessageViewModel(application: Application) : AndroidViewModel(applicat
     /**
      * Livedata for this channel starting from the passed in time so we don't get dupes of the newest message
      */
-    fun getChatListObservable(channelId: String, timeStamp: Long): LiveData<List<ChatMessage>>? {
+    fun getChatListObservable(channelId: String, userId: String, timeStamp: Long): LiveData<List<ChatMessage>>? {
         if (chatListObservable == null) {
-            chatListObservable = ChatRepository().getChatStreamForChannel(channelId = channelId, timestamp = timeStamp)
+            chatListObservable = ChatRepository().getChatStreamForChannel(channelId = channelId, userId = userId, timestamp = timeStamp)
         }
         return chatListObservable
     }

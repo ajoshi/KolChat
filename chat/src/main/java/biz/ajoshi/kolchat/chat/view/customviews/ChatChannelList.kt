@@ -24,6 +24,7 @@ class ChatChannelList : RecyclerView, ChannelClickListener {
     private var groupChatUpdateSubscriber: Disposable? = null
     private var pmChatUpdateSubscriber: Disposable? = null
     private var interactionListener: ChatChannelInteractionListener? = null
+    private lateinit var userId: String
 
     constructor(context: Context) : this(context, null)
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
@@ -40,25 +41,6 @@ class ChatChannelList : RecyclerView, ChannelClickListener {
         chatChannelAdapter = ChatChannelAdapter()
         adapter = chatChannelAdapter
         layoutManager = layoutMgr
-
-        groupChatUpdateSubscriber = KolDB.getDb()
-                ?.ChannelDao()
-                // TODO pass in the username instead of directly accessing from the singleton
-                ?.getAllChatChannels(ChatSingleton.network?.currentUser?.player?.name)
-                ?.subscribeOn(Schedulers.io())
-                ?.observeOn(AndroidSchedulers.mainThread())
-                ?.subscribe { channels ->
-                    chatChannelAdapter.setGroupList(channels)
-                }
-        pmChatUpdateSubscriber = KolDB.getDb()
-                ?.ChannelDao()
-                // TODO pass in the username instead of directly accessing from the singleton
-                ?.getAllPMChannels(ChatSingleton.network?.currentUser?.player?.name)
-                ?.subscribeOn(Schedulers.io())
-                ?.observeOn(AndroidSchedulers.mainThread())
-                ?.subscribe { channels ->
-                    chatChannelAdapter.setPmsList(channels)
-                }
         ItemTouchHelper(ChannelSwipeCallback()).attachToRecyclerView(this)
         chatChannelAdapter.setOnClickListener(this)
     }
@@ -87,6 +69,31 @@ class ChatChannelList : RecyclerView, ChannelClickListener {
      */
     fun setChatchannelInteractionListener(channelInteractionListener: ChatChannelInteractionListener) {
         interactionListener = channelInteractionListener
+    }
+
+    /**
+     * Sets the click and swipe listener for each element in the list of channels
+     */
+    fun setUserId(userId: String) {
+        this.userId = userId
+        groupChatUpdateSubscriber = KolDB.getDb()
+                ?.ChannelDao()
+                // TODO pass in the username instead of directly accessing from the singleton
+                ?.getAllChatChannels(userId)
+                ?.subscribeOn(Schedulers.io())
+                ?.observeOn(AndroidSchedulers.mainThread())
+                ?.subscribe { channels ->
+                    chatChannelAdapter.setGroupList(channels)
+                }
+        pmChatUpdateSubscriber = KolDB.getDb()
+                ?.ChannelDao()
+                // TODO pass in the username instead of directly accessing from the singleton
+                ?.getAllPMChannels(userId)
+                ?.subscribeOn(Schedulers.io())
+                ?.observeOn(AndroidSchedulers.mainThread())
+                ?.subscribe { channels ->
+                    chatChannelAdapter.setPmsList(channels)
+                }
     }
 
     override fun onChannelClicked(channel: ChatChannel) {

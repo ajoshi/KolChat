@@ -23,14 +23,14 @@ public interface MessageDao {
     List<ChatMessage> getMessagesForChannel (String channel_id, int offset);
 
     // gets 100 most recent commands, with the newest one at the bottom
-    @Query("SELECT * FROM (SELECT * FROM chatmessage WHERE channelId = :channel_id ORDER BY timeStamp DESC LIMIT 100) ORDER BY timestamp ASC")
-    List<ChatMessage> getMessagesForChannel (String channel_id);
+    @Query("SELECT * FROM (SELECT * FROM chatmessage WHERE channelId = :channel_id AND currentUserId = :user_id ORDER BY timeStamp DESC LIMIT 100) ORDER BY timestamp ASC")
+    List<ChatMessage> getMessagesForChannel (String channel_id, String user_id);
 
-    @Query("SELECT * FROM chatmessage WHERE channelId = :channel_id ORDER BY timeStamp ASC LIMIT 1")
-    Flowable<ChatMessage> getLastMessageForChannel(String channel_id);
+    @Query("SELECT * FROM chatmessage WHERE channelId = :channel_id AND currentUserId = :user_id ORDER BY timeStamp ASC LIMIT 1")
+    Flowable<ChatMessage> getLastMessageForChannel(String channel_id, String user_id);
 
-    @Query("SELECT * FROM chatmessage WHERE channelId = :channel_id ORDER BY timeStamp ASC LIMIT 1")
-    LiveData<ChatMessage> getLastMessageLivedataForChannel(String channel_id);
+    @Query("SELECT * FROM chatmessage WHERE channelId = :channel_id AND currentUserId = :user_id ORDER BY timeStamp ASC LIMIT 1")
+    LiveData<ChatMessage> getLastMessageLivedataForChannel(String channel_id, String user_id);
 
     /*
      * We want to show all commands inserted into the db after a given time, but we also don't want to get the newest
@@ -48,8 +48,8 @@ public interface MessageDao {
      * @param localTimestamp
      * @return
      */
-    @Query("SELECT * FROM chatmessage WHERE (channelId = :channel_id OR channelId = -1) AND localtimeStamp > :localTimestamp")
-    LiveData<List<ChatMessage>> getLastMessagesLivedataForChannel(String channel_id, long localTimestamp);
+    @Query("SELECT * FROM chatmessage WHERE (channelId = :channel_id OR channelId = -1) AND localtimeStamp > :localTimestamp AND currentUserId = :user_id")
+    LiveData<List<ChatMessage>> getLastMessagesLivedataForChannel(String channel_id, String user_id, long localTimestamp);
 
     @Insert
     void insert(ChatMessage message);

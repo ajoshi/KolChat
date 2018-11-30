@@ -17,16 +17,16 @@ public interface ChannelDao {
     String CHANNEL_DB_NAME = "chatchannel";
 
     // Get groups ordered by name and ALSO the System chat
-    @Query("SELECT * FROM chatchannel WHERE currentUserName=:userName AND (NOT isPrivate OR id == -1) ORDER BY name ASC")
-    Flowable<List<ChatChannel>> getAllChatChannels(String userName);
+    @Query("SELECT * FROM chatchannel WHERE currentUserId=:userId AND (NOT isPrivate OR id == -1) ORDER BY name ASC")
+    Flowable<List<ChatChannel>> getAllChatChannels(String userId);
 
     // Get PMs. We don't want System to show up here because it will almost always be up top, which is annoying
-    @Query("SELECT * FROM chatchannel WHERE currentUserName=:userName AND isPrivate AND id != -1 ORDER BY last_message_time DESC")
-    Flowable<List<ChatChannel>> getAllPMChannels(String userName);
+    @Query("SELECT * FROM chatchannel WHERE currentUserId=:userId AND isPrivate AND id != -1 ORDER BY last_message_time DESC")
+    Flowable<List<ChatChannel>> getAllPMChannels(String userId);
 
     // Get a single channel (and its data) based on its id
-    @Query("SELECT * FROM chatchannel WHERE id=:id")
-    Single<ChatChannel> getChannel(String id);
+    @Query("SELECT * FROM chatchannel WHERE currentUserId=:userId AND id=:id")
+    Single<ChatChannel> getChannel(String id, String userId);
 
     // Update a channel's lasttimeviewed
     @Query("UPDATE chatchannel SET lastTimeUserViewedChannel = :newTime WHERE id=:id")

@@ -14,6 +14,7 @@ import android.view.ViewGroup
 import biz.ajoshi.commonutils.StringUtilities
 import biz.ajoshi.kolchat.R
 import biz.ajoshi.kolchat.chat.ACTION_CHAT_COMMAND_FAILED
+import biz.ajoshi.kolchat.chat.ChatSingleton
 import biz.ajoshi.kolchat.chat.EXTRA_FAILED_CHAT_MESSAGE
 import biz.ajoshi.kolchat.chat.view.customviews.ChatChannelList
 import biz.ajoshi.kolchat.chat.view.customviews.NewChatFAB
@@ -43,6 +44,8 @@ class ChatChannelListFragment : BaseFragment(), NewChatFAB.ChatMessageSender {
         val newMessageFab = button_compose_new_chat
         newMessageFab?.chatMessageSender = this
         channelList = channel_list
+        // TODO set this in args somehow (this is currently created by nav fragment so I can't set args dynamically)
+        channelList?.setUserId(ChatSingleton.network?.currentUser?.player?.id!!)
         // right now just send it all to the activity. We might want to intercept it later on, but probably not
         channelList?.setChatchannelInteractionListener(activity as ChatChannelList.ChatChannelInteractionListener)
         super.onActivityCreated(savedInstanceState)

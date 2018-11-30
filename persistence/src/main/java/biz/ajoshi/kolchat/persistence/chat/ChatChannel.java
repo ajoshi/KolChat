@@ -9,7 +9,7 @@ import android.support.annotation.NonNull;
  * Created by ajoshi on 7/14/17.
  */
 
-@Entity
+@Entity(primaryKeys = {"id","currentUserId"})
 public class ChatChannel {
     @NonNull
     public String getId() {
@@ -20,13 +20,13 @@ public class ChatChannel {
         this.id = id;
     }
 
-    public ChatChannel(@NonNull String id, boolean isPrivate, String name, String lastMessage, long lastMessageTime, String currentUserName, long lastTimeUserViewedChannel) {
+    public ChatChannel(@NonNull String id, boolean isPrivate, String name, String lastMessage, long lastMessageTime, @NonNull String currentUserId, long lastTimeUserViewedChannel) {
         this.id = id;
         this.isPrivate = isPrivate;
         this.name = name;
         this.lastMessage = lastMessage;
         this.lastMessageTime = lastMessageTime;
-        this.currentUserName = currentUserName;
+        this.currentUserId = currentUserId;
         this.lastTimeUserViewedChannel = lastTimeUserViewedChannel;
     }
 
@@ -54,12 +54,12 @@ public class ChatChannel {
         this.lastMessageTime = lastMessageTime;
     }
 
-    @PrimaryKey
     @NonNull
     private String id;
+    @NonNull
+    private String currentUserId;
     private String name;
     private boolean isPrivate;
-    private String currentUserName;
     private long lastTimeUserViewedChannel;
 
     public long getLastTimeUserViewedChannel() {
@@ -82,11 +82,12 @@ public class ChatChannel {
     @ColumnInfo(name = "last_message_time")
     private long lastMessageTime;
 
-    public String getCurrentUserName() {
-        return currentUserName;
+    @NonNull
+    public String getCurrentUserId() {
+        return currentUserId;
     }
 
-    public void setCurrentUserName(String currentUserName) {
-        this.currentUserName = currentUserName;
+    public void setCurrentUserId(@NonNull String currentUserId) {
+        this.currentUserId = currentUserId;
     }
 }

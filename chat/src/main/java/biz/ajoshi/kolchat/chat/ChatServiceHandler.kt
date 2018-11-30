@@ -99,7 +99,7 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
                             val response = ChatSingleton.postChat(serviceMessage.textmessage)
                             response?.let {
                                 if (response.status == NetworkStatus.SUCCESS) {
-                                    insertChatsIntoDb((response.messages), ChatSingleton.network?.currentUser?.player?.name
+                                    insertChatsIntoDb((response.messages), ChatSingleton.network?.currentUser?.player?.id
                                             ?: ERROR_STRING)
                                     /*
                               Chat commands (and chat message sends) don't actually end up returning messages- they
@@ -172,7 +172,7 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
         val response = ChatSingleton.readChat(lastFetchedTime)
         // if we can, read the chat and stick in db
         if (response?.status == NetworkStatus.SUCCESS) {
-            insertChatsIntoDb(response.messages, ChatSingleton.network?.currentUser?.player?.name ?: ERROR_STRING)
+            insertChatsIntoDb(response.messages, ChatSingleton.network?.currentUser?.player?.id ?: ERROR_STRING)
             notifyUserOfPm(response.messages)
             lastFetchedTime = ChatSingleton.chatManager!!.lastSeen
             if (isItRo) {
@@ -215,12 +215,12 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
         }
     }
 
-    fun insertChatsIntoDb(messages: List<ServerChatMessage>?, currentUserName: String) {
+    fun insertChatsIntoDb(messages: List<ServerChatMessage>?, currentUserId: String) {
         if (messages != null) {
             if (messages.size > 0) {
-                Logg.i("${messages.size} items added 2 db")
+                Logg.i("${messages.size} items added 2 db for $currentUserId")
             }
-            roomInserter.insertAllMessages(messages, currentUserName)
+            roomInserter.insertAllMessages(messages, currentUserId)
         }
     }
 

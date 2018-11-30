@@ -26,6 +26,7 @@ import biz.ajoshi.kolchat.chat.view.customviews.ChatDetailList
 import biz.ajoshi.kolchat.persistence.KolDB
 import biz.ajoshi.kolchat.persistence.chat.ChatChannel
 import biz.ajoshi.kolchat.persistence.chat.ChatMessage
+import biz.ajoshi.kolnetwork.model.User
 import com.crashlytics.android.Crashlytics
 import com.crashlytics.android.answers.CustomEvent
 
@@ -50,7 +51,7 @@ class MainActivity : AppCompatActivity(), ChatChannelList.ChatChannelInteraction
             // getnetwork can not return null if logged in so ignore bad static analysis
             if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean(KEY_PREF_SEND_USERNAME, true)) {
                 // dont' log username unconditionally, but if the user has allowed it, then set it
-                Crashlytics.setUserIdentifier(ChatSingleton.network!!.currentUser.player.name)
+                Crashlytics.setUserIdentifier(getCurrentUser()?.name)
             }
             // we're logged in
             val serviceIntent = Intent(this, ChatBackgroundService::class.java)
@@ -118,8 +119,8 @@ class MainActivity : AppCompatActivity(), ChatChannelList.ChatChannelInteraction
                 // stop the frequent poller
                 stopBgChatService()
                 if (shouldEnableChatJob) {
-                    // if we wanted the slow poller, then enable that
-                    val currentUserName = ChatSingleton.network?.currentUser?.player?.name
+                    // if we wanted the slow poller, then enable that if the user is logged in
+                    val currentUserName = getCurrentUser()?.id
                     currentUserName?.let {
                         val accountMgr = KolAccountManager(this)
                         val account = accountMgr.getAccount(it)
@@ -172,6 +173,10 @@ class MainActivity : AppCompatActivity(), ChatChannelList.ChatChannelInteraction
                 .show()
     }
 
+    private fun getCurrentUser(): User? {
+        return ChatSingleton.network?.currentUser?.player
+    }
+
     /*************************************************************   Toolbar menu   ************************/
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -211,30 +216,33 @@ class MainActivity : AppCompatActivity(), ChatChannelList.ChatChannelInteraction
      * @param channel ChatChannel object describing the channel that was opened
      */
     override fun onChannelClicked(channel: ChatChannel) {
-        val b = Bundle()
         val plainTextName = getPlaintextForHtml(channel.name)
-        b.putString(EXTRA_CHANNEL_ID, channel.id)
-        b.putString(EXTRA_CHANNEL_NAME, plainTextName)
-        b.putBoolean(EXTRA_CHANNEL_IS_PRIVATE, channel.isPrivate)
-        b.putBoolean(EXTRA_CHANNEL_IS_COMPOSER_DISABLED, rolloverBroadcastReceiver.isRollover)
-        navController?.let { controller ->
-            controller.navigate(R.id.nav_chat_message, b)
-            // not setting the label here because 'currentDestination' is still the old page
-            //     controller.currentDestination?.label = plainTextName
+        getCurrentUser()?.let { user ->
+            val b = ChatMessageFragment.getBundleForChatMessageFragment(
+                    currentUserId = user.id,
+                    channelName = plainTextName,
+                    channelId = channel.id,
+                    isPrivate = channel.isPrivate,
+                    isComposerDisabled = rolloverBroadcastReceiver.isRollover)
+            navController?.let { controller ->
+                controller.navigate(R.id.nav_chat_message, b)
+                // not setting the label here because 'currentDestination' is still the old page
+                //     controller.currentDestination?.label = plainTextName
 
-            // Go back to this if nav arch is as half baked as it seems
+                // Go back to this if nav arch is as half baked as it seems
 //        val chatDetailFrag = ChatMessageFragment()
 //        chatDetailFrag.arguments = b
 //        supportFragmentManager.beginTransaction().replace(R.id.llist, chatDetailFrag, TAG_CHAT_DETAIL_FRAG)
 //                .addToBackStack(TAG_CHAT_DETAIL_FRAG).commit()
-            toolbar?.let {
-                it.title = getPlaintextForHtml(plainTextName)
+                toolbar?.let { toolbar ->
+                    toolbar.title = getPlaintextForHtml(plainTextName)
+                }
+                Logg.i("MainActivity", if (channel.isPrivate) {
+                    "Channel detail opened"
+                } else {
+                    "PM detail opened"
+                })
             }
-            Logg.i("MainActivity", if (channel.isPrivate) {
-                "Channel detail opened"
-            } else {
-                "PM detail opened"
-            })
         }
     }
 

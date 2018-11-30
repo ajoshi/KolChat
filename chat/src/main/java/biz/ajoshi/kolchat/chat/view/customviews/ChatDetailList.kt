@@ -56,14 +56,15 @@ class ChatDetailList : RecyclerView {
     /**
      * Loads the initial chat list for the channel/PM list with the given id
      * @param channelId id of the user or name of the channel
+     * @param currentUserId id of the currently logged in user (different users see different chats)
      * @param listener listener to be called when initial chat has been loaded
      */
-    fun loadInitialMessages(channelId: String, listener: ChatMessagesLoaderView) {
+    fun loadInitialMessages(channelId: String, currentUserId: String, listener: ChatMessagesLoaderView) {
         this.channelId = channelId
         initialChatLoadSubscriber = Observable.fromCallable {
             KolDB.getDb()
                     ?.ChannelDao()
-                    ?.getChannel(channelId)
+                    ?.getChannel(channelId, currentUserId)
             // get the channel object for this channel
         }?.subscribeOn(Schedulers.io())
                 // get the messages for this channel
@@ -75,7 +76,7 @@ class ChatDetailList : RecyclerView {
                     } catch (e: EmptyResultSetException) {
                         // we've never chatted in this room/with this person before. Hardly an issue
                     }
-                    getMessagesForChannel(channelId)
+                    getMessagesForChannel(channelId, userId = currentUserId)
                 }
 
                 ?.observeOn(Schedulers.computation())
@@ -118,10 +119,10 @@ class ChatDetailList : RecyclerView {
     /**
      * Make a DB query to fetch stored messages for a given chat channel
      */
-    private fun getMessagesForChannel(channelId: String): List<ChatMessage>? {
+    private fun getMessagesForChannel(channelId: String, userId: String): List<ChatMessage>? {
         return KolDB.getDb()
                 ?.MessageDao()
-                ?.getMessagesForChannel(channelId)
+                ?.getMessagesForChannel(channelId, userId)
     }
 
     /**

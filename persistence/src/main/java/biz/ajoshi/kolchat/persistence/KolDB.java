@@ -16,7 +16,7 @@ import android.content.Context;
  * Created by ajoshi on 7/14/17.
  */
 
-@Database(entities = { ChatMessage.class, ChatChannel.class }, version = 5)
+@Database(entities = { ChatMessage.class, ChatChannel.class }, version = 7)
 public abstract class KolDB extends RoomDatabase {
     private static KolDB DATABASE;
 
@@ -32,6 +32,7 @@ public abstract class KolDB extends RoomDatabase {
                              + " ADD COLUMN lastTimeUserViewedChannel INTEGER NOT NULL DEFAULT 0");
         }
     };
+    // no migration from v5 to 6 since I have no clue how to alter a table to alter the primary key
 
     public static void createDb(Context ctx) {
         if (DATABASE == null) {
