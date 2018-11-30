@@ -10,6 +10,7 @@ import android.os.Build
 import android.os.Bundle
 import android.support.v4.app.LoaderManager
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.AppCompatTextView
 import android.text.TextUtils
 import android.view.View
 import android.view.inputmethod.EditorInfo
@@ -72,11 +73,12 @@ class LoginActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<List<Ko
             }
         }
         // set up an item click listener for the dropdown
-        username.setOnItemClickListener { _, _, position, _ ->
+        username.setOnItemClickListener { _, textview, position, _ ->
             val tempAcctList = accountList
-            // if this list is not null && its size is more than the click position, go ahead
-            tempAcctList?.takeIf { tempAcctList.size > position }?.apply {
-                val account = tempAcctList[position]
+            // text in the view that was tapped. This only works because the dropdown is a simple textview
+            val clickerUsername = (textview as AppCompatTextView).text;
+            val account = tempAcctList?.find { acct -> acct.username == clickerUsername }
+            account?.let {
                 attemptLogin(account.username, account.password, WeakReference(this@LoginActivity))
             }
         }
