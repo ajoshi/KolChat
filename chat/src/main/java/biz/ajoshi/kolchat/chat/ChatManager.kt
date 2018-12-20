@@ -2,6 +2,7 @@ package biz.ajoshi.kolchat.chat
 
 import android.content.SharedPreferences
 import android.util.Log
+import biz.ajoshi.commonutils.Logg
 import biz.ajoshi.commonutils.StringUtilities
 import biz.ajoshi.kolnetwork.model.*
 import org.json.JSONObject
@@ -123,6 +124,14 @@ class ChatManager(val network: biz.ajoshi.kolnetwork.Network, internal val share
         // break up the response by the br tag. It's what kol uses to delimit commands
         if (!chatResponse.isSuccessful()) {
 //            onExpiredHash()
+            return ServerChatResponse("", emptyList(), chatResponse.status)
+        }
+        if(chatResponse.response[0] != '{') {
+            // https://fabric.io/meee9/android/apps/biz.ajoshi.kolchat/issues/5c142639f8b88c2963da8138
+            // this is not a valid chat response and might be some weird html.
+            // This incident will be reported
+            Logg.e(chatResponse.response)
+            Logg.logThrowable(IllegalArgumentException("Readchat gave html"))
             return ServerChatResponse("", emptyList(), chatResponse.status)
         }
         val response = JSONObject(chatResponse.response)
