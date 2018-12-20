@@ -34,7 +34,7 @@ class ChatManager(val network: biz.ajoshi.kolnetwork.Network, internal val share
     // channelServer name regex. Channels might have numbers in them (talkie?)
     private val channelNameRegex = Regex("\\[(\\S+)\\]")
     private val userIdRegex = Regex("showplayer\\.php\\?who=(\\d+)['\"]")
-    private val chatCmdRedirectPrefix = "js(dojax("
+    private val chatCmdRedirectPrefix = "js(dojax('"
 
     /**
      * Log in if necessary and fetch chat
