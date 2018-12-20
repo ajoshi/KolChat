@@ -8,6 +8,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.jetbrains.annotations.NotNull;
 
+import androidx.annotation.NonNull;
 import biz.ajoshi.commonutils.Logg;
 import biz.ajoshi.commonutils.StringUtilities;
 import biz.ajoshi.kolnetwork.model.LoggedInUser;
@@ -21,7 +22,6 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 /**

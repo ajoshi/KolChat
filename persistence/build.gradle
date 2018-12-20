@@ -1,15 +1,17 @@
 apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
 
 android {
-    compileSdkVersion 27
+    compileSdkVersion rootProject.ext.compileSdk
 
     defaultConfig {
-        minSdkVersion 15
-        targetSdkVersion 27
+        minSdkVersion rootProject.ext.minSdk
+        targetSdkVersion rootProject.ext.targetSdk
         versionCode 1
         versionName "1.0"
 
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
             // store the room schema for tests
             annotationProcessorOptions {
@@ -35,20 +37,19 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     // room
-    implementation "android.arch.persistence.room:runtime:$arch_room_version"
-    annotationProcessor "android.arch.persistence.room:compiler:$arch_room_version"
+    implementation "androidx.room:room-runtime:$room_version"
+    kapt "androidx.room:room-compiler:$room_version"
     //room rxjava support
-    implementation "android.arch.persistence.room:rxjava2:$arch_room_version"
+    implementation "androidx.room:room-rxjava2:$room_version"
 
     // lifecycle components
-    implementation "android.arch.lifecycle:runtime:$arch_lifecycle_version"
-    implementation "android.arch.lifecycle:extensions:$arch_lifecycle_version"
-    annotationProcessor "android.arch.lifecycle:compiler:$arch_lifecycle_version"
+    implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
+    kapt "androidx.lifecycle:lifecycle-compiler:$lifecycle_version"
 
     // tests
-    androidTestImplementation "android.arch.persistence.room:testing:$arch_room_version"
+    testImplementation "androidx.room:room-testing:$room_version"
 
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    androidTestImplementation 'androidx.test:runner:1.1.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
 }

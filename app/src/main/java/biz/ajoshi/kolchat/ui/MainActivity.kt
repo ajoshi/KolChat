@@ -4,17 +4,16 @@ import android.content.ComponentName
 import android.content.Intent
 import android.os.AsyncTask
 import android.os.Bundle
-import android.support.v7.app.AlertDialog
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.preference.PreferenceManager
-import android.support.v7.widget.Toolbar
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.findNavController
-import androidx.navigation.fragment.findNavController
+import androidx.preference.PreferenceManager
 import biz.ajoshi.commonutils.Logg
 import biz.ajoshi.commonutils.StringUtilities
 import biz.ajoshi.kolchat.*
@@ -69,8 +68,8 @@ class MainActivity : AppCompatActivity(), ChatChannelList.ChatChannelInteraction
         ChatJob.stopJob()
 
         // set up nav graph
-        val navHostFragment = supportFragmentManager.findFragmentById(R.id.llist)
-        navController = navHostFragment?.findNavController()
+        //     val navHostFragment = supportFragmentManager.findFragmentById(R.id.llist)
+        navController = findNavController(R.id.llist)
         navController?.let {
             it.setGraph(R.navigation.nav_graph)
             it.currentDestination?.label = getString(R.string.app_name)
@@ -81,14 +80,14 @@ class MainActivity : AppCompatActivity(), ChatChannelList.ChatChannelInteraction
         }
         // analytics- log the source of the launch intent
         when (intent.action) {
-            // launched by os
+        // launched by os
             Intent.ACTION_MAIN ->
                 logLaunchEvent("Launcher")
-            // launched by the notification for a chat message
+        // launched by the notification for a chat message
             action_navigate_to_chat_detail ->
                 logLaunchEvent("Notification: chat detail")
-            // launched by login screen (or something else?)
-            // this should tell me if users are logging in more than they should
+        // launched by login screen (or something else?)
+        // this should tell me if users are logging in more than they should
             else -> logLaunchEvent("Login/Unknown")
         }
         rolloverBroadcastReceiver.register(this, findViewById(R.id.llist))

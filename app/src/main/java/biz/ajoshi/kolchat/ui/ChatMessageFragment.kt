@@ -1,13 +1,13 @@
 package biz.ajoshi.kolchat.ui
 
-import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.navigation.fragment.findNavController
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.Navigation.findNavController
 import biz.ajoshi.kolchat.Analytics
 import biz.ajoshi.kolchat.EVENT_ATTRIBUTE_TIME_TAKEN
 import biz.ajoshi.kolchat.R
@@ -53,9 +53,12 @@ class ChatMessageFragment : BaseFragment(), QuickCommandView.CommandClickListene
     override fun onResume() {
         super.onResume()
         // only set the label if the destination is a chat list as well
-        if (findNavController().currentDestination?.id == R.id.nav_chat_message) {
-            findNavController().currentDestination?.label = getTitle()
+        view?.let {
+            if (findNavController(it).currentDestination?.id == R.id.nav_chat_message) {
+                findNavController(it).currentDestination?.label = getTitle()
+            }
         }
+
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -80,7 +83,7 @@ class ChatMessageFragment : BaseFragment(), QuickCommandView.CommandClickListene
         super.onActivityCreated(savedInstanceState)
     }
 
-    override fun onAttach(context: Context?) {
+    override fun onAttach(context: Context) {
         super.onAttach(context)
         if (context !is ChatDetailList.MessageClickListener) {
             // maybe this should check parent fragments as well?

@@ -8,15 +8,14 @@ import android.content.Intent
 import android.os.AsyncTask
 import android.os.Build
 import android.os.Bundle
-import android.support.v4.app.LoaderManager
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.AppCompatTextView
 import android.text.TextUtils
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.AppCompatTextView
 import biz.ajoshi.kolchat.R
 import biz.ajoshi.kolchat.accounts.AccountLoader
 import biz.ajoshi.kolchat.accounts.KolAccount
@@ -30,7 +29,7 @@ import java.lang.ref.WeakReference
  * A login screen that offers login via username/password. Different activity so it's easier to have a different
  * actionbar UI for the rest of the app (where we have an account)
  */
-class LoginActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<List<KolAccount>>, UserLoginTask.LoginFieldContainer {
+class LoginActivity : AppCompatActivity(), androidx.loader.app.LoaderManager.LoaderCallbacks<List<KolAccount>>, UserLoginTask.LoginFieldContainer {
 
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
@@ -186,7 +185,7 @@ class LoginActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<List<Ko
     /**********************************************************************************
      * LOADER CALLBACKS START
      **********************************************************************************/
-    override fun onLoadFinished(loader: android.support.v4.content.Loader<List<KolAccount>>, data: List<KolAccount>?) {
+    override fun onLoadFinished(loader: androidx.loader.content.Loader<List<KolAccount>>, data: List<KolAccount>?) {
         // save the account list for later
         accountList = data
         // now go through the list (shouldn't be too big) and make list of usernames
@@ -200,10 +199,10 @@ class LoginActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<List<Ko
         addUsernamesToAutocomplete(usernameList)
     }
 
-    override fun onLoaderReset(loader: android.support.v4.content.Loader<List<KolAccount>>) {
+    override fun onLoaderReset(loader: androidx.loader.content.Loader<List<KolAccount>>) {
     }
 
-    override fun onCreateLoader(id: Int, args: Bundle?): android.support.v4.content.Loader<List<KolAccount>> {
+    override fun onCreateLoader(id: Int, args: Bundle?): androidx.loader.content.Loader<List<KolAccount>> {
         return AccountLoader(this)
     }
 

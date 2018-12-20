@@ -4,8 +4,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.support.design.widget.Snackbar
-import android.support.v4.content.LocalBroadcastManager
 import android.view.View
 import biz.ajoshi.commonutils.Logg
 import biz.ajoshi.kolchat.chat.ACTION_CHAT_ROLLOVER
@@ -16,7 +14,7 @@ import biz.ajoshi.kolchat.chat.ACTION_CHAT_ROLLOVER_OVER
  */
 class RolloverBroadcastReceiver : BroadcastReceiver() {
     private var view: View? = null
-    private var snackbar: Snackbar? = null
+    private var snackbar: com.google.android.material.snackbar.Snackbar? = null
 
     var isRollover = false
 
@@ -26,7 +24,7 @@ class RolloverBroadcastReceiver : BroadcastReceiver() {
                 ACTION_CHAT_ROLLOVER -> {
                     isRollover = true
                     // showing a snackbar now, but I'd imagine we should blank out the UI or something
-                    snackbar = Snackbar.make(it, "Rollover in progress", Snackbar.LENGTH_INDEFINITE)
+                    snackbar = com.google.android.material.snackbar.Snackbar.make(it, "Rollover in progress", com.google.android.material.snackbar.Snackbar.LENGTH_INDEFINITE)
                     snackbar?.show()
                 }
                 ACTION_CHAT_ROLLOVER_OVER ->  {
@@ -46,7 +44,7 @@ class RolloverBroadcastReceiver : BroadcastReceiver() {
      */
     fun unregister(context: Context?) {
         context?.let {
-            LocalBroadcastManager.getInstance(it).unregisterReceiver(
+            androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(it).unregisterReceiver(
                     this);
         }
         view = null
@@ -60,9 +58,9 @@ class RolloverBroadcastReceiver : BroadcastReceiver() {
      */
     fun register(context: Context?, snackbarRootView: View) {
         context?.let {
-            LocalBroadcastManager.getInstance(it).registerReceiver(
+            androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(it).registerReceiver(
                     this, IntentFilter(ACTION_CHAT_ROLLOVER));
-            LocalBroadcastManager.getInstance(it).registerReceiver(
+            androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(it).registerReceiver(
                     this, IntentFilter(ACTION_CHAT_ROLLOVER_OVER));
         }
         view = snackbarRootView

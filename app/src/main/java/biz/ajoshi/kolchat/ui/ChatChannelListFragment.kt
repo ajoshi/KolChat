@@ -5,9 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
-import android.support.design.widget.Snackbar
-import android.support.design.widget.Snackbar.LENGTH_LONG
-import android.support.v4.content.LocalBroadcastManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,6 +15,7 @@ import biz.ajoshi.kolchat.chat.ChatSingleton
 import biz.ajoshi.kolchat.chat.EXTRA_FAILED_CHAT_MESSAGE
 import biz.ajoshi.kolchat.chat.view.customviews.ChatChannelList
 import biz.ajoshi.kolchat.chat.view.customviews.NewChatFAB
+import com.google.android.material.snackbar.Snackbar.LENGTH_LONG
 import kotlinx.android.synthetic.main.channel_list.*
 
 
@@ -66,7 +64,7 @@ class ChatChannelListFragment : BaseFragment(), NewChatFAB.ChatMessageSender {
         failedMessageReceiver.unregister(context)
     }
 
-    override fun onAttach(context: Context?) {
+    override fun onAttach(context: Context) {
         super.onAttach(context)
         if (context !is ChatChannelList.ChatChannelInteractionListener) {
             // maybe this should check parent fragments as well?
@@ -83,7 +81,7 @@ class ChatChannelListFragment : BaseFragment(), NewChatFAB.ChatMessageSender {
             val message = intent.getStringExtra(EXTRA_FAILED_CHAT_MESSAGE)
             if (!message.isEmpty()) {
                 view?.let {
-                    Snackbar.make(it, StringUtilities.getHtml(message), LENGTH_LONG).show()
+                    com.google.android.material.snackbar.Snackbar.make(it, StringUtilities.getHtml(message), LENGTH_LONG).show()
                 }
             }
         }
@@ -93,7 +91,7 @@ class ChatChannelListFragment : BaseFragment(), NewChatFAB.ChatMessageSender {
          */
         fun unregister(context: Context?) {
             context?.let {
-                LocalBroadcastManager.getInstance(it).unregisterReceiver(
+                androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(it).unregisterReceiver(
                         this);
             }
         }
@@ -103,7 +101,7 @@ class ChatChannelListFragment : BaseFragment(), NewChatFAB.ChatMessageSender {
          */
         fun register(context: Context?) {
             context?.let {
-                LocalBroadcastManager.getInstance(it).registerReceiver(
+                androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(it).registerReceiver(
                         this, IntentFilter(ACTION_CHAT_COMMAND_FAILED));
             }
         }

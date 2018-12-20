@@ -1,9 +1,9 @@
 package biz.ajoshi.kolchat.chat.view.customviews;
 
+import androidx.annotation.Nullable;
 import biz.ajoshi.kolchat.chat.R;
 
 import android.content.Context;
-import android.support.annotation.Nullable;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;

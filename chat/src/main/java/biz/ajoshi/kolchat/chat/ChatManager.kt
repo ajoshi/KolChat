@@ -126,7 +126,7 @@ class ChatManager(val network: biz.ajoshi.kolnetwork.Network, internal val share
 //            onExpiredHash()
             return ServerChatResponse("", emptyList(), chatResponse.status)
         }
-        if(chatResponse.response[0] != '{') {
+        if (chatResponse.response[0] != '{') {
             // https://fabric.io/meee9/android/apps/biz.ajoshi.kolchat/issues/5c142639f8b88c2963da8138
             // this is not a valid chat response and might be some weird html.
             // This incident will be reported
@@ -279,7 +279,7 @@ class ChatManager(val network: biz.ajoshi.kolnetwork.Network, internal val share
         val temptext = chatMessageJson.getString("msg")
         val text: String
         text = when (format) {
-            // Mod warnings need to be colored correctly. 3 is a red warning, 4 is a green announcement
+        // Mod warnings need to be colored correctly. 3 is a red warning, 4 is a green announcement
             3 -> "<font color=\"red\">" + replaceChatEffectImagesWithEmojis(temptext) + "</font>"
             4 -> "<font color=\"#117A65\">" + replaceChatEffectImagesWithEmojis(temptext) + "</font>"
             else -> {

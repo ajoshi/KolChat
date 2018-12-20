@@ -1,13 +1,10 @@
 package biz.ajoshi.kolchat.chat.view.customviews
 
 import android.content.Context
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.helper.ItemTouchHelper
-import android.support.v7.widget.helper.ItemTouchHelper.LEFT
-import android.support.v7.widget.helper.ItemTouchHelper.SimpleCallback
 import android.util.AttributeSet
-import biz.ajoshi.kolchat.chat.ChatSingleton
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.ItemTouchHelper.LEFT
+import androidx.recyclerview.widget.ItemTouchHelper.SimpleCallback
 import biz.ajoshi.kolchat.chat.view.ChatChannelAdapter
 import biz.ajoshi.kolchat.chat.view.ChatChannelAdapter.ChannelClickListener
 import biz.ajoshi.kolchat.persistence.KolDB
@@ -19,7 +16,7 @@ import io.reactivex.schedulers.Schedulers
 /**
  * Shows and updates the list of chat channels with messages. Updates automatically since it uses RxJava
  */
-class ChatChannelList : RecyclerView, ChannelClickListener {
+class ChatChannelList : androidx.recyclerview.widget.RecyclerView, ChannelClickListener {
     private lateinit var chatChannelAdapter: ChatChannelAdapter
     private var groupChatUpdateSubscriber: Disposable? = null
     private var pmChatUpdateSubscriber: Disposable? = null
@@ -37,7 +34,7 @@ class ChatChannelList : RecyclerView, ChannelClickListener {
      * Set up the view and everything that can be set up without being configured
      */
     private fun initializeViews(context: Context) {
-        val layoutMgr = LinearLayoutManager(context)
+        val layoutMgr = androidx.recyclerview.widget.LinearLayoutManager(context)
         chatChannelAdapter = ChatChannelAdapter()
         adapter = chatChannelAdapter
         layoutManager = layoutMgr
@@ -49,11 +46,11 @@ class ChatChannelList : RecyclerView, ChannelClickListener {
      * We want people to delete channels by swiping on them. We do not want them to reorder them yet
      */
     inner class ChannelSwipeCallback() : SimpleCallback(0, LEFT) {
-        override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
+        override fun onMove(recyclerView: androidx.recyclerview.widget.RecyclerView, viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder, target: androidx.recyclerview.widget.RecyclerView.ViewHolder): Boolean {
             return false
         }
 
-        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+        override fun onSwiped(viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder, direction: Int) {
             val position = viewHolder.adapterPosition
             val channel = chatChannelAdapter.getChannelAt(position)
             interactionListener?.onChannelSwiped(channel = channel)

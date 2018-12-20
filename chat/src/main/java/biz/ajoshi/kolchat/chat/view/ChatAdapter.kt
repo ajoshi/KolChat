@@ -1,7 +1,5 @@
 package biz.ajoshi.kolchat.chat.view
 
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import biz.ajoshi.kolchat.chat.R
@@ -10,7 +8,7 @@ import biz.ajoshi.kolchat.persistence.chat.ChatMessage
 /**
  * Adapter for the list of chat messages (inside a given channel)
  */
-class ChatAdapter(val layoutMgr: LinearLayoutManager, val listener: ChatMessageVH.MessageClickListener, val supportsPaging: Boolean = false) : RecyclerView.Adapter<ChatMessageVH>() {
+class ChatAdapter(val layoutMgr: androidx.recyclerview.widget.LinearLayoutManager, val listener: ChatMessageVH.MessageClickListener, val supportsPaging: Boolean = false) : androidx.recyclerview.widget.RecyclerView.Adapter<ChatMessageVH>() {
 
     var messages = mutableListOf<ChatMessage>()
     var idList = mutableListOf<Int>()
@@ -25,7 +23,7 @@ class ChatAdapter(val layoutMgr: LinearLayoutManager, val listener: ChatMessageV
                 val view = LayoutInflater.from(parent.context).inflate(R.layout.chat_message, parent, false)
                 return ChatMessageVH(view, listener)
             }
-            //viewtypeMessage -> // fallthrough
+        //viewtypeMessage -> // fallthrough
             else -> {
                 val view = LayoutInflater.from(parent.context).inflate(R.layout.chat_message, parent, false)
                 return ChatMessageVH(view, listener)

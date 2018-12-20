@@ -2,12 +2,11 @@ package biz.ajoshi.kolchat
 
 import android.app.Application
 import android.os.StrictMode
-import android.support.v7.preference.PreferenceManager
+import androidx.preference.PreferenceManager
 import biz.ajoshi.commonutils.Logg
 import biz.ajoshi.kolchat.chat.ChatJob
 import biz.ajoshi.kolchat.persistence.KolDB
 import com.crashlytics.android.Crashlytics
-import com.crashlytics.android.answers.Answers
 import com.facebook.drawee.backends.pipeline.Fresco
 import io.fabric.sdk.android.Fabric
 

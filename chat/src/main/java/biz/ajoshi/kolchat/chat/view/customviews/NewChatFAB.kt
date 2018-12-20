@@ -2,14 +2,13 @@ package biz.ajoshi.kolchat.chat.view.customviews
 
 import android.content.Context
 import android.content.DialogInterface
-import android.support.design.widget.FloatingActionButton
-import android.support.v7.app.AlertDialog
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.EditText
+import androidx.appcompat.app.AlertDialog
 import biz.ajoshi.kolchat.chat.R
 import kotlinx.android.synthetic.main.dialog_send_new_message.view.*
 
@@ -17,7 +16,7 @@ import kotlinx.android.synthetic.main.dialog_send_new_message.view.*
  * Floating action button that spins up UI flow for starting up a new chat
  * Launches dialogs, etc. Activity/Fragment can still override click behavior if it wants
  */
-class NewChatFAB : FloatingActionButton, View.OnClickListener {
+class NewChatFAB : com.google.android.material.floatingactionbutton.FloatingActionButton, View.OnClickListener {
 
     var chatMessageSender: ChatMessageSender? = null
 
@@ -80,7 +79,7 @@ class NewChatFAB : FloatingActionButton, View.OnClickListener {
                     })
                     .setNegativeButton(R.string.aj_chat_cancel, null)
                     .create()
-            dialog.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE)
+            dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE)
             dialog.show()
         }
     }
@@ -103,7 +102,7 @@ class NewChatFAB : FloatingActionButton, View.OnClickListener {
                         }
                     })
                     .setNegativeButton(R.string.aj_chat_cancel, null).create()
-            dialog.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE)
+            dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE)
             dialog.show()
         }
     }

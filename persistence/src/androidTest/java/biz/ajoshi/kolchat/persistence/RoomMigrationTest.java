@@ -6,13 +6,11 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import androidx.room.testing.MigrationTestHelper;
+import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory;
+import androidx.test.InstrumentationRegistry;
+import androidx.test.runner.AndroidJUnit4;
 import biz.ajoshi.kolchat.persistence.chat.ChannelDao;
-
-import android.arch.persistence.db.framework.FrameworkSQLiteOpenHelperFactory;
-import android.arch.persistence.room.Room;
-import android.arch.persistence.room.testing.MigrationTestHelper;
-import android.support.test.InstrumentationRegistry;
-import android.support.test.runner.AndroidJUnit4;
 
 import static biz.ajoshi.kolchat.persistence.KolDB.MIGRATION_4_5;
 

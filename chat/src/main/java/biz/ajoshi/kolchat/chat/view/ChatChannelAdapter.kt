@@ -1,6 +1,5 @@
 package biz.ajoshi.kolchat.chat.view
 
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import biz.ajoshi.kolchat.chat.R
@@ -9,7 +8,7 @@ import biz.ajoshi.kolchat.persistence.chat.ChatChannel
 /**
  * Created by a.joshi on 10/7/17.
  */
-class ChatChannelAdapter : RecyclerView.Adapter<ChatChannelVH>() {
+class ChatChannelAdapter : androidx.recyclerview.widget.RecyclerView.Adapter<ChatChannelVH>() {
 
     private val rowTypeGroup = 1
     private val rowTypePm = 2
@@ -37,7 +36,7 @@ class ChatChannelAdapter : RecyclerView.Adapter<ChatChannelVH>() {
                 clickListener?.onChannelClicked(channel)
             }
         }
-        return if(viewType == rowTypeGroup){
+        return if (viewType == rowTypeGroup) {
             ChatChannelVH(view, rowClickListener)
         } else {
             ChatUserVH(view, rowClickListener)

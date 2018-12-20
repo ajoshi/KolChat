@@ -1,11 +1,9 @@
 package biz.ajoshi.kolchat.chat.view.customviews
 
-import android.arch.persistence.room.EmptyResultSetException
 import android.content.Context
 import android.os.AsyncTask
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.util.AttributeSet
+import androidx.room.EmptyResultSetException
 import biz.ajoshi.kolchat.chat.view.ChatAdapter
 import biz.ajoshi.kolchat.chat.view.ChatMessageVH
 import biz.ajoshi.kolchat.persistence.KolDB
@@ -19,7 +17,7 @@ import io.reactivex.schedulers.Schedulers
  * Recyclerview that loads all the chat messages for a chat channel/PM. Does not update to show new data by itself.
  * Apps using LiveData should handle this themselves
  */
-class ChatDetailList : RecyclerView {
+class ChatDetailList : androidx.recyclerview.widget.RecyclerView {
     private lateinit var chatAdapter: ChatAdapter
     private var initialChatLoadSubscriber: Disposable? = null
     private var clickListener: MessageClickListener? = null
@@ -37,7 +35,7 @@ class ChatDetailList : RecyclerView {
      * Set up the view and everything that can be set up without being configured
      */
     private fun initializeViews(context: Context) {
-        val layoutMgr = LinearLayoutManager(context)
+        val layoutMgr = androidx.recyclerview.widget.LinearLayoutManager(context)
         chatAdapter = ChatAdapter(layoutMgr, object : ChatMessageVH.MessageClickListener {
             override fun onMessageLongClicked(message: ChatMessage) {
                 clickListener?.onMessageLongClicked(message = message)

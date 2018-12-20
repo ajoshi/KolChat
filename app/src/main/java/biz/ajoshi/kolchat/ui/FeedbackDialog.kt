@@ -2,10 +2,9 @@ package biz.ajoshi.kolchat.ui
 
 import android.content.Context
 import android.content.DialogInterface
-import android.support.design.widget.Snackbar
-import android.support.v7.app.AlertDialog
 import android.view.View
 import android.widget.EditText
+import androidx.appcompat.app.AlertDialog
 import biz.ajoshi.commonutils.Logg
 import biz.ajoshi.kolchat.R
 import biz.ajoshi.kolchat.UserSentLogsEvent
@@ -23,7 +22,7 @@ class FeedbackDialog(val context: Context, val rootView: View) {
                         val feedback = "" + dialog.findViewById<EditText>(R.id.feedback_text)?.text
                         Logg.i(feedback)
                         Crashlytics.logException(UserSentLogsEvent("User sent logs " + System.currentTimeMillis()))
-                        Snackbar.make(rootView, "Logs sent!", Snackbar.LENGTH_SHORT).show()
+                        com.google.android.material.snackbar.Snackbar.make(rootView, "Logs sent!", com.google.android.material.snackbar.Snackbar.LENGTH_SHORT).show()
                     }
                 })
                 .setNegativeButton(R.string.feedback_dialog_cancel, null)

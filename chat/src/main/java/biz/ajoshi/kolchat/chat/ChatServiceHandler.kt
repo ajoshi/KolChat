@@ -7,9 +7,8 @@ import android.content.Intent
 import android.os.Handler
 import android.os.Looper
 import android.os.Message
-import android.support.v4.app.NotificationCompat
-import android.support.v4.app.NotificationManagerCompat
-import android.support.v4.content.LocalBroadcastManager
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import biz.ajoshi.commonutils.Logg
 import biz.ajoshi.commonutils.StringUtilities
 import biz.ajoshi.kolchat.chat.persistence.RoomInserter
@@ -111,7 +110,7 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
                                     if (response.output.isNotEmpty()) {
                                         val broadcastIntent = Intent(ACTION_CHAT_COMMAND_FAILED)
                                         broadcastIntent.putExtra(EXTRA_FAILED_CHAT_MESSAGE, response.output)
-                                        LocalBroadcastManager.getInstance(service.getContext()).sendBroadcast(broadcastIntent)
+                                        androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(service.getContext()).sendBroadcast(broadcastIntent)
                                     }
                                     if (isItRo) {
                                         service.onRoIsOVer()

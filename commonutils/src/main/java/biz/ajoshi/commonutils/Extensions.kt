@@ -2,7 +2,7 @@ package biz.ajoshi.commonutils
 
 import android.content.Context
 import android.os.Build
-import android.support.annotation.ColorInt
+import androidx.annotation.ColorInt
 
 /**
  * Returns the color for the given color resource id. Uses the default/null theme

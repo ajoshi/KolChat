@@ -31,7 +31,7 @@
             android:layout_width="match_parent"
             android:orientation="vertical">
 
-            <android.support.design.widget.TextInputLayout
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent">
 
@@ -45,13 +45,13 @@
                     android:completionThreshold="@integer/login_username_field_completion_threshold"
                     android:singleLine="true"/>
 
-            </android.support.design.widget.TextInputLayout>
+            </com.google.android.material.textfield.TextInputLayout>
 
-            <android.support.design.widget.TextInputLayout
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent">
 
-                <android.support.design.widget.TextInputEditText
+                <com.google.android.material.textfield.TextInputEditText
                     android:hint="@string/prompt_password"
                     android:id="@+id/password"
                     android:imeActionId="6"
@@ -63,7 +63,7 @@
                     android:maxLines="1"
                     android:singleLine="true"/>
 
-            </android.support.design.widget.TextInputLayout>
+            </com.google.android.material.textfield.TextInputLayout>
 
             <Button
                 style="?android:textAppearanceSmall"

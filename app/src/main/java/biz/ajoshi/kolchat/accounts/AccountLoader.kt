@@ -1,12 +1,11 @@
 package biz.ajoshi.kolchat.accounts
 
 import android.content.Context
-import android.support.v4.content.AsyncTaskLoader
 
 /**
  * Loader that will return lists of usernames so the UI can be populated nicely
  */
-class AccountLoader(context: Context) : AsyncTaskLoader<List<KolAccount>>(context) {
+class AccountLoader(context: Context) : androidx.loader.content.AsyncTaskLoader<List<KolAccount>>(context) {
     override fun loadInBackground(): List<KolAccount>? {
         return KolAccountManager(context).getAllAccounts()
     }

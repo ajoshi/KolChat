@@ -1,6 +1,6 @@
 package biz.ajoshi.kolchat.chat.persistence
 
-import android.arch.persistence.room.EmptyResultSetException
+import androidx.room.EmptyResultSetException
 import biz.ajoshi.kolchat.persistence.KolDB
 import biz.ajoshi.kolchat.persistence.chat.ChatChannel
 import biz.ajoshi.kolchat.persistence.chat.ChatMessage

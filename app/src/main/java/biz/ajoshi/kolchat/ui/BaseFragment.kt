@@ -1,7 +1,6 @@
 package biz.ajoshi.kolchat.ui
 
 import android.content.Intent
-import android.support.v4.app.Fragment
 import biz.ajoshi.kolchat.*
 import biz.ajoshi.kolchat.chat.ChatBackgroundService
 import biz.ajoshi.kolchat.chat.ChatManager
@@ -11,7 +10,7 @@ import com.crashlytics.android.answers.CustomEvent
 /**
  * Defines the behavior of a base fragment. Lets us get titles, etc in a predictable manner
  */
-abstract class BaseFragment : Fragment() {
+abstract class BaseFragment : androidx.fragment.app.Fragment() {
     open fun getTitle(): String {
         return getString(R.string.app_name)
     }

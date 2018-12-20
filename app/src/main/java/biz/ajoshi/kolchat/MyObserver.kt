@@ -1,8 +1,8 @@
 package biz.ajoshi.kolchat
 
-import android.arch.lifecycle.Lifecycle
-import android.arch.lifecycle.LifecycleObserver
-import android.arch.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.OnLifecycleEvent
 
 /**
  * Created by ajoshi on 7/22/17. Does absolutely nothing right now. Might not even have a use (but maybe to kill chatservice)

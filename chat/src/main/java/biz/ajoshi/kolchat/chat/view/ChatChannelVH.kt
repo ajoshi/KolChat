@@ -1,6 +1,5 @@
 package biz.ajoshi.kolchat.chat.view
 
-import android.support.v7.widget.RecyclerView
 import android.text.format.DateUtils
 import android.view.View
 import biz.ajoshi.commonutils.StringUtilities
@@ -11,7 +10,7 @@ import java.util.*
 /**
  * Viewholder for an entry in the chat channel list for a public channel
  */
-open class ChatChannelVH(itemView: View, val listener: ChannelRowClickListener?) : RecyclerView.ViewHolder(itemView) {
+open class ChatChannelVH(itemView: View, val listener: ChannelRowClickListener?) : androidx.recyclerview.widget.RecyclerView.ViewHolder(itemView) {
 
     /**
      * Called when a channel is tapped on. Implementor gets the channel data and can do whatever it wants

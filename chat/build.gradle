@@ -1,17 +1,18 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-android-extensions'
 
 android {
-    compileSdkVersion 27
+    compileSdkVersion rootProject.ext.compileSdk
 
     defaultConfig {
-        minSdkVersion 15
-        targetSdkVersion 27
+        minSdkVersion rootProject.ext.minSdk
+        targetSdkVersion rootProject.ext.targetSdk
         versionCode 1
         versionName "1.0"
 
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
     }
 
@@ -32,8 +33,8 @@ dependencies {
     implementation project(path: ':persistence')
 
     // use job dispatcher to poll server in a more manageable way
-    implementation "com.evernote:android-job:1.2.5"
-    implementation "com.google.android.gms:play-services-gcm:15.0.1"
+    implementation "com.evernote:android-job:1.2.6"
+    implementation "com.google.android.gms:play-services-gcm:16.0.0"
 
     // or use   implementation 'com.firebase:firebase-jobdispatcher:0.8.5'
 
@@ -41,28 +42,28 @@ dependencies {
     implementation "com.facebook.fresco:fresco:$fresco_version"
     implementation "com.facebook.fresco:drawee-span:$fresco_version"
 
-    implementation "com.android.support:appcompat-v7:$android_support_lib_version"
-    implementation "com.android.support:recyclerview-v7:$android_support_lib_version"
-    implementation "com.android.support:design:$android_support_lib_version"
+    implementation 'androidx.appcompat:appcompat:1.1.0-alpha01'
+    implementation 'androidx.recyclerview:recyclerview:1.1.0-alpha01'
+    implementation 'com.google.android.material:material:1.1.0-alpha02'
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
     // room
-    implementation "android.arch.persistence.room:runtime:1.1.0"
-    annotationProcessor "android.arch.persistence.room:compiler:1.1.0"
+    implementation "androidx.room:room-runtime:$room_version"
+    kapt "androidx.room:room-compiler:$room_version"
 
     // lifecycle components
-    implementation "android.arch.lifecycle:runtime:$arch_lifecycle_version"
-    implementation "android.arch.lifecycle:extensions:$arch_lifecycle_version"
-    annotationProcessor "android.arch.lifecycle:compiler:$arch_lifecycle_version"
+    implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
+    kapt "androidx.lifecycle:lifecycle-compiler:$lifecycle_version"
 
     //room rxjava support
-    implementation "android.arch.persistence.room:rxjava2:$arch_room_version"
+    implementation "androidx.room:room-rxjava2:$room_version"
 
-    implementation 'io.reactivex.rxjava2:rxandroid:2.0.2'
-    implementation 'io.reactivex.rxjava2:rxjava:2.1.10'
+    implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
+    implementation 'io.reactivex.rxjava2:rxjava:2.2.2'
 
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    androidTestImplementation 'androidx.test:runner:1.1.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
+
 }

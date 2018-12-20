@@ -1,15 +1,15 @@
 package biz.ajoshi.kolchat.persistence;
 
+import androidx.room.Database;
+import androidx.room.Room;
+import androidx.room.RoomDatabase;
+import androidx.room.migration.Migration;
+import androidx.sqlite.db.SupportSQLiteDatabase;
 import biz.ajoshi.kolchat.persistence.chat.ChannelDao;
 import biz.ajoshi.kolchat.persistence.chat.ChatChannel;
 import biz.ajoshi.kolchat.persistence.chat.ChatMessage;
 import biz.ajoshi.kolchat.persistence.chat.MessageDao;
 
-import android.arch.persistence.db.SupportSQLiteDatabase;
-import android.arch.persistence.room.Database;
-import android.arch.persistence.room.Room;
-import android.arch.persistence.room.RoomDatabase;
-import android.arch.persistence.room.migration.Migration;
 import android.content.Context;
 
 /**

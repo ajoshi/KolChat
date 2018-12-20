@@ -1,6 +1,6 @@
 package biz.ajoshi.kolchat.chat.arch
 
-import android.arch.lifecycle.LiveData
+import androidx.lifecycle.LiveData
 import biz.ajoshi.kolchat.persistence.KolDB
 import biz.ajoshi.kolchat.persistence.chat.ChatMessage
 
@@ -13,7 +13,7 @@ class ChatRepository {
         return KolDB.getDb()?.MessageDao()?.getLastMessageLivedataForChannel(channelId, userId)
     }
 
-    fun getChatStreamForChannel(channelId: String, userId:String, timestamp: Long): LiveData<List<ChatMessage>>? {
+    fun getChatStreamForChannel(channelId: String, userId: String, timestamp: Long): LiveData<List<ChatMessage>>? {
         return KolDB.getDb()?.MessageDao()?.getLastMessagesLivedataForChannel(channelId, userId, timestamp)
     }
 }

@@ -1,7 +1,6 @@
 package biz.ajoshi.kolchat.chat.view
 
 import android.net.Uri
-import android.support.v7.widget.RecyclerView
 import android.text.format.DateUtils
 import android.text.method.LinkMovementMethod
 import android.text.style.ImageSpan
@@ -22,7 +21,7 @@ import java.util.*
 /**
  * Created by ajoshi on 7/22/17.
  */
-class ChatMessageVH(itemView: View, val listener: MessageClickListener) : RecyclerView.ViewHolder(itemView) {
+class ChatMessageVH(itemView: View, val listener: MessageClickListener) : androidx.recyclerview.widget.RecyclerView.ViewHolder(itemView) {
     /**
      * Called when a chat message is long pressed. Implementor gets the message data and can do whatever it wants
      */

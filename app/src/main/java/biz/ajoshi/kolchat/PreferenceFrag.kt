@@ -1,9 +1,9 @@
 package biz.ajoshi.kolchat
 
 import android.os.Bundle
-import android.support.v7.preference.PreferenceFragmentCompat
-import android.support.v7.preference.PreferenceScreen
-import androidx.navigation.fragment.findNavController
+import androidx.navigation.findNavController
+import androidx.preference.PreferenceFragmentCompat
+import androidx.preference.PreferenceScreen
 
 const val KEY_PREF_SEND_USERNAME = "pref_send_username"
 const val KEY_PREF_SEND_LOGS = "pref_send_logs"
@@ -23,12 +23,12 @@ class PreferenceFrag : PreferenceFragmentCompat() {
     }
 
     override fun onNavigateToScreen(preferenceScreen: PreferenceScreen) {
-        // based off of https://stackoverflow.com/a/46179417
-        // Turns out prefFragCompat doesn't support nested screens so we create a new instance of this frag and navigate to it.
+//        // based off of https://stackoverflow.com/a/46179417
+//        // Turns out prefFragCompat doesn't support nested screens so we create a new instance of this frag and navigate to it.
         val nextPreferenceFrag = PreferenceFrag()
         val args = Bundle()
         args.putString(ARG_ROOTKEY, preferenceScreen.key)
         nextPreferenceFrag.arguments = args
-        findNavController().navigate(R.id.nav_preferences, args)
+        view?.findNavController()?.navigate(R.id.nav_preferences, args)
     }
 }

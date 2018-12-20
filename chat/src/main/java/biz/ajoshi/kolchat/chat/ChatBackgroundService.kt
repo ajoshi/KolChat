@@ -6,8 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.*
-import android.support.v4.app.NotificationCompat
-import android.support.v4.content.LocalBroadcastManager
+import androidx.core.app.NotificationCompat
 import biz.ajoshi.commonutils.Logg
 
 
@@ -30,13 +29,13 @@ const val MENTION_NOTIFICATION_CHANNEL_ID = "kolMention"
 class ChatBackgroundService : Service(), ChatServiceHandler.ChatService {
     override fun onRoIsOVer() {
         val broadcastIntent = Intent(ACTION_CHAT_ROLLOVER_OVER)
-        LocalBroadcastManager.getInstance(getContext()).sendBroadcast(broadcastIntent)
+        androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(getContext()).sendBroadcast(broadcastIntent)
     }
 
     override fun onRollover() {
         val broadcastIntent = Intent(ACTION_CHAT_ROLLOVER)
         broadcastIntent.putExtra(EXTRA_FAILED_CHAT_MESSAGE, "Rollover in progress, restart in 5 minutes")
-        LocalBroadcastManager.getInstance(getContext()).sendBroadcast(broadcastIntent)
+        androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(getContext()).sendBroadcast(broadcastIntent)
     }
 
     override fun getContext(): Context {
@@ -93,7 +92,7 @@ class ChatBackgroundService : Service(), ChatServiceHandler.ChatService {
         val interval = intent?.extras?.getLong(EXTRA_POLL_INTERVAL_IN_MS, DEFAULT_POLL_INTERVAL)
         val chatMessageToSend = intent?.extras?.getString(EXTRA_CHAT_MESSAGE_TO_SEND, null)
         intent?.extras?.getParcelable<ComponentName>(EXTRA_MAIN_ACTIVITY_COMPONENTNAME)?.let {
-            mainActivityComponentName = intent.extras.getParcelable(EXTRA_MAIN_ACTIVITY_COMPONENTNAME)
+            mainActivityComponentName = intent.extras?.getParcelable(EXTRA_MAIN_ACTIVITY_COMPONENTNAME)
         }
         if (mainActivityComponentName == null) {
             Logg.e("No componentname was passed in for ChatBGService- no activity launchable on tap")
