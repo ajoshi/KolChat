@@ -23,8 +23,6 @@ apply plugin: 'io.fabric'
 // need this for nav components to be able to generate type safe args for bundles
 //apply plugin: 'androidx.navigation.safeargs'
 
-def nav_version = '1.0.0-alpha06'
-
 repositories {
     maven { url 'https://maven.fabric.io/public' }
 }

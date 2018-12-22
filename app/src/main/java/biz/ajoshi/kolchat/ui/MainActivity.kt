@@ -31,7 +31,7 @@ import com.crashlytics.android.answers.CustomEvent
 
 const val action_navigate_to_chat_detail = "biz.ajoshi.kolchat.ui.MainActivity.ACTION_NAVIGATE_TO_CHAT_DETAIL"
 
-class MainActivity : AppCompatActivity(), ChatChannelList.ChatChannelInteractionListener, ChatDetailList.MessageClickListener, NavController.OnNavigatedListener {
+class MainActivity : AppCompatActivity(), ChatChannelList.ChatChannelInteractionListener, ChatDetailList.MessageClickListener, NavController.OnDestinationChangedListener {
     private var toolbar: Toolbar? = null
     private var navController: NavController? = null
     private val rolloverBroadcastReceiver = biz.ajoshi.kolchat.accounts.RolloverBroadcastReceiver()
@@ -74,9 +74,8 @@ class MainActivity : AppCompatActivity(), ChatChannelList.ChatChannelInteraction
             it.setGraph(R.navigation.nav_graph)
             it.currentDestination?.label = getString(R.string.app_name)
             //         NavigationUI.setupActionBarWithNavController(this, it)
-
             // Nav components don't work correctly (surprise!). Setting labels programmatically seems not to be doable at all
-            it.addOnNavigatedListener(this)
+            it.addOnDestinationChangedListener(this)
         }
         // analytics- log the source of the launch intent
         when (intent.action) {
@@ -93,7 +92,7 @@ class MainActivity : AppCompatActivity(), ChatChannelList.ChatChannelInteraction
         rolloverBroadcastReceiver.register(this, findViewById(R.id.llist))
     }
 
-    override fun onNavigated(controller: NavController, destination: NavDestination) {
+    override fun onDestinationChanged(controller: NavController, destination: NavDestination, arguments: Bundle?) {
         toolbar?.title = getPlaintextForHtml("" + destination.label)
     }
 

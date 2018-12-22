@@ -33,6 +33,7 @@ ext {
     arch_lifecycle_version = "1.1.1"
     arch_room_version = "1.1.1"
     fresco_version = "1.11.0"
+    nav_version = '1.0.0-alpha09'
 }
 
 task clean(type: Delete) {
