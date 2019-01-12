@@ -40,5 +40,16 @@
             android:title="@string/pref_enable_fast_polling_bg_title"/>
     </PreferenceScreen>
 
+    <PreferenceScreen
+        android:key="screen_advanced"
+        android:persistent="false"
+        android:title="@string/pref_advanced_settings">
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="pref_use_androidx_paging"
+            android:summary="@string/pref_enable_androidx_paging_summary"
+            android:title="@string/pref_enable_androidx_paging_title"/>
+    </PreferenceScreen>
+
     <!-- add a button to allow users to customize quickchat. Maybe a list of 5/6 edittextpreferences? -->
 </PreferenceScreen>

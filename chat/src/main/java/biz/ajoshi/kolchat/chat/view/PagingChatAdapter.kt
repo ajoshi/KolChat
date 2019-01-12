@@ -1,0 +1,73 @@
+package biz.ajoshi.kolchat.chat.view
+
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import androidx.paging.PagedListAdapter
+import androidx.recyclerview.widget.DiffUtil
+import biz.ajoshi.kolchat.chat.R
+import biz.ajoshi.kolchat.persistence.chat.ChatMessage
+
+/**
+ * Adapter that uses AndroidX Paging library for paging up and down (so it auto-fetches new messages).
+ * This doesn't seem to work super well, when new messages are added to the bottom- it doesn't always scroll down.
+ */
+class PagingChatAdapter(val layoutMgr: androidx.recyclerview.widget.LinearLayoutManager, val listener: ChatMessageVH.MessageClickListener) :
+        PagedListAdapter<ChatMessage, ChatMessageVH>(DIFF_CALLBACK) {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatMessageVH {
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.chat_message, parent, false)
+        return ChatMessageVH(view, listener)
+    }
+
+    override fun onBindViewHolder(holder: ChatMessageVH, position: Int) {
+        val concert = getItem(position)
+        if (concert != null) {
+            holder.bind(concert)
+        } else {
+            // Null defines a placeholder item - PagedListAdapter automatically
+            // invalidates this row when the actual object is loaded from the
+            // database.
+            holder.bind(null)
+        }
+    }
+
+    companion object {
+        private val DIFF_CALLBACK = object :
+                DiffUtil.ItemCallback<ChatMessage>() {
+            // Concert details may have changed if reloaded from the database,
+            // but ID is fixed.
+            override fun areItemsTheSame(oldMessage: ChatMessage,
+                                         newMessage: ChatMessage): Boolean =
+                    oldMessage.id == newMessage.id
+
+            override fun areContentsTheSame(oldMessage: ChatMessage,
+                                            newMessage: ChatMessage): Boolean =
+                    oldMessage == newMessage
+        }
+    }
+
+    fun scrollToBottomAlways() {
+        layoutMgr.scrollToPosition(itemCount - 1)
+    }
+
+    fun scrollToBottom() {
+        scrollToBottom(8)
+    }
+
+    fun scrollToBottom(ifCloserThan: Int) {
+        val currentIndex = layoutMgr.findLastCompletelyVisibleItemPosition()
+        if (currentIndex + ifCloserThan > itemCount) {
+            layoutMgr.scrollToPosition(itemCount - 1)
+        }
+    }
+
+    var started = false
+    fun scrollToBottomOnceAndThenThreshold() {
+        if (!started) {
+            scrollToBottomAlways()
+            started = true
+        } else {
+            scrollToBottom()
+        }
+    }
+
+}

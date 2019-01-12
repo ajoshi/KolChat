@@ -1,5 +1,6 @@
 package biz.ajoshi.kolchat.persistence.chat;
 
+import androidx.annotation.Nullable;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
@@ -101,5 +102,10 @@ public class ChatMessage {
 
     public void setCurrentUserID(String currentUserId) {
         this.currentUserId = currentUserId;
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        return super.equals(obj);
     }
 }

@@ -18,8 +18,8 @@ import io.reactivex.schedulers.Schedulers
  * Apps using LiveData should handle this themselves
  */
 class ChatDetailList : androidx.recyclerview.widget.RecyclerView {
-    private lateinit var chatAdapter: ChatAdapter
-    private var initialChatLoadSubscriber: Disposable? = null
+    public lateinit var chatAdapter: ChatAdapter
+    public var initialChatLoadSubscriber: Disposable? = null
     private var clickListener: MessageClickListener? = null
     private var lastTimeSeen: Long? = 0
     private lateinit var channelId: String

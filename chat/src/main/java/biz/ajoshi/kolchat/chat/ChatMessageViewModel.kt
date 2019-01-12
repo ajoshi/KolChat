@@ -3,6 +3,8 @@ package biz.ajoshi.kolchat.chat
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import androidx.paging.LivePagedListBuilder
+import androidx.paging.PagedList
 import biz.ajoshi.kolchat.chat.arch.ChatRepository
 import biz.ajoshi.kolchat.persistence.chat.ChatMessage
 
@@ -16,11 +18,13 @@ class ChatMessageViewModel(application: Application) : AndroidViewModel(applicat
     /**
      * We want a livedata that only gives us data for this channel. We never want to share data streams across channels
      */
-    fun getLastChatObservable(channelId: String, userId: String): LiveData<ChatMessage>? {
-        if (chatMessageObservable == null) {
-            chatMessageObservable = ChatRepository().getLastChatStreamForChannel(channelId = channelId, userId = userId)
+    fun getLastChatObservable(channelId: String, userId: String): LiveData<PagedList<ChatMessage>>? {
+        val results = ChatRepository().getLastChatStreamForChannel(channelId = channelId, userId = userId)
+        results?.let {
+            val temp: LiveData<PagedList<ChatMessage>> = LivePagedListBuilder<Int, ChatMessage>(it, 50).build()
+            return temp
         }
-        return chatMessageObservable
+        return null
     }
 
     /**

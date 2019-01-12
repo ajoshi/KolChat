@@ -1,6 +1,7 @@
 package biz.ajoshi.kolchat.chat.arch
 
 import androidx.lifecycle.LiveData
+import androidx.paging.DataSource
 import biz.ajoshi.kolchat.persistence.KolDB
 import biz.ajoshi.kolchat.persistence.chat.ChatMessage
 
@@ -9,7 +10,7 @@ import biz.ajoshi.kolchat.persistence.chat.ChatMessage
  * just fine as a repository
  */
 class ChatRepository {
-    fun getLastChatStreamForChannel(channelId: String, userId: String): LiveData<ChatMessage>? {
+    fun getLastChatStreamForChannel(channelId: String, userId: String): DataSource.Factory<Int, ChatMessage>?  {
         return KolDB.getDb()?.MessageDao()?.getLastMessageLivedataForChannel(channelId, userId)
     }
 

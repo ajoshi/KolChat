@@ -47,7 +47,6 @@ class MainActivity : AppCompatActivity(), ChatChannelList.ChatChannelInteraction
 
         setContentView(R.layout.activity_main)
         if (launchLoginActivityIfLoggedOut()) {
-            // getnetwork can not return null if logged in so ignore bad static analysis
             if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean(KEY_PREF_SEND_USERNAME, true)) {
                 // dont' log username unconditionally, but if the user has allowed it, then set it
                 Crashlytics.setUserIdentifier(getCurrentUser()?.name)
@@ -221,7 +220,8 @@ class MainActivity : AppCompatActivity(), ChatChannelList.ChatChannelInteraction
                     channelName = plainTextName,
                     channelId = channel.id,
                     isPrivate = channel.isPrivate,
-                    isComposerDisabled = rolloverBroadcastReceiver.isRollover)
+                    isComposerDisabled = rolloverBroadcastReceiver.isRollover,
+                    shouldUseAndroidxPaging = PreferenceManager.getDefaultSharedPreferences(this).getBoolean(KEY_PREF_ANDROIDX_PAGING, false) )
             navController?.let { controller ->
                 controller.navigate(R.id.nav_chat_message, b)
                 // not setting the label here because 'currentDestination' is still the old page

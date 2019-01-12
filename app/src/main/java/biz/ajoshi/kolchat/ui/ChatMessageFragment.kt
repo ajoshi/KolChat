@@ -12,24 +12,29 @@ import biz.ajoshi.kolchat.Analytics
 import biz.ajoshi.kolchat.EVENT_ATTRIBUTE_TIME_TAKEN
 import biz.ajoshi.kolchat.R
 import biz.ajoshi.kolchat.chat.ChatMessageViewModel
+import biz.ajoshi.kolchat.chat.view.ChatMessageVH
+import biz.ajoshi.kolchat.chat.view.PagingChatAdapter
 import biz.ajoshi.kolchat.chat.view.customviews.ChatDetailList
 import biz.ajoshi.kolchat.chat.view.customviews.ChatInputView
 import biz.ajoshi.kolchat.chat.view.customviews.QuickCommand
 import biz.ajoshi.kolchat.chat.view.customviews.QuickCommandView
+import biz.ajoshi.kolchat.persistence.chat.ChatMessage
 import com.crashlytics.android.answers.ContentViewEvent
 import kotlinx.android.synthetic.main.chat_detail.*
+
 
 /**
  * Fragment displaying a conversation in a channel or with a user. Uses the arch components instead of rxjava
  */
 // TODO give new values when fully moving to arch components
 class ChatMessageFragment : BaseFragment(), QuickCommandView.CommandClickListener, ChatDetailList.ChatMessagesLoaderView {
-    var id = "newbie"
-    var name = "newbie"
-    var isPrivate = false
-    var chatLoadStartTimestamp = 0L
-    var isComposerDisabled = true
-    lateinit var currentUserId: String
+    private var id = "newbie"
+    private var name = "newbie"
+    private var isPrivate = false
+    private var chatLoadStartTimestamp = 0L
+    private var isComposerDisabled = true
+    private lateinit var currentUserId: String
+    private var shouldUseAndroidxPaging: Boolean = false
 
     var chatDetailList: ChatDetailList? = null
     var inputView: ChatInputView? = null
@@ -42,6 +47,7 @@ class ChatMessageFragment : BaseFragment(), QuickCommandView.CommandClickListene
             isPrivate = args.getBoolean((EXTRA_CHANNEL_IS_PRIVATE))
             isComposerDisabled = args.getBoolean(EXTRA_CHANNEL_IS_COMPOSER_DISABLED)
             currentUserId = args.getString(EXTRA_CURRENT_USER_ID)!!
+            shouldUseAndroidxPaging = args.getBoolean(EXTRA_USE_ANDROIDX_PAGING, false)
         }
         super.onCreate(savedInstanceState)
     }
@@ -73,7 +79,14 @@ class ChatMessageFragment : BaseFragment(), QuickCommandView.CommandClickListene
         }
 
         chatLoadStartTimestamp = System.currentTimeMillis()
-        chatDetailList?.loadInitialMessages(id, currentUserId, this)
+        if (shouldUseAndroidxPaging) {
+            // the paginglist needs the parent fragment to get the vm, so it can't load data on its own. So we trigger it here
+            loadPagedList()
+        } else {
+            // paginglist will load its messages on its own
+            // TODO if paginglist actually becomes stable and usable, this should be revisited
+            chatDetailList?.loadInitialMessages(id, currentUserId, this)
+        }
 
         inputView?.isEnabled = !isComposerDisabled
         inputView?.setSubmitListener { input: CharSequence? -> makePost(input, isPrivate, id) }
@@ -89,6 +102,26 @@ class ChatMessageFragment : BaseFragment(), QuickCommandView.CommandClickListene
             // maybe this should check parent fragments as well?
             throw ClassCastException("Activity must implement ChatDetailList.MessageClickListener")
         }
+    }
+
+    /**
+     * Loads the paged list of chats for this channel. Sets the adapter to the paged adapter which seems buggy
+     */
+    private fun loadPagedList() {
+        val vm: ChatMessageViewModel = ViewModelProviders.of(this).get(ChatMessageViewModel::class.java)
+
+        val adapter = PagingChatAdapter(chatDetailList!!.chatAdapter.layoutMgr, object : ChatMessageVH.MessageClickListener {
+            override fun onMessageLongClicked(message: ChatMessage) {
+                onMessageLongClicked(message = message)
+            }
+        })
+        vm.getLastChatObservable(id, currentUserId)?.observe(this, Observer { pagedList ->
+            adapter.submitList(pagedList)
+            adapter.scrollToBottomOnceAndThenThreshold()
+        })
+        chatDetailList?.adapter = adapter
+
+        // how do we log perf metrics in this? can we?
     }
 
     /*
@@ -124,17 +157,21 @@ class ChatMessageFragment : BaseFragment(), QuickCommandView.CommandClickListene
         val EXTRA_CHANNEL_IS_PRIVATE = "biz.ajoshi.kolchat.ExtraChannelPrivate"
         // lets the app disable the input view if it wants. doesn't let it disable when the fragment is already up, but nbd
         val EXTRA_CHANNEL_IS_COMPOSER_DISABLED = "biz.ajoshi.kolchat.ExtraChannelIsComposerDisabled"
+        // lets the app enable or disable androidx paging. Not fully done
+        val EXTRA_USE_ANDROIDX_PAGING = "biz.ajoshi.kolchat.ExtraUseAndroidxPaging"
+
         /**
          * Creates a bundle for a Chat Message Fragment with the passed in properties.
          */
         fun getBundleForChatMessageFragment(currentUserId: String, channelName: String, channelId: String, isPrivate: Boolean,
-                                            isComposerDisabled: Boolean): Bundle {
+                                            isComposerDisabled: Boolean, shouldUseAndroidxPaging: Boolean): Bundle {
             val b = Bundle()
             b.putString(EXTRA_CHANNEL_NAME, channelName)
             b.putString(EXTRA_CHANNEL_ID, channelId)
             b.putString(EXTRA_CURRENT_USER_ID, currentUserId)
             b.putBoolean(EXTRA_CHANNEL_IS_PRIVATE, isPrivate)
             b.putBoolean(EXTRA_CHANNEL_IS_COMPOSER_DISABLED, isComposerDisabled)
+            b.putBoolean(EXTRA_USE_ANDROIDX_PAGING, shouldUseAndroidxPaging)
             return b
         }
     }

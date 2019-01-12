@@ -3,6 +3,7 @@ package biz.ajoshi.kolchat.persistence.chat;
 import java.util.List;
 
 import androidx.lifecycle.LiveData;
+import androidx.paging.DataSource;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
@@ -28,8 +29,8 @@ public interface MessageDao {
     @Query("SELECT * FROM chatmessage WHERE channelId = :channel_id AND currentUserId = :user_id ORDER BY timeStamp ASC LIMIT 1")
     Flowable<ChatMessage> getLastMessageForChannel(String channel_id, String user_id);
 
-    @Query("SELECT * FROM chatmessage WHERE channelId = :channel_id AND currentUserId = :user_id ORDER BY timeStamp ASC LIMIT 1")
-    LiveData<ChatMessage> getLastMessageLivedataForChannel(String channel_id, String user_id);
+    @Query("SELECT * FROM chatmessage WHERE channelId = :channel_id AND currentUserId = :user_id ORDER BY timeStamp ASC")
+    DataSource.Factory<Integer, ChatMessage>  getLastMessageLivedataForChannel(String channel_id, String user_id);
 
     /*
      * We want to show all commands inserted into the db after a given time, but we also don't want to get the newest

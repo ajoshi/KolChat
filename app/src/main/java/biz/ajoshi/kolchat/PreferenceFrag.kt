@@ -10,6 +10,7 @@ const val KEY_PREF_SEND_LOGS = "pref_send_logs"
 const val KEY_PREF_TRACK_EVENTs = "pref_track_events"
 const val KEY_PREF_ENABLE_POLL = "pref_enable_poll"
 const val KEY_PREF_SUPER_FAST_POLL = "pref_super_fast_poll"
+const val KEY_PREF_ANDROIDX_PAGING = "pref_use_androidx_paging"
 
 private const val ARG_ROOTKEY = "arg_rootkey"
 

@@ -94,7 +94,8 @@ dependencies {
 
     // optional - Test helpers
  //   androidTestImplementation "android.arch.navigation:navigation-testing-ktx:$nav_version"
-    implementation 'android.arch.navigation:navigation-fragment:1.0.0-alpha06' // use -ktx for Kotlin
+    implementation "android.arch.navigation:navigation-fragment:$nav_version"
+    implementation "androidx.paging:paging-runtime-ktx:paging_version"
 
 }
 repositories {

@@ -51,7 +51,11 @@ class ChatMessageVH(itemView: View, val listener: MessageClickListener) : androi
         chatMessageTv?.setOnLongClickListener(longClickListener)
     }
 
-    fun bind(message: ChatMessage) {
+    fun bind(messages: ChatMessage?) {
+        var message = messages
+        if (message == null) {
+            message = ChatMessage(12345678, "id", "name", "message", "games", System.currentTimeMillis(), System.currentTimeMillis(), false, "500")
+        }
         chatmessage = message
         // TODO don't do all this excessive computation on ui thread. maybe use Transform/Map to convert to some ui model
         if (message.shouldHideUsername()) {
