@@ -64,7 +64,6 @@ class ChatMessageFragment : BaseFragment(), QuickCommandView.CommandClickListene
                 findNavController(it).currentDestination?.label = getTitle()
             }
         }
-
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -112,7 +111,7 @@ class ChatMessageFragment : BaseFragment(), QuickCommandView.CommandClickListene
 
         val adapter = PagingChatAdapter(chatDetailList!!.chatAdapter.layoutMgr, object : ChatMessageVH.MessageClickListener {
             override fun onMessageLongClicked(message: ChatMessage) {
-                onMessageLongClicked(message = message)
+                (activity as ChatDetailList.MessageClickListener).onMessageLongClicked(message)
             }
         })
         vm.getLastChatObservable(id, currentUserId)?.observe(this, Observer { pagedList ->
