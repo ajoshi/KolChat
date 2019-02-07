@@ -415,8 +415,14 @@ public class Network {
         String redirectLocation = chatResponse.header("location");
         if (redirectLocation != null &&
             (redirectLocation.contains(MAINT_POSTFIX) || (redirectLocation.contains("login.php")))) {
-            // RO time or we got logged out
-            return onRollover();
+            // RO time or we got logged out- it seems reads no longer redirect to maint.php
+            if(login().isSuccessful()) {
+                // try to log in again and make request again
+                return postUrl(url, body);
+            } else {
+                // definitely RO time
+                return onRollover();
+            }
         }
         String response = null;
         ResponseBody responseBody = chatResponse.body();
