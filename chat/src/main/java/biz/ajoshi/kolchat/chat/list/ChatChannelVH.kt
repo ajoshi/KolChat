@@ -1,8 +1,10 @@
-package biz.ajoshi.kolchat.chat.view
+package biz.ajoshi.kolchat.chat.list
 
 import android.text.format.DateUtils
 import android.view.View
 import biz.ajoshi.commonutils.StringUtilities
+import biz.ajoshi.kolchat.chat.chatMessageDateFormat
+import biz.ajoshi.kolchat.chat.chatMessageTimeFormat
 import biz.ajoshi.kolchat.persistence.chat.ChatChannel
 import kotlinx.android.synthetic.main.channel_list_item.view.*
 import java.util.*
@@ -50,7 +52,7 @@ open class ChatChannelVH(itemView: View, val listener: ChannelRowClickListener?)
  * Viewholder for an entry in the chat channel list for a private message
  */
 // TODO use composition instead of inheritance?
-class ChatUserVH(itemView: View, listener: ChatChannelVH.ChannelRowClickListener?) : ChatChannelVH(itemView = itemView, listener = listener) {
+class ChatUserVH(itemView: View, listener: ChannelRowClickListener?) : ChatChannelVH(itemView = itemView, listener = listener) {
     init {
         // this is a PM, so show the PM icon
         itemView.pm_indicator?.visibility = View.VISIBLE

@@ -13,8 +13,8 @@ import biz.ajoshi.kolchat.R
 import biz.ajoshi.kolchat.chat.ACTION_CHAT_COMMAND_FAILED
 import biz.ajoshi.kolchat.chat.ChatSingleton
 import biz.ajoshi.kolchat.chat.EXTRA_FAILED_CHAT_MESSAGE
-import biz.ajoshi.kolchat.chat.view.customviews.ChatChannelList
-import biz.ajoshi.kolchat.chat.view.customviews.NewChatFAB
+import biz.ajoshi.kolchat.chat.list.ChatChannelList
+import biz.ajoshi.kolchat.chat.detail.customviews.NewChatFAB
 import com.google.android.material.snackbar.Snackbar.LENGTH_LONG
 import kotlinx.android.synthetic.main.channel_list.*
 

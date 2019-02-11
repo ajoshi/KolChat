@@ -1,12 +1,11 @@
-package biz.ajoshi.kolchat.chat.view.customviews
+package biz.ajoshi.kolchat.chat.list
 
 import android.content.Context
 import android.util.AttributeSet
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.ItemTouchHelper.LEFT
 import androidx.recyclerview.widget.ItemTouchHelper.SimpleCallback
-import biz.ajoshi.kolchat.chat.view.ChatChannelAdapter
-import biz.ajoshi.kolchat.chat.view.ChatChannelAdapter.ChannelClickListener
+import biz.ajoshi.kolchat.chat.list.ChatChannelAdapter.ChannelClickListener
 import biz.ajoshi.kolchat.persistence.KolDB
 import biz.ajoshi.kolchat.persistence.chat.ChatChannel
 import io.reactivex.android.schedulers.AndroidSchedulers

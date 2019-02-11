@@ -1,4 +1,4 @@
-package biz.ajoshi.kolchat.chat.view.customviews;
+package biz.ajoshi.kolchat.chat.detail.customviews;
 
 import androidx.annotation.Nullable;
 import biz.ajoshi.kolchat.chat.R;

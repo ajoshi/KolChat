@@ -1,4 +1,4 @@
-package biz.ajoshi.kolchat.chat.view.customviews
+package biz.ajoshi.kolchat.chat.detail.customviews
 
 import android.content.Context
 import android.util.AttributeSet
@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.recyclerview.widget.LinearLayoutManager
 import biz.ajoshi.kolchat.chat.R
 
 /**

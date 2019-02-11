@@ -1,4 +1,4 @@
-package biz.ajoshi.kolchat.chat.view
+package biz.ajoshi.kolchat.chat.list
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

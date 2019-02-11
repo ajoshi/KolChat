@@ -1,11 +1,9 @@
-package biz.ajoshi.kolchat.chat.view.customviews
+package biz.ajoshi.kolchat.chat.detail
 
 import android.content.Context
 import android.os.AsyncTask
 import android.util.AttributeSet
 import androidx.room.EmptyResultSetException
-import biz.ajoshi.kolchat.chat.view.ChatAdapter
-import biz.ajoshi.kolchat.chat.view.ChatMessageVH
 import biz.ajoshi.kolchat.persistence.KolDB
 import biz.ajoshi.kolchat.persistence.chat.ChatMessage
 import io.reactivex.Observable
@@ -44,11 +42,11 @@ class ChatDetailList : androidx.recyclerview.widget.RecyclerView {
         adapter = chatAdapter
         layoutManager = layoutMgr
         // scroll when the keyboard comes up
-        addOnLayoutChangeListener({ _, _, _, _, bottom, _, _, _, oldBottom ->
+        addOnLayoutChangeListener { _, _, _, _, bottom, _, _, _, oldBottom ->
             if (bottom < oldBottom) {
-                post({ chatAdapter.scrollToBottom(16) })
+                post { chatAdapter.scrollToBottom(16) }
             }
-        })
+        }
     }
 
     /**
@@ -74,7 +72,10 @@ class ChatDetailList : androidx.recyclerview.widget.RecyclerView {
                     } catch (e: EmptyResultSetException) {
                         // we've never chatted in this room/with this person before. Hardly an issue
                     }
-                    getMessagesForChannel(channelId, userId = currentUserId)
+                    KolDB.getDb()
+                            ?.MessageDao()
+                            ?.getMessagesForChannel(channelId, currentUserId)
+                    //getMessagesForChannel(channelId, userId = currentUserId)
                 }
 
                 ?.observeOn(Schedulers.computation())

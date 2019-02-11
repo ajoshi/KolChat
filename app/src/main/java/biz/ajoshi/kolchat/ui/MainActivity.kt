@@ -20,8 +20,8 @@ import biz.ajoshi.kolchat.*
 import biz.ajoshi.kolchat.R
 import biz.ajoshi.kolchat.accounts.KolAccountManager
 import biz.ajoshi.kolchat.chat.*
-import biz.ajoshi.kolchat.chat.view.customviews.ChatChannelList
-import biz.ajoshi.kolchat.chat.view.customviews.ChatDetailList
+import biz.ajoshi.kolchat.chat.list.ChatChannelList
+import biz.ajoshi.kolchat.chat.detail.ChatDetailList
 import biz.ajoshi.kolchat.persistence.KolDB
 import biz.ajoshi.kolchat.persistence.chat.ChatChannel
 import biz.ajoshi.kolchat.persistence.chat.ChatMessage

@@ -1,4 +1,4 @@
-package biz.ajoshi.kolchat.chat.view
+package biz.ajoshi.kolchat.chat.detail
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -13,6 +13,8 @@ import biz.ajoshi.kolchat.persistence.chat.ChatMessage
  */
 class PagingChatAdapter(val layoutMgr: androidx.recyclerview.widget.LinearLayoutManager, val listener: ChatMessageVH.MessageClickListener) :
         PagedListAdapter<ChatMessage, ChatMessageVH>(DIFF_CALLBACK) {
+    private var started = false
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatMessageVH {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.chat_message, parent, false)
         return ChatMessageVH(view, listener)
@@ -26,7 +28,7 @@ class PagingChatAdapter(val layoutMgr: androidx.recyclerview.widget.LinearLayout
             // Null defines a placeholder item - PagedListAdapter automatically
             // invalidates this row when the actual object is loaded from the
             // database.
-            holder.bind(null)
+        //    holder.bind(null)
         }
     }
 
@@ -60,7 +62,9 @@ class PagingChatAdapter(val layoutMgr: androidx.recyclerview.widget.LinearLayout
         }
     }
 
-    var started = false
+    /**
+     * Scrolls to the bottom ASAP and then only scrolls down if the user has scrolled up beyond the threshold
+     */
     fun scrollToBottomOnceAndThenThreshold() {
         if (!started) {
             scrollToBottomAlways()

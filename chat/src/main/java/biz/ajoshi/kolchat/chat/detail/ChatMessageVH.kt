@@ -1,4 +1,4 @@
-package biz.ajoshi.kolchat.chat.view
+package biz.ajoshi.kolchat.chat.detail
 
 import android.net.Uri
 import android.text.format.DateUtils
@@ -8,6 +8,8 @@ import android.view.View
 import android.widget.TextView
 import biz.ajoshi.commonutils.StringUtilities
 import biz.ajoshi.kolchat.chat.R
+import biz.ajoshi.kolchat.chat.chatMessageDateTimeFormat
+import biz.ajoshi.kolchat.chat.chatMessageTimeFormat
 import biz.ajoshi.kolchat.persistence.chat.ChatMessage
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.drawee.generic.GenericDraweeHierarchyBuilder

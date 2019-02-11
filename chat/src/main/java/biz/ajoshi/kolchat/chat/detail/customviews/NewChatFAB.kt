@@ -1,4 +1,4 @@
-package biz.ajoshi.kolchat.chat.view.customviews
+package biz.ajoshi.kolchat.chat.detail.customviews
 
 import android.content.Context
 import android.content.DialogInterface
