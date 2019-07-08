@@ -28,4 +28,7 @@
     <dimen name="quick_command_margin_horizontal">3dp</dimen>
     <dimen name="quick_command_margin_vertical">2dp</dimen>
     <dimen name="quick_command_padding">4dp</dimen>
+
+    <!-- Padding for the custom title view for dialog shown when long pressing a message -->
+    <dimen name="chat_dialog_title_padding">5dp</dimen>
 </resources>
