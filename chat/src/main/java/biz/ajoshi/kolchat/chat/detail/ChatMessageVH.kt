@@ -60,13 +60,13 @@ class ChatMessageVH(itemView: View, val listener: MessageClickListener) : androi
         }
         chatmessage = message
         // TODO don't do all this excessive computation on ui thread. maybe use Transform/Map to convert to some ui model
-        if (message.shouldHideUsername()) {
+        if (chatmessage.shouldHideUsername()) {
             userNameTv?.visibility = View.GONE
         } else {
-            userNameTv?.text = StringUtilities.getHtml(message.userName)
+            userNameTv?.text = StringUtilities.getHtml(chatmessage.userName)
             userNameTv?.visibility = View.VISIBLE
         }
-        val oldSpannable = StringUtilities.getHtml(message.text)
+        val oldSpannable = StringUtilities.getHtml(chatmessage.text)
         val newSpannable = DraweeSpanStringBuilder(oldSpannable)
         val imageSpans = newSpannable.getSpans(0, oldSpannable.length, ImageSpan::class.java)
         val embeddedImageSize = itemView.context.resources.getDimensionPixelSize(R.dimen.chat_message_embedded_image_size)
@@ -82,7 +82,7 @@ class ChatMessageVH(itemView: View, val listener: MessageClickListener) : androi
                     , false, DraweeSpan.ALIGN_CENTER)
         }
         chatMessageTv?.setDraweeSpanStringBuilder(newSpannable)
-        val time = message.timeStamp * 1000 //or use message.localtimeStamp
+        val time = chatmessage.timeStamp * 1000 //or use message.localtimeStamp
         date.time = time
         timeStampTv?.text = if (DateUtils.isToday(time)) {
             // if this is today then no need to show date

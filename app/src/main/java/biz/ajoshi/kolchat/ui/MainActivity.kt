@@ -1,7 +1,6 @@
 package biz.ajoshi.kolchat.ui
 
-import android.content.ComponentName
-import android.content.Intent
+import android.content.*
 import android.os.AsyncTask
 import android.os.Bundle
 import android.view.Menu
@@ -19,19 +18,23 @@ import biz.ajoshi.commonutils.StringUtilities
 import biz.ajoshi.kolchat.*
 import biz.ajoshi.kolchat.R
 import biz.ajoshi.kolchat.accounts.KolAccountManager
+import biz.ajoshi.kolchat.background.DeleteChannelTask
 import biz.ajoshi.kolchat.chat.*
 import biz.ajoshi.kolchat.chat.list.ChatChannelList
 import biz.ajoshi.kolchat.chat.detail.ChatDetailList
+import biz.ajoshi.kolchat.chat.detail.ChatMessageDetailDialog
+import biz.ajoshi.kolchat.chat.detail.MessageDetailDialogListener
 import biz.ajoshi.kolchat.persistence.KolDB
 import biz.ajoshi.kolchat.persistence.chat.ChatChannel
 import biz.ajoshi.kolchat.persistence.chat.ChatMessage
 import biz.ajoshi.kolnetwork.model.User
 import com.crashlytics.android.Crashlytics
 import com.crashlytics.android.answers.CustomEvent
+import com.google.android.material.snackbar.Snackbar
 
 const val action_navigate_to_chat_detail = "biz.ajoshi.kolchat.ui.MainActivity.ACTION_NAVIGATE_TO_CHAT_DETAIL"
 
-class MainActivity : AppCompatActivity(), ChatChannelList.ChatChannelInteractionListener, ChatDetailList.MessageClickListener, NavController.OnDestinationChangedListener {
+class MainActivity : AppCompatActivity(), ChatChannelList.ChatChannelInteractionListener, ChatDetailList.MessageClickListener, NavController.OnDestinationChangedListener, MessageDetailDialogListener {
     private var toolbar: Toolbar? = null
     private var navController: NavController? = null
     private val rolloverBroadcastReceiver = biz.ajoshi.kolchat.accounts.RolloverBroadcastReceiver()
@@ -253,11 +256,11 @@ class MainActivity : AppCompatActivity(), ChatChannelList.ChatChannelInteraction
         AlertDialog.Builder(this)
                 .setTitle(R.string.remove_chat_dialog_title)
                 .setMessage(removeChatMessage)
-                .setPositiveButton(R.string.remove_chat_dialog_option_yes, { _, _ ->
+                .setPositiveButton(R.string.remove_chat_dialog_option_yes) { _, _ ->
                     // delete the channel
                     val deleteTask = DeleteChannelTask()
                     deleteTask.execute(channel)
-                })
+                }
                 .setNegativeButton(R.string.remove_chat_dialog_option_no, null).show()
     }
 
@@ -268,8 +271,25 @@ class MainActivity : AppCompatActivity(), ChatChannelList.ChatChannelInteraction
         // trying to open a new chat? Go back to main list first to keep backstack simple
         // needed because nav components have bad support for programmatic label/toolbar title setting
         //    navController?.popBackStack()
+        // show options for this chat message
+                ChatMessageDetailDialog(context = this)
+                        .createDialog(message = message, listener = this)
+                        .show()
+    }
+
+    override fun sendPm(message: ChatMessage) {
         onChannelClicked(ChatChannel(message.userId, true, message.userName, "", 0, "", 0))
     }
+
+        override fun copyText(text: CharSequence) {
+                val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                val clip: ClipData = ClipData.newPlainText(getString(R.string.app_name), text)
+                clipboard.primaryClip = clip
+            }
+
+        override fun showText(text: CharSequence) {
+                Snackbar.make(findViewById<View>(R.id.llist), text, Snackbar.LENGTH_LONG).show()
+            }
 
     /*************************************************************   Handle Navigation   ************************/
 
@@ -356,19 +376,7 @@ class MainActivity : AppCompatActivity(), ChatChannelList.ChatChannelInteraction
     }
 }
 
-class DeleteChannelTask() : AsyncTask<ChatChannel, Unit, Unit>() {
-    override fun doInBackground(vararg params: ChatChannel?) {
-        for (channel in params) {
-            // I'll never send more than one (I think) but whatever
-            channel?.let {
-                // delete the messages in this channel
-                KolDB.getDb()?.MessageDao()?.deleteAllForChannelId(it.id)
-                // delete this channel as well
-                KolDB.getDb()?.ChannelDao()?.delete(it)
-            }
-        }
-    }
-}
+
 
 /*
 
