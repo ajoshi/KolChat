@@ -5,20 +5,29 @@ import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
 @Entity
-public class ChatMessage {
+public class ChatMessage implements Cloneable {
     @PrimaryKey(autoGenerate = true)
     private int id;
+    /**
+     * Id of the user sending this message
+     */
     private String userId;
     private String userName;
     private String text;
+    /**
+     * Id of the channel this was posted in
+     */
     private String channelId;
     private long timeStamp;
     private long localtimeStamp;
+    /**
+     * True if the username should be hidden: Useful when displaying /me messages
+     */
     private boolean shouldHideUsername;
     private String currentUserId;
 
     public ChatMessage(int id, String userId, String userName, String text, String channelId, long timeStamp,
-            long localtimeStamp, boolean shouldHideUsername, String currentUserId) {
+                       long localtimeStamp, boolean shouldHideUsername, String currentUserId) {
 
         this.id = id;
         this.userId = userId;
@@ -102,6 +111,11 @@ public class ChatMessage {
 
     public void setCurrentUserID(String currentUserId) {
         this.currentUserId = currentUserId;
+    }
+
+    @Override
+    public ChatMessage clone() {
+        return new ChatMessage(id, userId, userName, text, channelId, timeStamp, localtimeStamp, shouldHideUsername, currentUserId);
     }
 
     @Override
