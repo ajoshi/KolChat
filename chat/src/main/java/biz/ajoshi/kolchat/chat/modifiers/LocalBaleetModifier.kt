@@ -1,6 +1,5 @@
 package biz.ajoshi.kolchat.chat.modifiers
 
-import biz.ajoshi.kolchat.chat.detail.customviews.NewChatFAB
 import biz.ajoshi.kolchat.persistence.chat.ChatMessage
 
 /**

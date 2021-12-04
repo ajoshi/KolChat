@@ -14,7 +14,12 @@ object ChatSingleton {
     var network: biz.ajoshi.kolnetwork.Network? = null
     val tag = "ChatSingleton"
 
-    fun login(username: String, password: String, silent: Boolean, context: Context): NetworkStatus {
+    fun login(
+        username: String,
+        password: String,
+        silent: Boolean,
+        context: Context
+    ): NetworkStatus {
         network = biz.ajoshi.kolnetwork.Network(username, password, silent)
         network?.let {
             val status: NetworkStatus
@@ -26,13 +31,21 @@ object ChatSingleton {
             }
             // return whatever the failure status was
             if (!it.isLoggedIn) return status
-            chatManager = ChatManager(it, context.getSharedPreferences(CHAT_SHARED_PREF_NAME, Context.MODE_PRIVATE))
+            chatManager = ChatManager(
+                it,
+                context.getSharedPreferences(CHAT_SHARED_PREF_NAME, Context.MODE_PRIVATE)
+            )
             return status
         }
         return NetworkStatus.FAILURE
     }
 
-    fun loginIfNeeded(username: String, password: String, silent: Boolean, context: Context): NetworkStatus {
+    fun loginIfNeeded(
+        username: String,
+        password: String,
+        silent: Boolean,
+        context: Context
+    ): NetworkStatus {
         if (network == null) {
             return login(username, password, silent, context)
         }

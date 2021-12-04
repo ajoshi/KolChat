@@ -1,8 +1,5 @@
 package biz.ajoshi.kolchat.chat.detail.customviews;
 
-import androidx.annotation.Nullable;
-import biz.ajoshi.kolchat.chat.R;
-
 import android.content.Context;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -16,6 +13,10 @@ import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
+
+import androidx.annotation.Nullable;
+
+import biz.ajoshi.kolchat.chat.R;
 
 /**
  * Shows an input area and a submit button. Button is enabled when text is entered into the edittext
@@ -32,8 +33,7 @@ public class ChatInputView extends RelativeLayout {
         /**
          * The user wants to submit this text so make a network call to do so
          *
-         * @param text
-         *         Text to submit to the server
+         * @param text Text to submit to the server
          */
         void onSubmit(CharSequence text);
     }
@@ -55,8 +55,7 @@ public class ChatInputView extends RelativeLayout {
     /**
      * Inflates the views in the layout.
      *
-     * @param context
-     *         the current context for the view.
+     * @param context the current context for the view.
      */
     private void initializeViews(Context context) {
         LayoutInflater inflater = (LayoutInflater) context
@@ -120,8 +119,7 @@ public class ChatInputView extends RelativeLayout {
     /**
      * Enabled and disabled the submit button.
      *
-     * @param shouldEnable
-     *         true to enable the button, else false
+     * @param shouldEnable true to enable the button, else false
      */
     private void shouldEnableSubmitButton(boolean shouldEnable) {
         submitButton.setEnabled(shouldEnable);
@@ -130,8 +128,7 @@ public class ChatInputView extends RelativeLayout {
     /**
      * Sets a new listener to be invoked when the submit button is tapped
      *
-     * @param newListener
-     *         the listener to be called when submit button is tapped. Replaces the old listener
+     * @param newListener the listener to be called when submit button is tapped. Replaces the old listener
      */
     public void setSubmitListener(SubmitListener newListener) {
         listener = newListener;
@@ -140,8 +137,7 @@ public class ChatInputView extends RelativeLayout {
     /**
      * Sets the input field text to the given value
      *
-     * @param text
-     *         new value of the input field
+     * @param text new value of the input field
      */
     public void setInputText(CharSequence text) {
         inputField.setText(text);
@@ -159,9 +155,7 @@ public class ChatInputView extends RelativeLayout {
     /**
      * Appends the given text to whatever is currently in the input field
      *
-     * @param text
-     *         CharSequence to append to the input field
-     *
+     * @param text CharSequence to append to the input field
      * @return the new input field value
      */
     public Editable appendInputText(CharSequence text) {

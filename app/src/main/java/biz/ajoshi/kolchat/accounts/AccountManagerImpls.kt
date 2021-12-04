@@ -15,29 +15,56 @@ import android.os.IBinder
  * Perhaps it would be easier to just encrypt and store auth creds in a file/sharedprefs?
  */
 class FakeAcctAuthenticator(context: Context?) : AbstractAccountAuthenticator(context) {
-    override fun confirmCredentials(response: AccountAuthenticatorResponse?, account: Account?, options: Bundle?): Bundle {
+    override fun confirmCredentials(
+        response: AccountAuthenticatorResponse?,
+        account: Account?,
+        options: Bundle?
+    ): Bundle {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun updateCredentials(response: AccountAuthenticatorResponse?, account: Account?, authTokenType: String?, options: Bundle?): Bundle {
+    override fun updateCredentials(
+        response: AccountAuthenticatorResponse?,
+        account: Account?,
+        authTokenType: String?,
+        options: Bundle?
+    ): Bundle {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun getAuthToken(response: AccountAuthenticatorResponse?, account: Account?, authTokenType: String?, options: Bundle?): Bundle {
+    override fun getAuthToken(
+        response: AccountAuthenticatorResponse?,
+        account: Account?,
+        authTokenType: String?,
+        options: Bundle?
+    ): Bundle {
         val accountBundle = Bundle()
 
         return accountBundle
     }
 
-    override fun hasFeatures(response: AccountAuthenticatorResponse?, account: Account?, features: Array<out String>?): Bundle {
+    override fun hasFeatures(
+        response: AccountAuthenticatorResponse?,
+        account: Account?,
+        features: Array<out String>?
+    ): Bundle {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun editProperties(response: AccountAuthenticatorResponse?, accountType: String?): Bundle {
+    override fun editProperties(
+        response: AccountAuthenticatorResponse?,
+        accountType: String?
+    ): Bundle {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun addAccount(response: AccountAuthenticatorResponse?, accountType: String?, authTokenType: String?, requiredFeatures: Array<out String>?, options: Bundle?): Bundle {
+    override fun addAccount(
+        response: AccountAuthenticatorResponse?,
+        accountType: String?,
+        authTokenType: String?,
+        requiredFeatures: Array<out String>?,
+        options: Bundle?
+    ): Bundle {
         val accountBundle = Bundle()
 
         return accountBundle
@@ -49,7 +76,7 @@ class FakeAcctAuthenticator(context: Context?) : AbstractAccountAuthenticator(co
 
 }
 
-class FakeAuthService: Service() {
+class FakeAuthService : Service() {
 
     var authenticator: FakeAcctAuthenticator? = null
 

@@ -12,7 +12,8 @@ import java.util.*
 /**
  * Viewholder for an entry in the chat channel list for a public channel
  */
-open class ChatChannelVH(binding: ChannelListItemBinding, val listener: ChannelRowClickListener?) : androidx.recyclerview.widget.RecyclerView.ViewHolder(binding.root) {
+open class ChatChannelVH(binding: ChannelListItemBinding, val listener: ChannelRowClickListener?) :
+    androidx.recyclerview.widget.RecyclerView.ViewHolder(binding.root) {
 
     /**
      * Called when a channel is tapped on. Implementor gets the channel data and can do whatever it wants
@@ -52,7 +53,8 @@ open class ChatChannelVH(binding: ChannelListItemBinding, val listener: ChannelR
  * Viewholder for an entry in the chat channel list for a private message
  */
 // TODO use composition instead of inheritance?
-class ChatUserVH(binding: ChannelListItemBinding, listener: ChannelRowClickListener?) : ChatChannelVH(binding = binding, listener = listener) {
+class ChatUserVH(binding: ChannelListItemBinding, listener: ChannelRowClickListener?) :
+    ChatChannelVH(binding = binding, listener = listener) {
     init {
         // this is a PM, so show the PM icon
         binding.pmIndicator.visibility = View.VISIBLE

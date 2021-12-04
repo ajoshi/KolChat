@@ -23,14 +23,19 @@ import java.io.IOException
 const val SYSTEM_USER_ID = "-1"
 const val SYSTEM_USER_NAME = "system"
 
-class ChatManager(val network: biz.ajoshi.kolnetwork.Network, internal val sharedPrefs: SharedPreferences) {
+class ChatManager(
+    val network: biz.ajoshi.kolnetwork.Network,
+    internal val sharedPrefs: SharedPreferences
+) {
     // when the last chat message was seen
     var lastSeen: Long = sharedPrefs.getLong(SHARED_PREF_LAST_FETCH_TIME, 0)
 
     // Each chat response contains this followed by the timestamp
     private val timeStampPrefix = "<!--lastseen:"
+
     // timestamp comes in a comment
     private val timeStampRegex = Regex("<!--lastseen:(\\d+)-->")
+
     // channelServer name regex. Channels might have numbers in them (talkie?)
     private val channelNameRegex = Regex("\\[(\\S+)\\]")
     private val userIdRegex = Regex("showplayer\\.php\\?who=(\\d+)['\"]")
@@ -88,16 +93,24 @@ class ChatManager(val network: biz.ajoshi.kolnetwork.Network, internal val share
         if (!output.isNullOrEmpty()) {
             // this was a chat command
             if (output.contains(chatCmdRedirectPrefix)) {
-                val redirectUrl = StringUtilities.getBetweenTwoStrings(output, chatCmdRedirectPrefix, "');)");
+                val redirectUrl =
+                    StringUtilities.getBetweenTwoStrings(output, chatCmdRedirectPrefix, "');)");
                 // this chat command was a redirect, so go to the actual php page (oh god), but ignore that one's response
                 network.getUrl(redirectUrl);
             }
-            val systemMessageUser = ServerChatChannel(name = SYSTEM_USER_NAME, id = SYSTEM_USER_ID, isPrivate = true)
+            val systemMessageUser =
+                ServerChatChannel(name = SYSTEM_USER_NAME, id = SYSTEM_USER_ID, isPrivate = true)
             // we want this message to show up in chat, but we also don't want it to look too new.
             // Since kol time != real time, we use the timestamp of the last received message as this one's timestamp.
             // Ensures that the next message received will always be seen as newer (wouldn't happen if we used local time)
-            val commandResponseMessage = ServerChatMessage(author = User(id = systemMessageUser.id, name = systemMessageUser.name),
-                    htmlText = output, channelNameServer = systemMessageUser, localTime = System.currentTimeMillis(), hideAuthorName = false, time = lastSeen)
+            val commandResponseMessage = ServerChatMessage(
+                author = User(id = systemMessageUser.id, name = systemMessageUser.name),
+                htmlText = output,
+                channelNameServer = systemMessageUser,
+                localTime = System.currentTimeMillis(),
+                hideAuthorName = false,
+                time = lastSeen
+            )
             parsedChat.add(commandResponseMessage)
         }
 
@@ -206,7 +219,10 @@ class ChatManager(val network: biz.ajoshi.kolnetwork.Network, internal val share
     /**
      * Handles chat response for one message in json format. Message can be PMs from/to me and public chats
      */
-    fun parseChatMessageJsonObject(chatMessageJson: JSONObject, currentTime: Long): ServerChatMessage {
+    fun parseChatMessageJsonObject(
+        chatMessageJson: JSONObject,
+        currentTime: Long
+    ): ServerChatMessage {
         val currentUser = network.currentUser.player
 //{"msgs":[{"type":"private","who":{"id":"2239681","name":"Corman","color":"black"},"for":{"id":"2129446","name":"ajoshi","color":"black"},"msg":"Butts","time":1505616130,"format":0}]}
         //{"output":"<br><table><tr><td class=tiny><center><b>Players in this channel:<\/b><\/center><a target=mainpane href=\"showplayer.php?who=2129446\"><font color=blue>ajoshi<\/font><\/a>, <a target=mainpane href=\"showplayer.php?who=2239681\"><font color=black>Corman<\/font><\/a> (2&nbsp;total)<\/td><\/tr><\/table>","msgs":[]}
@@ -262,8 +278,10 @@ class ChatManager(val network: biz.ajoshi.kolnetwork.Network, internal val share
                 // this was a pm from me to someone else so ensure the channel name is right
                 val pmReceiver: JSONObject? = chatMessageJson.optJSONObject("for")
 
-                ServerChatChannel(name = pmReceiver?.getString("name") ?: name, id = pmReceiver?.getString("id")
-                        ?: id, isPrivate = channelIsPrivate)
+                ServerChatChannel(
+                    name = pmReceiver?.getString("name") ?: name, id = pmReceiver?.getString("id")
+                        ?: id, isPrivate = channelIsPrivate
+                )
             } else {
                 ServerChatChannel(name = name, id = id, isPrivate = channelIsPrivate)
             }
@@ -279,7 +297,7 @@ class ChatManager(val network: biz.ajoshi.kolnetwork.Network, internal val share
         val temptext = chatMessageJson.getString("msg")
         val text: String
         text = when (format) {
-        // Mod warnings need to be colored correctly. 3 is a red warning, 4 is a green announcement
+            // Mod warnings need to be colored correctly. 3 is a red warning, 4 is a green announcement
             3 -> "<font color=\"red\">" + replaceChatEffectImagesWithEmojis(temptext) + "</font>"
             4 -> "<font color=\"#117A65\">" + replaceChatEffectImagesWithEmojis(temptext) + "</font>"
             else -> {
@@ -288,7 +306,14 @@ class ChatManager(val network: biz.ajoshi.kolnetwork.Network, internal val share
         }
         val time = chatMessageJson.getLong("time")
 
-        val message = ServerChatMessage(author = User(id = id, name = name), htmlText = text, channelNameServer = channel, localTime = currentTime, hideAuthorName = isEmPost, time = time)
+        val message = ServerChatMessage(
+            author = User(id = id, name = name),
+            htmlText = text,
+            channelNameServer = channel,
+            localTime = currentTime,
+            hideAuthorName = isEmPost,
+            time = time
+        )
         return message
     }
 
@@ -337,7 +362,8 @@ class ChatManager(val network: biz.ajoshi.kolnetwork.Network, internal val share
             val channelNameStartIndex = chat.indexOf('[')
             // if [ is too late, then it's likely not a channelServer name
             if (channelNameStartIndex < 25) {
-                channelName = getStringUsingRegex(regex = channelNameRegex, sourceString = chat) ?: channelName
+                channelName = getStringUsingRegex(regex = channelNameRegex, sourceString = chat)
+                    ?: channelName
 //                val channelNameRegexMatches = channelNameRegex.find(chat)?.groups
 //                if (channelNameRegexMatches != null && channelNameRegexMatches.size > 1) {
 //                    channelServer = channelNameRegexMatches[1]?.value ?: "defaultChannel"
@@ -367,7 +393,8 @@ class ChatManager(val network: biz.ajoshi.kolnetwork.Network, internal val share
             if (tempUserName != null && tempUserName.contains("(private):")) {
                 tempUserName = tempUserName.replace(oldValue = " (private):", newValue = "")
                 // it's a pm so the channelServer name is the username
-                channelServer = ServerChatChannel(name = tempUserName, id = userId, isPrivate = true)
+                channelServer =
+                    ServerChatChannel(name = tempUserName, id = userId, isPrivate = true)
                 channelName = tempUserName
             }
 
@@ -410,11 +437,13 @@ class ChatManager(val network: biz.ajoshi.kolnetwork.Network, internal val share
 
             val username = tempUserName ?: ""
             //TODO clean up username
-            val chatObject = ServerChatMessage(author = User(id = userId, name = username),
-                    htmlText = chatText,
-                    channelNameServer = channelServer
-                            ?: ServerChatChannel(name = channelName, id = channelName, isPrivate = false),
-                    time = lastSeen, hideAuthorName = false, localTime = currentTime)
+            val chatObject = ServerChatMessage(
+                author = User(id = userId, name = username),
+                htmlText = chatText,
+                channelNameServer = channelServer
+                    ?: ServerChatChannel(name = channelName, id = channelName, isPrivate = false),
+                time = lastSeen, hideAuthorName = false, localTime = currentTime
+            )
             returnList.add(chatObject)
         }
         return returnList
@@ -461,9 +490,11 @@ class ChatManager(val network: biz.ajoshi.kolnetwork.Network, internal val share
         }
 
 
-        val imageBasePath = "<img src=\"https:\\/\\/s3\\.amazonaws\\.com\\/images\\.kingdomofloathing\\.com\\/otherimages\\/12x12%s\\.gif\" height=\"12\" width=\"12\" \\/>"
+        val imageBasePath =
+            "<img src=\"https:\\/\\/s3\\.amazonaws\\.com\\/images\\.kingdomofloathing\\.com\\/otherimages\\/12x12%s\\.gif\" height=\"12\" width=\"12\" \\/>"
         val skullRegex = Regex(imageBasePath.format("skull"))
         val heartRegex = Regex(imageBasePath.format("heart"))
+
         /**
          * Some chat effects have tiny images in them. Instead of converting these images to ImageSpans and then trying
          * to load the image, we just replace the img tags with emojis
@@ -476,8 +507,8 @@ class ChatManager(val network: biz.ajoshi.kolnetwork.Network, internal val share
 
             // I would have thought that using stringbuilders would be better here, but strings are much faster
             return input
-                    .replace(skullRegex, "☠")
-                    .replace(heartRegex, "❤")
+                .replace(skullRegex, "☠")
+                .replace(heartRegex, "❤")
         }
     }
 }

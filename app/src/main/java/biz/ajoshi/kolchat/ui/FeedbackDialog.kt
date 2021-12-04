@@ -17,15 +17,21 @@ class FeedbackDialog(val context: Context, val rootView: View) {
     fun createDialog(): AlertDialog {
         val builder = AlertDialog.Builder(context)
         return builder.setView(R.layout.dialog_send_feedback)
-                .setPositiveButton(R.string.feedback_dialog_submit, DialogInterface.OnClickListener { dialog, _ ->
+            .setPositiveButton(
+                R.string.feedback_dialog_submit,
+                DialogInterface.OnClickListener { dialog, _ ->
                     if (dialog is AlertDialog) {
                         val feedback = "" + dialog.findViewById<EditText>(R.id.feedback_text)?.text
                         Logg.i(feedback)
                         Crashlytics.logException(UserSentLogsEvent("User sent logs " + System.currentTimeMillis()))
-                        com.google.android.material.snackbar.Snackbar.make(rootView, "Logs sent!", com.google.android.material.snackbar.Snackbar.LENGTH_SHORT).show()
+                        com.google.android.material.snackbar.Snackbar.make(
+                            rootView,
+                            "Logs sent!",
+                            com.google.android.material.snackbar.Snackbar.LENGTH_SHORT
+                        ).show()
                     }
                 })
-                .setNegativeButton(R.string.feedback_dialog_cancel, null)
-                .create()
+            .setNegativeButton(R.string.feedback_dialog_cancel, null)
+            .create()
     }
 }

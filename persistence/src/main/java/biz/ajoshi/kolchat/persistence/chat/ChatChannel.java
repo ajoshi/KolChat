@@ -1,15 +1,14 @@
 package biz.ajoshi.kolchat.persistence.chat;
 
+import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
-import androidx.room.PrimaryKey;
-import androidx.annotation.NonNull;
 
 /**
  * Created by ajoshi on 7/14/17.
  */
 
-@Entity(primaryKeys = {"id","currentUserId"})
+@Entity(primaryKeys = {"id", "currentUserId"})
 public class ChatChannel {
     @NonNull
     public String getId() {

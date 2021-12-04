@@ -1,13 +1,14 @@
 package biz.ajoshi.kolchat.persistence.chat;
 
-import java.util.List;
-
 import androidx.lifecycle.LiveData;
 import androidx.paging.DataSource;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
+
+import java.util.List;
+
 import io.reactivex.Flowable;
 
 /**
@@ -20,17 +21,17 @@ public interface MessageDao {
 
     // gets next pages. Offset might need to depend on hwo many items are shown (db could have more inserted in the meantime)
     @Query("SELECT * FROM (SELECT * FROM chatmessage WHERE channelId = :channel_id ORDER BY timeStamp DESC LIMIT 100 OFFSET :offset) ORDER BY timestamp ASC")
-    List<ChatMessage> getMessagesForChannel (String channel_id, int offset);
+    List<ChatMessage> getMessagesForChannel(String channel_id, int offset);
 
     // gets 100 most recent commands, with the newest one at the bottom
     @Query("SELECT * FROM (SELECT * FROM chatmessage WHERE channelId = :channel_id AND currentUserId = :user_id ORDER BY timeStamp DESC LIMIT 100) ORDER BY timestamp ASC")
-    List<ChatMessage> getMessagesForChannel (String channel_id, String user_id);
+    List<ChatMessage> getMessagesForChannel(String channel_id, String user_id);
 
     @Query("SELECT * FROM chatmessage WHERE channelId = :channel_id AND currentUserId = :user_id ORDER BY timeStamp ASC LIMIT 1")
     Flowable<ChatMessage> getLastMessageForChannel(String channel_id, String user_id);
 
     @Query("SELECT * FROM chatmessage WHERE channelId = :channel_id AND currentUserId = :user_id ORDER BY timeStamp ASC")
-    DataSource.Factory<Integer, ChatMessage>  getLastMessageLivedataForChannel(String channel_id, String user_id);
+    DataSource.Factory<Integer, ChatMessage> getLastMessageLivedataForChannel(String channel_id, String user_id);
 
     /*
      * We want to show all commands inserted into the db after a given time, but we also don't want to get the newest
@@ -44,6 +45,7 @@ public interface MessageDao {
 
     /**
      * Get us the newest commands for the channel after the given local time. Also show System updates after that time
+     *
      * @param channel_id
      * @param localTimestamp
      * @return

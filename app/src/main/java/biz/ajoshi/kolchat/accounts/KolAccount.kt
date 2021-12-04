@@ -30,9 +30,10 @@ class KolAccountManager(val ctx: Context) {
         for (account in accountList) {
             if (account.name == username) {
                 return KolAccount(
-                        username = account.name,
-                        password = acctMgr.getPassword(account),
-                        isActive = currentUsername == account.name)
+                    username = account.name,
+                    password = acctMgr.getPassword(account),
+                    isActive = currentUsername == account.name
+                )
             }
         }
         return null
@@ -43,10 +44,13 @@ class KolAccountManager(val ctx: Context) {
         val acctMgr = AccountManager.get(ctx)
         val accountArray = acctMgr.getAccountsByType(USER_TYPE_KOL)
         for (account in accountArray) {
-            accountList.add(KolAccount(
+            accountList.add(
+                KolAccount(
                     username = account.name,
                     password = acctMgr.getPassword(account),
-                    isActive = currentUsername == account.name))
+                    isActive = currentUsername == account.name
+                )
+            )
         }
         return accountList
     }

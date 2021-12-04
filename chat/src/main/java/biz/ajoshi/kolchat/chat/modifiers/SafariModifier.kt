@@ -9,8 +9,11 @@ import biz.ajoshi.kolchat.persistence.chat.ChatMessage
 class SafariModifier : Modifier<ChatMessage> {
     // slightly better regex that's easier to read
     private val nicerRegex = Regex("<[ií] t[i(&#237;)í]tle=\\\"(.*?)\\\">[[:graph:]]*<\\/i>")
+
     // crappy regex because server applies socks after safari
-    private val shittyRegex = Regex("<(i|&#237;|í) t(i|&#237;|í)tl(e|&#233;|è|é|ë|ê)=\\\"(.*?)\\\">[[:graph:]]*<\\/(i|&#237;|í)>")
+    private val shittyRegex =
+        Regex("<(i|&#237;|í) t(i|&#237;|í)tl(e|&#233;|è|é|ë|ê)=\\\"(.*?)\\\">[[:graph:]]*<\\/(i|&#237;|í)>")
+
     // How many capture groups exist before the *? one
     private val INDEX_OF_REPLACED_TEXT = 4
 
@@ -19,8 +22,10 @@ class SafariModifier : Modifier<ChatMessage> {
         val allMatches2 = shittyRegex.findAll(chatMessage.text)
         for (matchResult in allMatches2) {
             matchResult.groupValues
-            chatMessage.text = chatMessage.text.replaceFirst(matchResult.groupValues[0],
-                    matchResult.groupValues[INDEX_OF_REPLACED_TEXT])
+            chatMessage.text = chatMessage.text.replaceFirst(
+                matchResult.groupValues[0],
+                matchResult.groupValues[INDEX_OF_REPLACED_TEXT]
+            )
         }
         return chatMessage
     }

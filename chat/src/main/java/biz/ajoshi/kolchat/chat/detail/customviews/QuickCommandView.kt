@@ -28,7 +28,11 @@ class QuickCommandView : LinearLayout, QuickCommandVH.VHCommandClickListener {
     constructor(context: Context) : this(context, null)
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
 
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    ) {
         initializeViews(context)
     }
 
@@ -36,14 +40,15 @@ class QuickCommandView : LinearLayout, QuickCommandVH.VHCommandClickListener {
 
     fun initializeViews(context: Context) {
         val inflater = context
-                .getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+            .getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         val view = inflater.inflate(R.layout.quick_command_view, this)
         val commands = mutableListOf<QuickCommand>()
         commands.add(QuickCommand("em", "/em "))
         commands.add(QuickCommand("romans", "/romans"))
         commands.add(QuickCommand("who", "/who"))
         commands.add(QuickCommand(">:(", ">:("))
-        val recyclerView = view.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.quick_command_list)
+        val recyclerView =
+            view.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.quick_command_list)
         val layoutMgr = androidx.recyclerview.widget.LinearLayoutManager(context)
         layoutMgr.orientation = androidx.recyclerview.widget.LinearLayoutManager.HORIZONTAL
         val adapter = QuickCommandAdapter(this)
@@ -65,7 +70,8 @@ data class QuickCommand(val name: String, val command: String)
 /**
  * Viewholder for a QuickCommand
  */
-class QuickCommandVH(itemView: View, val commandClickListener: VHCommandClickListener) : androidx.recyclerview.widget.RecyclerView.ViewHolder(itemView) {
+class QuickCommandVH(itemView: View, val commandClickListener: VHCommandClickListener) :
+    androidx.recyclerview.widget.RecyclerView.ViewHolder(itemView) {
 
     interface VHCommandClickListener {
         fun onViewHolderCommandClicked(command: QuickCommand)
@@ -92,11 +98,13 @@ class QuickCommandVH(itemView: View, val commandClickListener: VHCommandClickLis
 /**
  * Basic Array Adapter for quick commands
  */
-class QuickCommandAdapter(val commandClickListener: QuickCommandVH.VHCommandClickListener) : androidx.recyclerview.widget.RecyclerView.Adapter<QuickCommandVH>() {
+class QuickCommandAdapter(val commandClickListener: QuickCommandVH.VHCommandClickListener) :
+    androidx.recyclerview.widget.RecyclerView.Adapter<QuickCommandVH>() {
     var commands = mutableListOf<QuickCommand>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): QuickCommandVH {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.quick_command_item, parent, false)
+        val view =
+            LayoutInflater.from(parent.context).inflate(R.layout.quick_command_item, parent, false)
         return QuickCommandVH(view, commandClickListener)
     }
 

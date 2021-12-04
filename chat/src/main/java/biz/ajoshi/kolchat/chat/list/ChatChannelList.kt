@@ -25,7 +25,11 @@ class ChatChannelList : androidx.recyclerview.widget.RecyclerView, ChannelClickL
     constructor(context: Context) : this(context, null)
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
 
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    ) {
         initializeViews(context)
     }
 
@@ -45,11 +49,18 @@ class ChatChannelList : androidx.recyclerview.widget.RecyclerView, ChannelClickL
      * We want people to delete channels by swiping on them. We do not want them to reorder them yet
      */
     inner class ChannelSwipeCallback() : SimpleCallback(0, LEFT) {
-        override fun onMove(recyclerView: androidx.recyclerview.widget.RecyclerView, viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder, target: androidx.recyclerview.widget.RecyclerView.ViewHolder): Boolean {
+        override fun onMove(
+            recyclerView: androidx.recyclerview.widget.RecyclerView,
+            viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder,
+            target: androidx.recyclerview.widget.RecyclerView.ViewHolder
+        ): Boolean {
             return false
         }
 
-        override fun onSwiped(viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder, direction: Int) {
+        override fun onSwiped(
+            viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder,
+            direction: Int
+        ) {
             val position = viewHolder.adapterPosition
             val channel = chatChannelAdapter.getChannelAt(position)
             interactionListener?.onChannelSwiped(channel = channel)
@@ -73,23 +84,23 @@ class ChatChannelList : androidx.recyclerview.widget.RecyclerView, ChannelClickL
     fun setUserId(userId: String) {
         this.userId = userId
         groupChatUpdateSubscriber = KolDB.getDb()
-                ?.ChannelDao()
-                // TODO pass in the username instead of directly accessing from the singleton
-                ?.getAllChatChannels(userId)
-                ?.subscribeOn(Schedulers.io())
-                ?.observeOn(AndroidSchedulers.mainThread())
-                ?.subscribe { channels ->
-                    chatChannelAdapter.setGroupList(channels)
-                }
+            ?.ChannelDao()
+            // TODO pass in the username instead of directly accessing from the singleton
+            ?.getAllChatChannels(userId)
+            ?.subscribeOn(Schedulers.io())
+            ?.observeOn(AndroidSchedulers.mainThread())
+            ?.subscribe { channels ->
+                chatChannelAdapter.setGroupList(channels)
+            }
         pmChatUpdateSubscriber = KolDB.getDb()
-                ?.ChannelDao()
-                // TODO pass in the username instead of directly accessing from the singleton
-                ?.getAllPMChannels(userId)
-                ?.subscribeOn(Schedulers.io())
-                ?.observeOn(AndroidSchedulers.mainThread())
-                ?.subscribe { channels ->
-                    chatChannelAdapter.setPmsList(channels)
-                }
+            ?.ChannelDao()
+            // TODO pass in the username instead of directly accessing from the singleton
+            ?.getAllPMChannels(userId)
+            ?.subscribeOn(Schedulers.io())
+            ?.observeOn(AndroidSchedulers.mainThread())
+            ?.subscribe { channels ->
+                chatChannelAdapter.setPmsList(channels)
+            }
     }
 
     override fun onChannelClicked(channel: ChatChannel) {

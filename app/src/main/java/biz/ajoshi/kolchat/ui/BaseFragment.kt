@@ -20,7 +20,8 @@ abstract class BaseFragment : androidx.fragment.app.Fragment() {
      */
     fun makePost(post: CharSequence?, isPrivate: Boolean, id: String): Boolean {
         // log to analytics as well
-        Analytics.getAnswers()?.logCustom(CustomEvent(EVENT_NAME_CHAT_MESSAGE_SENT)
+        Analytics.getAnswers()?.logCustom(
+            CustomEvent(EVENT_NAME_CHAT_MESSAGE_SENT)
                 .putCustomAttribute(EVENT_ATTRIBUTE_RECIPIENT, if (isPrivate) "PM" else id)
                 .putCustomAttribute(EVENT_ATTRIBUTE_MESSAGE_LENGTH, post?.length)
         )

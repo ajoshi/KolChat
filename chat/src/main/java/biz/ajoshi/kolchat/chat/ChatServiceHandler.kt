@@ -25,12 +25,16 @@ const val PM_NOTIFICATION_ID = 667
 const val ERROR_STRING = "error"
 
 // if this id is sent in, launch this chat as soon as possible- the user tapped on a notification for this chat
-const val EXTRA_LAUNCH_TO_CHAT_ID = "biz.ajoshi.kolchat.chat.ChatServiceHandler.EXTRA_LAUNCH_TO_CHAT_ID"
+const val EXTRA_LAUNCH_TO_CHAT_ID =
+    "biz.ajoshi.kolchat.chat.ChatServiceHandler.EXTRA_LAUNCH_TO_CHAT_ID"
 
-const val ACTION_CHAT_COMMAND_FAILED = "biz.ajoshi.kolchat.chat.ChatServiceHandler.ACTION_CHAT_COMMAND_FAILED"
-const val EXTRA_FAILED_CHAT_MESSAGE = "biz.ajoshi.kolchat.chat.ChatServiceHandler.EXTRA_FAILED_CHAT_MESSAGE"
+const val ACTION_CHAT_COMMAND_FAILED =
+    "biz.ajoshi.kolchat.chat.ChatServiceHandler.ACTION_CHAT_COMMAND_FAILED"
+const val EXTRA_FAILED_CHAT_MESSAGE =
+    "biz.ajoshi.kolchat.chat.ChatServiceHandler.EXTRA_FAILED_CHAT_MESSAGE"
 const val ACTION_CHAT_ROLLOVER = "biz.ajoshi.kolchat.chat.ChatServiceHandler.ACTION_CHAT_ROLLOVER"
-const val ACTION_CHAT_ROLLOVER_OVER = "biz.ajoshi.kolchat.chat.ChatServiceHandler.ACTION_CHAT_ROLLOVER_OVER"
+const val ACTION_CHAT_ROLLOVER_OVER =
+    "biz.ajoshi.kolchat.chat.ChatServiceHandler.ACTION_CHAT_ROLLOVER_OVER"
 
 /**
  * A Handler that lets us read chat and insert to DB
@@ -40,6 +44,7 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
     interface ChatService {
         fun stopChatService(id: Int)
         fun getContext(): Context
+
         /**
          * Returns an Intent that will launch 1 'main' activity. If any decision making needs to be done to
          * correctly direct the user to another activity, the 'main' activity must do this.
@@ -62,7 +67,8 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
     override fun handleMessage(msg: Message) {
         try {
             if (ChatSingleton.chatManager == null || // chatmgr is null so we have no userinfo to use for login
-                    !ChatSingleton.chatManager!!.network.isLoggedIn) { // we're not logged in (but have the ability)
+                !ChatSingleton.chatManager!!.network.isLoggedIn
+            ) { // we're not logged in (but have the ability)
                 val response = ChatSingleton.chatManager?.network?.login()
                 if (response?.isSuccessful() != true) {
                     // not logged in so exit service. may be premature and a bad idea
@@ -98,8 +104,11 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
                             val response = ChatSingleton.postChat(serviceMessage.textmessage)
                             response?.let {
                                 if (response.status == NetworkStatus.SUCCESS) {
-                                    insertChatsIntoDb((response.messages), ChatSingleton.network?.currentUser?.player?.id
-                                            ?: ERROR_STRING)
+                                    insertChatsIntoDb(
+                                        (response.messages),
+                                        ChatSingleton.network?.currentUser?.player?.id
+                                            ?: ERROR_STRING
+                                    )
                                     /*
                               Chat commands (and chat message sends) don't actually end up returning messages- they
                               only return an output (if anything)
@@ -109,8 +118,13 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
                              */
                                     if (response.output.isNotEmpty()) {
                                         val broadcastIntent = Intent(ACTION_CHAT_COMMAND_FAILED)
-                                        broadcastIntent.putExtra(EXTRA_FAILED_CHAT_MESSAGE, response.output)
-                                        androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(service.getContext()).sendBroadcast(broadcastIntent)
+                                        broadcastIntent.putExtra(
+                                            EXTRA_FAILED_CHAT_MESSAGE,
+                                            response.output
+                                        )
+                                        androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(
+                                            service.getContext()
+                                        ).sendBroadcast(broadcastIntent)
                                     }
                                     if (isItRo) {
                                         service.onRoIsOVer()
@@ -171,7 +185,10 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
         val response = ChatSingleton.readChat(lastFetchedTime)
         // if we can, read the chat and stick in db
         if (response?.status == NetworkStatus.SUCCESS) {
-            insertChatsIntoDb(response.messages, ChatSingleton.network?.currentUser?.player?.id ?: ERROR_STRING)
+            insertChatsIntoDb(
+                response.messages,
+                ChatSingleton.network?.currentUser?.player?.id ?: ERROR_STRING
+            )
             notifyUserOfPm(response.messages)
             lastFetchedTime = ChatSingleton.chatManager!!.lastSeen
             if (isItRo) {
@@ -262,20 +279,25 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
         // intent meant for main activity. will launch the app
         val launchMainActivityIntent = service.getMainActivityIntent()
         launchMainActivityIntent.putExtra(EXTRA_LAUNCH_TO_CHAT_ID, chatId)
-        val mainActivityPintent = PendingIntent.getActivity(ctx, 1, launchMainActivityIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+        val mainActivityPintent = PendingIntent.getActivity(
+            ctx,
+            1,
+            launchMainActivityIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT
+        )
 
         // TODO use messagingstyle notificationcompat to group multiple message notifications. right now just replace to avoid spam
         // Will have to keep track of which notifications are shown and when notification is tapped/dismissed to correctly
         // update the notification
         val notificationBuilder = NotificationCompat.Builder(ctx, MENTION_NOTIFICATION_CHANNEL_ID)
         notificationBuilder
-                .setContentTitle(ctx.getString(R.string.app_name))
-                .setContentText(message)
-                .setSmallIcon(R.drawable.ic_send)
-                .setGroup("mentions")
-                .setAutoCancel(true)
-                .setDefaults(Notification.DEFAULT_VIBRATE)
-                .setContentIntent(mainActivityPintent)
+            .setContentTitle(ctx.getString(R.string.app_name))
+            .setContentText(message)
+            .setSmallIcon(R.drawable.ic_send)
+            .setGroup("mentions")
+            .setAutoCancel(true)
+            .setDefaults(Notification.DEFAULT_VIBRATE)
+            .setContentIntent(mainActivityPintent)
 
         val notificationManager = NotificationManagerCompat.from(ctx)
         notificationManager.notify(PM_NOTIFICATION_ID, notificationBuilder.build())
@@ -289,7 +311,11 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
             message.channelNameServer.isPrivate && message.author.id != "-1"
         }
         relevantMessages?.forEach { message ->
-            makeMentionNotification(service.getContext(), StringUtilities.getHtml(message.channelNameServer.name + ": " + message.htmlText), message.author.id)
+            makeMentionNotification(
+                service.getContext(),
+                StringUtilities.getHtml(message.channelNameServer.name + ": " + message.htmlText),
+                message.author.id
+            )
         }
     }
 }

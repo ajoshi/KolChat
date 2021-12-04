@@ -14,8 +14,9 @@ class Themer {
     companion object {
         var currentTheme = Theme.KOL
     }
+
     fun getThemeId(): Int {
-        return when(currentTheme) {
+        return when (currentTheme) {
             Theme.CHILL -> R.style.KoLTheme_ChillOut
             Theme.FRUITS -> R.style.KoLTheme_Fruit
             Theme.KOL -> R.style.KoLTheme

@@ -25,11 +25,12 @@ public interface ChatEndpoint {
     Call<List<ChatMessage>> post(@Query("playerid") String playerId,
                                  @Query("pwd") String passwordHash,
                                  @Query("graf") String encodedMessage);
+
     @GET("login.php")
     Call<ChatMessage> login();
 
     @GET("login.php")
     Call<ChatMessage> login(@Query("loginid") String loginid,
-               @Query("loginname") String username,
-               @Query("password") String password);
+                            @Query("loginname") String username,
+                            @Query("password") String password);
 }

@@ -1,12 +1,13 @@
 package biz.ajoshi.kolchat.persistence.chat;
 
-import java.util.List;
-
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
+
+import java.util.List;
+
 import io.reactivex.Flowable;
 import io.reactivex.Single;
 

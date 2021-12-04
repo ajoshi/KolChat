@@ -4,7 +4,6 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
-import biz.ajoshi.kolchat.chat.R
 import biz.ajoshi.kolchat.chat.databinding.ChatMessageBinding
 import biz.ajoshi.kolchat.persistence.chat.ChatMessage
 
@@ -12,12 +11,16 @@ import biz.ajoshi.kolchat.persistence.chat.ChatMessage
  * Adapter that uses AndroidX Paging library for paging up and down (so it auto-fetches new messages).
  * This doesn't seem to work super well, when new messages are added to the bottom- it doesn't always scroll down.
  */
-class PagingChatAdapter(val layoutMgr: androidx.recyclerview.widget.LinearLayoutManager, val listener: ChatMessageVH.MessageClickListener) :
-        PagedListAdapter<ChatMessage, ChatMessageVH>(DIFF_CALLBACK) {
+class PagingChatAdapter(
+    val layoutMgr: androidx.recyclerview.widget.LinearLayoutManager,
+    val listener: ChatMessageVH.MessageClickListener
+) :
+    PagedListAdapter<ChatMessage, ChatMessageVH>(DIFF_CALLBACK) {
     private var started = false
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatMessageVH {
-        val chatMessageBinding = ChatMessageBinding.inflate(LayoutInflater.from(parent.context),  parent, false)
+        val chatMessageBinding =
+            ChatMessageBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ChatMessageVH(chatMessageBinding, listener)
     }
 
@@ -29,22 +32,26 @@ class PagingChatAdapter(val layoutMgr: androidx.recyclerview.widget.LinearLayout
             // Null defines a placeholder item - PagedListAdapter automatically
             // invalidates this row when the actual object is loaded from the
             // database.
-        //    holder.bind(null)
+            //    holder.bind(null)
         }
     }
 
     companion object {
         private val DIFF_CALLBACK = object :
-                DiffUtil.ItemCallback<ChatMessage>() {
+            DiffUtil.ItemCallback<ChatMessage>() {
             // Concert details may have changed if reloaded from the database,
             // but ID is fixed.
-            override fun areItemsTheSame(oldMessage: ChatMessage,
-                                         newMessage: ChatMessage): Boolean =
-                    oldMessage.id == newMessage.id
+            override fun areItemsTheSame(
+                oldMessage: ChatMessage,
+                newMessage: ChatMessage
+            ): Boolean =
+                oldMessage.id == newMessage.id
 
-            override fun areContentsTheSame(oldMessage: ChatMessage,
-                                            newMessage: ChatMessage): Boolean =
-                    oldMessage == newMessage
+            override fun areContentsTheSame(
+                oldMessage: ChatMessage,
+                newMessage: ChatMessage
+            ): Boolean =
+                oldMessage == newMessage
         }
     }
 

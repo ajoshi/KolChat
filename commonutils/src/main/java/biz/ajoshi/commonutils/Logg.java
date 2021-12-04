@@ -59,8 +59,7 @@ public class Logg {
     /**
      * Logs a throwable to the logger or logcat
      *
-     * @param t
-     *         throwable to log
+     * @param t throwable to log
      */
     public static void logThrowable(Throwable t) {
         logThrowable("ajoshi", t);
@@ -69,10 +68,8 @@ public class Logg {
     /**
      * Logs a throwable to the logger or logcat
      *
-     * @param tag
-     *         tag for the message
-     * @param t
-     *         throwable to log
+     * @param tag tag for the message
+     * @param t   throwable to log
      */
     public static void logThrowable(String tag, Throwable t) {
         Log.w(tag, t);
@@ -86,40 +83,32 @@ public class Logg {
         /**
          * Logs an error message
          *
-         * @param tag
-         *         tag for the message
-         * @param message
-         *         message to log
+         * @param tag     tag for the message
+         * @param message message to log
          */
         void logE(String tag, String message);
 
         /**
          * Logs a warning message
          *
-         * @param tag
-         *         tag for the message
-         * @param message
-         *         message to log
+         * @param tag     tag for the message
+         * @param message message to log
          */
         void logW(String tag, String message);
 
         /**
          * Logs an info message
          *
-         * @param tag
-         *         tag for the message
-         * @param message
-         *         message to log
+         * @param tag     tag for the message
+         * @param message message to log
          */
         void logI(String tag, String message);
 
         /**
          * Logs an logThrowable
          *
-         * @param tag
-         *         tag for the message
-         * @param throwable
-         *         throwable to log
+         * @param tag       tag for the message
+         * @param throwable throwable to log
          */
         void logException(String tag, Throwable throwable);
     }

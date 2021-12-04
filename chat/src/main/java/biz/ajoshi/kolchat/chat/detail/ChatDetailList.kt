@@ -25,7 +25,11 @@ class ChatDetailList : androidx.recyclerview.widget.RecyclerView {
     constructor(context: Context) : this(context, null)
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
 
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    ) {
         initializeViews(context)
     }
 
@@ -55,40 +59,44 @@ class ChatDetailList : androidx.recyclerview.widget.RecyclerView {
      * @param currentUserId id of the currently logged in user (different users see different chats)
      * @param listener listener to be called when initial chat has been loaded
      */
-    fun loadInitialMessages(channelId: String, currentUserId: String, listener: ChatMessagesLoaderView) {
+    fun loadInitialMessages(
+        channelId: String,
+        currentUserId: String,
+        listener: ChatMessagesLoaderView
+    ) {
         this.channelId = channelId
         initialChatLoadSubscriber = Observable.fromCallable {
             KolDB.getDb()
-                    ?.ChannelDao()
-                    ?.getChannel(channelId, currentUserId)
+                ?.ChannelDao()
+                ?.getChannel(channelId, currentUserId)
             // get the channel object for this channel
         }?.subscribeOn(Schedulers.io())
-                // get the messages for this channel
-                ?.map { singleChannel ->
-                    // Or should I be using a normal (non-Single) Channel object?
-                    try {
-                        val channel = singleChannel.blockingGet()
-                        lastTimeSeen = channel.lastTimeUserViewedChannel
-                    } catch (e: EmptyResultSetException) {
-                        // we've never chatted in this room/with this person before. Hardly an issue
-                    }
-                    KolDB.getDb()
-                            ?.MessageDao()
-                            ?.getMessagesForChannel(channelId, currentUserId)
-                    //getMessagesForChannel(channelId, userId = currentUserId)
+            // get the messages for this channel
+            ?.map { singleChannel ->
+                // Or should I be using a normal (non-Single) Channel object?
+                try {
+                    val channel = singleChannel.blockingGet()
+                    lastTimeSeen = channel.lastTimeUserViewedChannel
+                } catch (e: EmptyResultSetException) {
+                    // we've never chatted in this room/with this person before. Hardly an issue
                 }
+                KolDB.getDb()
+                    ?.MessageDao()
+                    ?.getMessagesForChannel(channelId, currentUserId)
+                //getMessagesForChannel(channelId, userId = currentUserId)
+            }
 
-                ?.observeOn(Schedulers.computation())
-                ?.map { list -> makeFakeRow(list) }  // add the 'new messages row' in the correct place
+            ?.observeOn(Schedulers.computation())
+            ?.map { list -> makeFakeRow(list) }  // add the 'new messages row' in the correct place
 
 
-                ?.observeOn(AndroidSchedulers.mainThread())
-                ?.subscribe { list ->
-                    // we have the list, so set it as the displayed list
-                    chatAdapter.setList(list)
-                    listener.onInitialMessageListLoaded()
-                    initialMessagesLoaded()
-                }
+            ?.observeOn(AndroidSchedulers.mainThread())
+            ?.subscribe { list ->
+                // we have the list, so set it as the displayed list
+                chatAdapter.setList(list)
+                listener.onInitialMessageListLoaded()
+                initialMessagesLoaded()
+            }
     }
 
     /**
@@ -120,8 +128,8 @@ class ChatDetailList : androidx.recyclerview.widget.RecyclerView {
      */
     private fun getMessagesForChannel(channelId: String, userId: String): List<ChatMessage>? {
         return KolDB.getDb()
-                ?.MessageDao()
-                ?.getMessagesForChannel(channelId, userId)
+            ?.MessageDao()
+            ?.getMessagesForChannel(channelId, userId)
     }
 
     /**
@@ -167,8 +175,8 @@ class UpdateChatTimeTask(val time: Long) : AsyncTask<String, Unit, Unit>() {
     override fun doInBackground(vararg params: String?): Unit {
         params[0]?.let {
             KolDB.getDb()
-                    ?.ChannelDao()
-                    ?.setChannelLastTime(it, time)
+                ?.ChannelDao()
+                ?.setChannelLastTime(it, time)
         }
     }
 

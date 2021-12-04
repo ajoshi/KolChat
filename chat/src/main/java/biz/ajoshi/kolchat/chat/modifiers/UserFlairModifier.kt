@@ -13,7 +13,7 @@ class UserFlairModifier : Modifier<ChatMessage> {
         return returnMessage
     }
 
-    private fun getUserFlair(message : ChatMessage) : String {
+    private fun getUserFlair(message: ChatMessage): String {
         return message.userName
     }
 }

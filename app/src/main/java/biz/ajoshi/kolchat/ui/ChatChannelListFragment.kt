@@ -29,12 +29,17 @@ class ChatChannelListFragment : BaseFragment(), NewChatFAB.ChatMessageSender {
     // local broadcast receiver that will show a snackbar when a chat command fails.
     // Needed because the fab allows no place for this error message to be shown
     private val failedMessageReceiver = FailedMessageReceiver()
+
     // list of the channels
     var channelList: ChatChannelList? = null
 
     lateinit var binding: ChannelListBinding
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         binding = ChannelListBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -80,7 +85,11 @@ class ChatChannelListFragment : BaseFragment(), NewChatFAB.ChatMessageSender {
             val message = intent.getStringExtra(EXTRA_FAILED_CHAT_MESSAGE)
             if (message?.isNotEmpty() == true) {
                 view?.let {
-                    com.google.android.material.snackbar.Snackbar.make(it, StringUtilities.getHtml(message), LENGTH_LONG).show()
+                    com.google.android.material.snackbar.Snackbar.make(
+                        it,
+                        StringUtilities.getHtml(message),
+                        LENGTH_LONG
+                    ).show()
                 }
             }
         }
@@ -90,8 +99,10 @@ class ChatChannelListFragment : BaseFragment(), NewChatFAB.ChatMessageSender {
          */
         fun unregister(context: Context?) {
             context?.let {
-                androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(it).unregisterReceiver(
-                        this);
+                androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(it)
+                    .unregisterReceiver(
+                        this
+                    );
             }
         }
 
@@ -100,8 +111,10 @@ class ChatChannelListFragment : BaseFragment(), NewChatFAB.ChatMessageSender {
          */
         fun register(context: Context?) {
             context?.let {
-                androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(it).registerReceiver(
-                        this, IntentFilter(ACTION_CHAT_COMMAND_FAILED));
+                androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(it)
+                    .registerReceiver(
+                        this, IntentFilter(ACTION_CHAT_COMMAND_FAILED)
+                    );
             }
         }
     }

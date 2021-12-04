@@ -32,10 +32,13 @@ class ChatJob : Job() {
         if (serviceLooper != null) {
             // it seems we sometimes want the slow polling job to log in. This is because the OS might not call the job
             // for a few hours and our session token becomes invalid
-            if (ChatSingleton.loginIfNeeded(username = params.extras.getString(extra_username, ""),
-                            password = params.extras.getString(extra_password, ""),
-                            silent = true,
-                            context = context) == NetworkStatus.SUCCESS) {
+            if (ChatSingleton.loginIfNeeded(
+                    username = params.extras.getString(extra_username, ""),
+                    password = params.extras.getString(extra_password, ""),
+                    silent = true,
+                    context = context
+                ) == NetworkStatus.SUCCESS
+            ) {
                 val serviceHandler = ChatServiceHandler(serviceLooper, ServiceImpl())
                 val message = serviceHandler.obtainLoopMessage(1)
                 message.obj = ChatServiceMessage(MessageType.READ_UNTIL_THRESHOLD, null)
@@ -60,7 +63,11 @@ class ChatJob : Job() {
         /**
          * Schedules the Chat fetching job. Chat will be fetched once every 15 minutes if internet is available
          */
-        fun scheduleJob(mainActivityComponentName: ComponentName, username: String, password: String) {
+        fun scheduleJob(
+            mainActivityComponentName: ComponentName,
+            username: String,
+            password: String
+        ) {
             val bundleCompat = PersistableBundleCompat()
             bundleCompat.putString(extra_package_name, mainActivityComponentName.packageName)
             bundleCompat.putString(extra_activity_name, mainActivityComponentName.className)
@@ -68,11 +75,11 @@ class ChatJob : Job() {
             bundleCompat.putString(extra_password, password)
             // schedule a poll once every 15 minutes (might be too slow)
             jobId = JobRequest.Builder(tag)
-                    .setPeriodic(15 * 60_000)
-                    .setExtras(bundleCompat)
-                    .setRequiredNetworkType(JobRequest.NetworkType.CONNECTED)
-                    .build()
-                    .schedule()
+                .setPeriodic(15 * 60_000)
+                .setExtras(bundleCompat)
+                .setRequiredNetworkType(JobRequest.NetworkType.CONNECTED)
+                .build()
+                .schedule()
         }
 
         /**

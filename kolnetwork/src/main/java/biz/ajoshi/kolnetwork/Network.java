@@ -1,14 +1,17 @@
 package biz.ajoshi.kolnetwork;
 
+import android.text.TextUtils;
+
+import androidx.annotation.NonNull;
+
+import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
-import org.jetbrains.annotations.NotNull;
-
-import androidx.annotation.NonNull;
 import biz.ajoshi.commonutils.Logg;
 import biz.ajoshi.commonutils.StringUtilities;
 import biz.ajoshi.kolnetwork.model.LoggedInUser;
@@ -22,8 +25,6 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 
-import android.text.TextUtils;
-
 /**
  * Class that makes network calls to KoL.
  *
@@ -32,7 +33,7 @@ import android.text.TextUtils;
  */
 public class Network {
     public static final String APP_NAME = "ajoshiChatApp";
-    private static final String APP_NAME_QUERYPARAM = "for="+APP_NAME;
+    private static final String APP_NAME_QUERYPARAM = "for=" + APP_NAME;
 
     private final String username;
     private final String password;
@@ -79,9 +80,7 @@ public class Network {
      * Logs in
      *
      * @return true if login succeeded, else false
-     *
-     * @throws IOException
-     *         if a exception occured
+     * @throws IOException if a exception occured
      */
     public NetworkResponse login() throws IOException {
         client = new OkHttpClient()
@@ -122,15 +121,15 @@ public class Network {
             return new NetworkResponse("Redirected to invalid url", NetworkStatus.FAILURE);
         }
         loginUrl = loginUrl.newBuilder()
-                           .addQueryParameter("loggingin", "Yup.")
-                           .addQueryParameter("promo", "")
-                           .addQueryParameter("mrstore", "")
-                           .addQueryParameter("secure", "1")
-                           .addQueryParameter("loginname",
-                                              isQuiet ? String.format(IS_QUIET_MODIFIER, username) : username)
-                           .addQueryParameter("password", password)
-                           .addQueryParameter("submitbutton", "Log+In")
-                           .build();
+                .addQueryParameter("loggingin", "Yup.")
+                .addQueryParameter("promo", "")
+                .addQueryParameter("mrstore", "")
+                .addQueryParameter("secure", "1")
+                .addQueryParameter("loginname",
+                        isQuiet ? String.format(IS_QUIET_MODIFIER, username) : username)
+                .addQueryParameter("password", password)
+                .addQueryParameter("submitbutton", "Log+In")
+                .build();
 
         Request loginrequest = new Request.Builder()
                 .url(loginUrl)
@@ -193,7 +192,6 @@ public class Network {
      * Fetches the passwordhash and the playerid for the current user. Maybe current channel as well?
      *
      * @return
-     *
      * @throws IOException
      */
     private String fetchPlayerData() throws IOException {
@@ -283,35 +281,30 @@ public class Network {
     /**
      * URL encodes and posts a message to chat
      *
-     * @param message
-     *         Message to be posted
-     *
+     * @param message Message to be posted
      * @return server response in string form
-     *
      * @throws IOException
      */
     public NetworkResponse postChat(String message) throws IOException {
         return postUrl(BASE_URL +
-                       "/submitnewchat.php?playerid=%s&pwd=%s&graf=%s&j=1&format=php", message);
+                "/submitnewchat.php?playerid=%s&pwd=%s&graf=%s&j=1&format=php", message);
     }
 
     /**
      * Requests new chat events since the last time. We can't use retrofit at all for chat.
      *
      * @param timeStamp
-     *
      * @return String response
-     *
      * @throws IOException
      */
     public NetworkResponse readChat(long timeStamp) throws IOException {
         return getUrl(String.format(Locale.US,
-                                    // <a target=mainpane href="showplayer.php?who=2129446">
-                                    // <font color=blue><b>ajoshi (private):</b></font></a>
-                                    // <font color="blue">yolo</font><br><!--lastseen:1442257857-->
-                                    BASE_URL +
-                                    "/newchatmessages.php?lasttime=%d&j=1&aa=0.5901808745871704&format=json",
-                                    timeStamp));
+                // <a target=mainpane href="showplayer.php?who=2129446">
+                // <font color=blue><b>ajoshi (private):</b></font></a>
+                // <font color="blue">yolo</font><br><!--lastseen:1442257857-->
+                BASE_URL +
+                        "/newchatmessages.php?lasttime=%d&j=1&aa=0.5901808745871704&format=json",
+                timeStamp));
     }
 
     private NetworkResponse onExpiredHash() {
@@ -337,6 +330,7 @@ public class Network {
 
     /**
      * Makes an arbitrary KoL related network call (GET) and returns the response
+     *
      * @param url full url (https) to get data from
      * @return the server response
      */
@@ -388,7 +382,8 @@ public class Network {
 
     /**
      * Makes an arbitrary kol related POST and returns the response
-     * @param url url to make the post to
+     *
+     * @param url  url to make the post to
      * @param body post needs a body (non null)
      * @return network response resulting from this call
      * @throws IOException
@@ -396,27 +391,27 @@ public class Network {
     public NetworkResponse postUrl(String url, @NonNull String body) throws IOException {
         loginIfNeeded();
         Request sendChatRequest = new Request.Builder().get()
-                                                       .url(String.format(sanitizeUrlForKol(url),
-                                                                          playerid,
-                                                                          pwdHash,
-                                                                          URLEncoder.encode(body, "UTF-8")))
-                                                       .addHeader("cookie",
-                                                                  String.format("PHPSESSID=%s; AWSALB=%s; chatpwd=%s",
-                                                                                phpSessId,
-                                                                                awsCookie,
-                                                                                chatpwd))
-                                                       .addHeader("referer",
-                                                                  "https://www.kingdomofloathing.com/mchat.php")
-                                                       .addHeader("Connection", "close")
-                                                       .addHeader("X-Requested-With", "XMLHttpRequest")
-                                                       .build();
+                .url(String.format(sanitizeUrlForKol(url),
+                        playerid,
+                        pwdHash,
+                        URLEncoder.encode(body, "UTF-8")))
+                .addHeader("cookie",
+                        String.format("PHPSESSID=%s; AWSALB=%s; chatpwd=%s",
+                                phpSessId,
+                                awsCookie,
+                                chatpwd))
+                .addHeader("referer",
+                        "https://www.kingdomofloathing.com/mchat.php")
+                .addHeader("Connection", "close")
+                .addHeader("X-Requested-With", "XMLHttpRequest")
+                .build();
         Call call = client.newCall(sendChatRequest);
         Response chatResponse = call.execute();
         String redirectLocation = chatResponse.header("location");
         if (redirectLocation != null &&
-            (redirectLocation.contains(MAINT_POSTFIX) || (redirectLocation.contains("login.php")))) {
+                (redirectLocation.contains(MAINT_POSTFIX) || (redirectLocation.contains("login.php")))) {
             // RO time or we got logged out- it seems reads no longer redirect to maint.php
-            if(login().isSuccessful()) {
+            if (login().isSuccessful()) {
                 // try to log in again and make request again
                 return postUrl(url, body);
             } else {
@@ -443,6 +438,7 @@ public class Network {
 
     /**
      * Adds the AjoshiChatApp param to all network calls so it's easy to isolate
+     *
      * @param url url we're making the network call for
      * @return url with "for=ajoshichatapp" added to the end
      */
@@ -457,12 +453,13 @@ public class Network {
 
     /**
      * Ensures that urls sent in are absolute URLs (will convert relative to absolute) and they have the app Id appended
+     *
      * @param url url to send in to kol servers (relative or absolute)
      * @return absolute url that's absolutely correct
      */
     private String sanitizeUrlForKol(String url) {
         url = addAppIdToUrl(url);
-        if (!url.startsWith("http")){
+        if (!url.startsWith("http")) {
             if (url.startsWith("/")) {
                 url = BASE_URL + url;
             } else {
