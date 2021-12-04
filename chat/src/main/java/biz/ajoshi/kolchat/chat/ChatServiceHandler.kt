@@ -233,7 +233,7 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
 
     fun insertChatsIntoDb(messages: List<ServerChatMessage>?, currentUserId: String) {
         if (messages != null) {
-            if (messages.size > 0) {
+            if (messages.isNotEmpty()) {
                 Logg.i("${messages.size} items added 2 db for $currentUserId")
             }
             roomInserter.insertAllMessages(messages, currentUserId)

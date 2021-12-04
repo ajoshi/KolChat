@@ -32,7 +32,7 @@ abstract class BaseFragment : androidx.fragment.app.Fragment() {
      * Send a chat command to the server. Is not scoped to this channel, so scoping should be
      * done before calling this
      */
-    fun sendChatCommand(command: String): Boolean {
+    private fun sendChatCommand(command: String): Boolean {
         val serviceIntent = Intent(activity, ChatBackgroundService::class.java)
         serviceIntent.putExtra(EXTRA_CHAT_MESSAGE_TO_SEND, command)
         activity?.startService(serviceIntent)

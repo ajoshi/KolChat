@@ -38,9 +38,7 @@ class FakeAcctAuthenticator(context: Context?) : AbstractAccountAuthenticator(co
         authTokenType: String?,
         options: Bundle?
     ): Bundle {
-        val accountBundle = Bundle()
-
-        return accountBundle
+        return Bundle()
     }
 
     override fun hasFeatures(
@@ -65,9 +63,7 @@ class FakeAcctAuthenticator(context: Context?) : AbstractAccountAuthenticator(co
         requiredFeatures: Array<out String>?,
         options: Bundle?
     ): Bundle {
-        val accountBundle = Bundle()
-
-        return accountBundle
+        return Bundle()
     }
 
     override fun getAuthTokenLabel(authTokenType: String?): String {

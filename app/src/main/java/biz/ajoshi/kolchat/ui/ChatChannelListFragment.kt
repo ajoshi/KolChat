@@ -39,7 +39,7 @@ class ChatChannelListFragment : BaseFragment(), NewChatFAB.ChatMessageSender {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = ChannelListBinding.inflate(inflater, container, false)
         return binding.root
     }
