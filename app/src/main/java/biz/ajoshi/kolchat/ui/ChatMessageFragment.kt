@@ -12,22 +12,22 @@ import biz.ajoshi.kolchat.Analytics
 import biz.ajoshi.kolchat.EVENT_ATTRIBUTE_TIME_TAKEN
 import biz.ajoshi.kolchat.R
 import biz.ajoshi.kolchat.chat.ChatMessageViewModel
+import biz.ajoshi.kolchat.chat.detail.ChatDetailList
 import biz.ajoshi.kolchat.chat.detail.ChatMessageVH
 import biz.ajoshi.kolchat.chat.detail.PagingChatAdapter
-import biz.ajoshi.kolchat.chat.detail.ChatDetailList
-import biz.ajoshi.kolchat.chat.detail.customviews.ChatInputView
 import biz.ajoshi.kolchat.chat.detail.customviews.QuickCommand
 import biz.ajoshi.kolchat.chat.detail.customviews.QuickCommandView
+import biz.ajoshi.kolchat.databinding.ChatDetailBinding
 import biz.ajoshi.kolchat.persistence.chat.ChatMessage
 import com.crashlytics.android.answers.ContentViewEvent
-import kotlinx.android.synthetic.main.chat_detail.*
 
 
 /**
  * Fragment displaying a conversation in a channel or with a user. Uses the arch components instead of rxjava
  */
 // TODO give new values when fully moving to arch components
-class ChatMessageFragment : BaseFragment(), QuickCommandView.CommandClickListener, ChatDetailList.ChatMessagesLoaderView {
+class ChatMessageFragment : BaseFragment(), QuickCommandView.CommandClickListener,
+    ChatDetailList.ChatMessagesLoaderView {
     private var id = "newbie"
     private var name = "newbie"
     private var isPrivate = false
@@ -36,8 +36,7 @@ class ChatMessageFragment : BaseFragment(), QuickCommandView.CommandClickListene
     private lateinit var currentUserId: String
     private var shouldUseAndroidxPaging: Boolean = false
 
-    var chatDetailList: ChatDetailList? = null
-    var inputView: ChatInputView? = null
+    lateinit var binding: ChatDetailBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val args = arguments
@@ -52,8 +51,13 @@ class ChatMessageFragment : BaseFragment(), QuickCommandView.CommandClickListene
         super.onCreate(savedInstanceState)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.chat_detail, container, false)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        binding = ChatDetailBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onResume() {
@@ -67,13 +71,10 @@ class ChatMessageFragment : BaseFragment(), QuickCommandView.CommandClickListene
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
-        chatDetailList = messagesList
-        inputView = input_view
-
         activity?.let {
             if (!isPrivate) {
                 // right now all we do is open up chat, so disable when in PMs
-                chatDetailList?.setClickListener(it as ChatDetailList.MessageClickListener)
+                binding.messagesList.setClickListener(it as ChatDetailList.MessageClickListener)
             }
         }
 
@@ -84,14 +85,19 @@ class ChatMessageFragment : BaseFragment(), QuickCommandView.CommandClickListene
         } else {
             // paginglist will load its messages on its own
             // TODO if paginglist actually becomes stable and usable, this should be revisited
-            chatDetailList?.loadInitialMessages(id, currentUserId, this)
+            binding.messagesList.loadInitialMessages(id, currentUserId, this)
         }
 
-        inputView?.isEnabled = !isComposerDisabled
-        inputView?.setSubmitListener { input: CharSequence? -> makePost(input, isPrivate, id) }
+        binding.inputView.isEnabled = !isComposerDisabled
+        binding.inputView.setSubmitListener { input: CharSequence? ->
+            makePost(
+                input,
+                isPrivate,
+                id
+            )
+        }
 
-        val quickCommands = quick_commands
-        quickCommands.setClickListener(this)
+        binding.quickCommands.setClickListener(this)
         super.onActivityCreated(savedInstanceState)
     }
 
@@ -107,18 +113,21 @@ class ChatMessageFragment : BaseFragment(), QuickCommandView.CommandClickListene
      * Loads the paged list of chats for this channel. Sets the adapter to the paged adapter which seems buggy
      */
     private fun loadPagedList() {
-        val vm: ChatMessageViewModel = ViewModelProviders.of(this).get(ChatMessageViewModel::class.java)
+        val vm: ChatMessageViewModel =
+            ViewModelProviders.of(this).get(ChatMessageViewModel::class.java)
 
-        val adapter = PagingChatAdapter(chatDetailList!!.chatAdapter.layoutMgr, object : ChatMessageVH.MessageClickListener {
-            override fun onMessageLongClicked(message: ChatMessage) {
-                (activity as ChatDetailList.MessageClickListener).onMessageLongClicked(message)
-            }
-        })
+        val adapter = PagingChatAdapter(
+            binding.messagesList.chatAdapter.layoutMgr,
+            object : ChatMessageVH.MessageClickListener {
+                override fun onMessageLongClicked(message: ChatMessage) {
+                    (activity as ChatDetailList.MessageClickListener).onMessageLongClicked(message)
+                }
+            })
         vm.getLastChatObservable(id, currentUserId)?.observe(this, Observer { pagedList ->
             adapter.submitList(pagedList)
             adapter.scrollToBottomOnceAndThenThreshold()
         })
-        chatDetailList?.adapter = adapter
+        binding.messagesList.adapter = adapter
 
         // how do we log perf metrics in this? can we?
     }
@@ -128,21 +137,28 @@ class ChatMessageFragment : BaseFragment(), QuickCommandView.CommandClickListene
      */
     override fun onInitialMessageListLoaded() {
         val chatLoadEndTimestamp = System.currentTimeMillis()
-        val vm: ChatMessageViewModel = ViewModelProviders.of(this).get(ChatMessageViewModel::class.java)
-        vm.getChatListObservable(id, currentUserId, System.currentTimeMillis())?.observe(this, Observer
-        { message ->
-            if (message != null)
-            //add this new message to the bottom (will scroll down if we're at the bottom of the list)
-                chatDetailList?.addMessages(message)
-        })
-        Analytics.getAnswers()?.logContentView(ContentViewEvent()
+        val vm: ChatMessageViewModel =
+            ViewModelProviders.of(this).get(ChatMessageViewModel::class.java)
+        vm.getChatListObservable(id, currentUserId, System.currentTimeMillis())
+            ?.observe(this, Observer
+            { message ->
+                if (message != null)
+                //add this new message to the bottom (will scroll down if we're at the bottom of the list)
+                    binding.messagesList.addMessages(message)
+            })
+        Analytics.getAnswers()?.logContentView(
+            ContentViewEvent()
                 .putContentName("Channel detail opened")
                 .putContentId(if (isPrivate) "PM" else name)
-                .putCustomAttribute(EVENT_ATTRIBUTE_TIME_TAKEN, (chatLoadEndTimestamp - chatLoadStartTimestamp)))
+                .putCustomAttribute(
+                    EVENT_ATTRIBUTE_TIME_TAKEN,
+                    (chatLoadEndTimestamp - chatLoadStartTimestamp)
+                )
+        )
     }
 
     override fun onCommandClicked(command: QuickCommand) {
-        inputView?.appendInputText(command.command)
+        binding.inputView.appendInputText(command.command)
     }
 
     override fun getTitle(): String {
@@ -154,16 +170,20 @@ class ChatMessageFragment : BaseFragment(), QuickCommandView.CommandClickListene
         val EXTRA_CHANNEL_NAME = "biz.ajoshi.kolchat.ExtraChannelName"
         val EXTRA_CURRENT_USER_ID = "biz.ajoshi.kolchat.ExtraCurrentUserId"
         val EXTRA_CHANNEL_IS_PRIVATE = "biz.ajoshi.kolchat.ExtraChannelPrivate"
+
         // lets the app disable the input view if it wants. doesn't let it disable when the fragment is already up, but nbd
         val EXTRA_CHANNEL_IS_COMPOSER_DISABLED = "biz.ajoshi.kolchat.ExtraChannelIsComposerDisabled"
+
         // lets the app enable or disable androidx paging. Not fully done
         val EXTRA_USE_ANDROIDX_PAGING = "biz.ajoshi.kolchat.ExtraUseAndroidxPaging"
 
         /**
          * Creates a bundle for a Chat Message Fragment with the passed in properties.
          */
-        fun getBundleForChatMessageFragment(currentUserId: String, channelName: String, channelId: String, isPrivate: Boolean,
-                                            isComposerDisabled: Boolean, shouldUseAndroidxPaging: Boolean): Bundle {
+        fun getBundleForChatMessageFragment(
+            currentUserId: String, channelName: String, channelId: String, isPrivate: Boolean,
+            isComposerDisabled: Boolean, shouldUseAndroidxPaging: Boolean
+        ): Bundle {
             val b = Bundle()
             b.putString(EXTRA_CHANNEL_NAME, channelName)
             b.putString(EXTRA_CHANNEL_ID, channelId)

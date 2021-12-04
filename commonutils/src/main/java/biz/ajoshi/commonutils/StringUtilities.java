@@ -1,7 +1,5 @@
 package biz.ajoshi.commonutils;
 
-import android.os.Build.VERSION;
-import android.os.Build.VERSION_CODES;
 import android.text.Html;
 import android.text.Spanned;
 
@@ -25,13 +23,6 @@ public class StringUtilities {
     }
 
     public static Spanned getHtml(String html) {
-        Spanned returnValue;
-        if (VERSION.SDK_INT < VERSION_CODES.N) {
-            returnValue = Html.fromHtml(html);
-        } else {
-            returnValue = Html.fromHtml(html, Html.FROM_HTML_OPTION_USE_CSS_COLORS);
-        }
-
-        return returnValue;
+        return Html.fromHtml(html, Html.FROM_HTML_OPTION_USE_CSS_COLORS);
     }
 }

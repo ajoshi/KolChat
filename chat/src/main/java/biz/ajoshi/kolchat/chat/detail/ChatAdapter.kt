@@ -2,13 +2,17 @@ package biz.ajoshi.kolchat.chat.detail
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import biz.ajoshi.kolchat.chat.R
+import biz.ajoshi.kolchat.chat.databinding.ChatMessageBinding
 import biz.ajoshi.kolchat.persistence.chat.ChatMessage
 
 /**
  * Adapter for the list of chat messages (inside a given channel)
  */
-class ChatAdapter(val layoutMgr: androidx.recyclerview.widget.LinearLayoutManager, val listener: ChatMessageVH.MessageClickListener, val supportsPaging: Boolean = false) : androidx.recyclerview.widget.RecyclerView.Adapter<ChatMessageVH>() {
+class ChatAdapter(
+    val layoutMgr: androidx.recyclerview.widget.LinearLayoutManager,
+    val listener: ChatMessageVH.MessageClickListener,
+    val supportsPaging: Boolean = false
+) : androidx.recyclerview.widget.RecyclerView.Adapter<ChatMessageVH>() {
 
     var messages = mutableListOf<ChatMessage>()
     var idList = mutableListOf<Int>()
@@ -20,13 +24,15 @@ class ChatAdapter(val layoutMgr: androidx.recyclerview.widget.LinearLayoutManage
         when (viewType) {
             viewtypeLoadMore -> {
                 // TODO replace with more row
-                val view = LayoutInflater.from(parent.context).inflate(R.layout.chat_message, parent, false)
-                return ChatMessageVH(view, listener)
+                val binding =
+                    ChatMessageBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                return ChatMessageVH(binding, listener)
             }
-        //viewtypeMessage -> // fallthrough
+            //viewtypeMessage -> // fallthrough
             else -> {
-                val view = LayoutInflater.from(parent.context).inflate(R.layout.chat_message, parent, false)
-                return ChatMessageVH(view, listener)
+                val binding =
+                    ChatMessageBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                return ChatMessageVH(binding, listener)
             }
         }
     }

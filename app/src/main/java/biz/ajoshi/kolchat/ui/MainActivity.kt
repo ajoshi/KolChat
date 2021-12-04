@@ -1,7 +1,6 @@
 package biz.ajoshi.kolchat.ui
 
 import android.content.*
-import android.os.AsyncTask
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -20,11 +19,10 @@ import biz.ajoshi.kolchat.R
 import biz.ajoshi.kolchat.accounts.KolAccountManager
 import biz.ajoshi.kolchat.background.DeleteChannelTask
 import biz.ajoshi.kolchat.chat.*
-import biz.ajoshi.kolchat.chat.list.ChatChannelList
 import biz.ajoshi.kolchat.chat.detail.ChatDetailList
 import biz.ajoshi.kolchat.chat.detail.ChatMessageDetailDialog
 import biz.ajoshi.kolchat.chat.detail.MessageDetailDialogListener
-import biz.ajoshi.kolchat.persistence.KolDB
+import biz.ajoshi.kolchat.chat.list.ChatChannelList
 import biz.ajoshi.kolchat.persistence.chat.ChatChannel
 import biz.ajoshi.kolchat.persistence.chat.ChatMessage
 import biz.ajoshi.kolnetwork.model.User
@@ -32,9 +30,12 @@ import com.crashlytics.android.Crashlytics
 import com.crashlytics.android.answers.CustomEvent
 import com.google.android.material.snackbar.Snackbar
 
-const val action_navigate_to_chat_detail = "biz.ajoshi.kolchat.ui.MainActivity.ACTION_NAVIGATE_TO_CHAT_DETAIL"
+const val action_navigate_to_chat_detail =
+    "biz.ajoshi.kolchat.ui.MainActivity.ACTION_NAVIGATE_TO_CHAT_DETAIL"
 
-class MainActivity : AppCompatActivity(), ChatChannelList.ChatChannelInteractionListener, ChatDetailList.MessageClickListener, NavController.OnDestinationChangedListener, MessageDetailDialogListener {
+class MainActivity : AppCompatActivity(), ChatChannelList.ChatChannelInteractionListener,
+    ChatDetailList.MessageClickListener, NavController.OnDestinationChangedListener,
+    MessageDetailDialogListener {
     private var toolbar: Toolbar? = null
     private var navController: NavController? = null
     private val rolloverBroadcastReceiver = biz.ajoshi.kolchat.accounts.RolloverBroadcastReceiver()
@@ -50,14 +51,19 @@ class MainActivity : AppCompatActivity(), ChatChannelList.ChatChannelInteraction
 
         setContentView(R.layout.activity_main)
         if (launchLoginActivityIfLoggedOut()) {
-            if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean(KEY_PREF_SEND_USERNAME, true)) {
+            if (PreferenceManager.getDefaultSharedPreferences(this)
+                    .getBoolean(KEY_PREF_SEND_USERNAME, true)
+            ) {
                 // dont' log username unconditionally, but if the user has allowed it, then set it
                 Crashlytics.setUserIdentifier(getCurrentUser()?.name)
             }
             // we're logged in
             val serviceIntent = Intent(this, ChatBackgroundService::class.java)
             serviceIntent.putExtra(EXTRA_POLL_INTERVAL_IN_MS, 2000L)
-            serviceIntent.putExtra(EXTRA_MAIN_ACTIVITY_COMPONENTNAME, ComponentName(this, javaClass))
+            serviceIntent.putExtra(
+                EXTRA_MAIN_ACTIVITY_COMPONENTNAME,
+                ComponentName(this, javaClass)
+            )
             startService(serviceIntent)
         } else {
             return
@@ -81,20 +87,24 @@ class MainActivity : AppCompatActivity(), ChatChannelList.ChatChannelInteraction
         }
         // analytics- log the source of the launch intent
         when (intent.action) {
-        // launched by os
+            // launched by os
             Intent.ACTION_MAIN ->
                 logLaunchEvent("Launcher")
-        // launched by the notification for a chat message
+            // launched by the notification for a chat message
             action_navigate_to_chat_detail ->
                 logLaunchEvent("Notification: chat detail")
-        // launched by login screen (or something else?)
-        // this should tell me if users are logging in more than they should
+            // launched by login screen (or something else?)
+            // this should tell me if users are logging in more than they should
             else -> logLaunchEvent("Login/Unknown")
         }
         rolloverBroadcastReceiver.register(this, findViewById(R.id.llist))
     }
 
-    override fun onDestinationChanged(controller: NavController, destination: NavDestination, arguments: Bundle?) {
+    override fun onDestinationChanged(
+        controller: NavController,
+        destination: NavDestination,
+        arguments: Bundle?
+    ) {
         toolbar?.title = getPlaintextForHtml("" + destination.label)
     }
 
@@ -107,7 +117,8 @@ class MainActivity : AppCompatActivity(), ChatChannelList.ChatChannelInteraction
             val preferenceManager = PreferenceManager.getDefaultSharedPreferences(this)
 
             val shouldEnableChatJob = preferenceManager.getBoolean(KEY_PREF_ENABLE_POLL, true)
-            val shouldEnableFrequentBgPoll = preferenceManager.getBoolean(KEY_PREF_SUPER_FAST_POLL, false)
+            val shouldEnableFrequentBgPoll =
+                preferenceManager.getBoolean(KEY_PREF_SUPER_FAST_POLL, false)
 
             if (shouldEnableFrequentBgPoll) {
                 // this kills battery, but polls every minute. Probably off.
@@ -126,9 +137,10 @@ class MainActivity : AppCompatActivity(), ChatChannelList.ChatChannelInteraction
                         val account = accountMgr.getAccount(it)
                         account?.let { currentAccount ->
                             ChatJob.scheduleJob(
-                                    ComponentName(this, javaClass),
-                                    currentAccount.username,
-                                    currentAccount.password)
+                                ComponentName(this, javaClass),
+                                currentAccount.username,
+                                currentAccount.password
+                            )
                         }
                     }
                 }
@@ -146,12 +158,16 @@ class MainActivity : AppCompatActivity(), ChatChannelList.ChatChannelInteraction
     private fun logLaunchEvent(source: String) {
         if (Analytics.shouldTrackEvents) {
             val customEvent = CustomEvent(EVENT_NAME_APP_LAUNCH)
-                    .putCustomAttribute(EVENT_ATTRIBUTE_SOURCE, source)
+                .putCustomAttribute(EVENT_ATTRIBUTE_SOURCE, source)
             val preferenceManager = PreferenceManager.getDefaultSharedPreferences(this)
-            customEvent.putCustomAttribute(EVENT_ATTRIBUTE_IS_POLLING_ENABLED,
-                    preferenceManager.getBoolean(KEY_PREF_ENABLE_POLL, true).toString())
-            customEvent.putCustomAttribute(EVENT_ATTRIBUTE_IS_FAST_POLLING_ENABLED,
-                    preferenceManager.getBoolean(KEY_PREF_SUPER_FAST_POLL, false).toString())
+            customEvent.putCustomAttribute(
+                EVENT_ATTRIBUTE_IS_POLLING_ENABLED,
+                preferenceManager.getBoolean(KEY_PREF_ENABLE_POLL, true).toString()
+            )
+            customEvent.putCustomAttribute(
+                EVENT_ATTRIBUTE_IS_FAST_POLLING_ENABLED,
+                preferenceManager.getBoolean(KEY_PREF_SUPER_FAST_POLL, false).toString()
+            )
             Analytics.getAnswers()?.logCustom(customEvent)
         }
     }
@@ -169,8 +185,8 @@ class MainActivity : AppCompatActivity(), ChatChannelList.ChatChannelInteraction
      */
     private fun showSendLogsDialog() {
         FeedbackDialog(context = this, rootView = findViewById<View>(R.id.llist))
-                .createDialog()
-                .show()
+            .createDialog()
+            .show()
     }
 
     private fun getCurrentUser(): User? {
@@ -219,12 +235,14 @@ class MainActivity : AppCompatActivity(), ChatChannelList.ChatChannelInteraction
         val plainTextName = getPlaintextForHtml(channel.name)
         getCurrentUser()?.let { user ->
             val b = ChatMessageFragment.getBundleForChatMessageFragment(
-                    currentUserId = user.id,
-                    channelName = plainTextName,
-                    channelId = channel.id,
-                    isPrivate = channel.isPrivate,
-                    isComposerDisabled = rolloverBroadcastReceiver.isRollover,
-                    shouldUseAndroidxPaging = PreferenceManager.getDefaultSharedPreferences(this).getBoolean(KEY_PREF_ANDROIDX_PAGING, false) )
+                currentUserId = user.id,
+                channelName = plainTextName,
+                channelId = channel.id,
+                isPrivate = channel.isPrivate,
+                isComposerDisabled = rolloverBroadcastReceiver.isRollover,
+                shouldUseAndroidxPaging = PreferenceManager.getDefaultSharedPreferences(this)
+                    .getBoolean(KEY_PREF_ANDROIDX_PAGING, false)
+            )
             navController?.let { controller ->
                 controller.navigate(R.id.nav_chat_message, b)
                 // not setting the label here because 'currentDestination' is still the old page
@@ -238,11 +256,13 @@ class MainActivity : AppCompatActivity(), ChatChannelList.ChatChannelInteraction
                 toolbar?.let { toolbar ->
                     toolbar.title = getPlaintextForHtml(plainTextName)
                 }
-                Logg.i("MainActivity", if (channel.isPrivate) {
-                    "Channel detail opened"
-                } else {
-                    "PM detail opened"
-                })
+                Logg.i(
+                    "MainActivity", if (channel.isPrivate) {
+                        "Channel detail opened"
+                    } else {
+                        "PM detail opened"
+                    }
+                )
             }
         }
     }
@@ -252,16 +272,20 @@ class MainActivity : AppCompatActivity(), ChatChannelList.ChatChannelInteraction
      */
     override fun onChannelSwiped(channel: ChatChannel) {
         // throw up yet another dialog to confirm that the user wants to delete channel
-        val removeChatMessage = String.format(if (channel.isPrivate) getString(R.string.remove_chat_dialog_message_pm) else getString(R.string.remove_chat_dialog_message_group), channel.name)
+        val removeChatMessage = String.format(
+            if (channel.isPrivate) getString(R.string.remove_chat_dialog_message_pm) else getString(
+                R.string.remove_chat_dialog_message_group
+            ), channel.name
+        )
         AlertDialog.Builder(this)
-                .setTitle(R.string.remove_chat_dialog_title)
-                .setMessage(removeChatMessage)
-                .setPositiveButton(R.string.remove_chat_dialog_option_yes) { _, _ ->
-                    // delete the channel
-                    val deleteTask = DeleteChannelTask()
-                    deleteTask.execute(channel)
-                }
-                .setNegativeButton(R.string.remove_chat_dialog_option_no, null).show()
+            .setTitle(R.string.remove_chat_dialog_title)
+            .setMessage(removeChatMessage)
+            .setPositiveButton(R.string.remove_chat_dialog_option_yes) { _, _ ->
+                // delete the channel
+                val deleteTask = DeleteChannelTask()
+                deleteTask.execute(channel)
+            }
+            .setNegativeButton(R.string.remove_chat_dialog_option_no, null).show()
     }
 
     /**
@@ -272,24 +296,24 @@ class MainActivity : AppCompatActivity(), ChatChannelList.ChatChannelInteraction
         // needed because nav components have bad support for programmatic label/toolbar title setting
         //    navController?.popBackStack()
         // show options for this chat message
-                ChatMessageDetailDialog(context = this)
-                        .createDialog(message = message, listener = this)
-                        .show()
+        ChatMessageDetailDialog(context = this)
+            .createDialog(message = message, listener = this)
+            .show()
     }
 
     override fun sendPm(message: ChatMessage) {
         onChannelClicked(ChatChannel(message.userId, true, message.userName, "", 0, "", 0))
     }
 
-        override fun copyText(text: CharSequence) {
-                val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                val clip: ClipData = ClipData.newPlainText(getString(R.string.app_name), text)
-                clipboard.primaryClip = clip
-            }
+    override fun copyText(text: CharSequence) {
+        val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val clip: ClipData = ClipData.newPlainText(getString(R.string.app_name), text)
+        clipboard.setPrimaryClip(clip)
+    }
 
-        override fun showText(text: CharSequence) {
-                Snackbar.make(findViewById<View>(R.id.llist), text, Snackbar.LENGTH_LONG).show()
-            }
+    override fun showText(text: CharSequence) {
+        Snackbar.make(findViewById<View>(R.id.llist), text, Snackbar.LENGTH_LONG).show()
+    }
 
     /*************************************************************   Handle Navigation   ************************/
 
@@ -375,7 +399,6 @@ class MainActivity : AppCompatActivity(), ChatChannelList.ChatChannelInteraction
         val TAG_CHAT_LIST_FRAG = "list frag"
     }
 }
-
 
 
 /*

@@ -5,8 +5,6 @@ import android.content.Context
 import android.content.Context.LAYOUT_INFLATER_SERVICE
 import android.content.DialogInterface
 import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import biz.ajoshi.commonutils.StringUtilities
@@ -30,15 +28,22 @@ class ChatMessageDetailDialog(val context: Context) : DialogInterface.OnClickLis
 
         val inflater = context.getSystemService(LAYOUT_INFLATER_SERVICE) as LayoutInflater
         val layout = inflater.inflate(R.layout.dialog_chat_detail, null)
-        layout.findViewById<TextView>(R.id.chat_message)?.text = (StringUtilities.getHtml(message.text))
-        layout.findViewById<TextView>(R.id.chat_title)?.text = StringUtilities.getHtml(message.userName).toString()
+        layout.findViewById<TextView>(R.id.chat_message)?.text =
+            (StringUtilities.getHtml(message.text))
+        layout.findViewById<TextView>(R.id.chat_title)?.text =
+            StringUtilities.getHtml(message.userName).toString()
         //TODO too much hardcoding in here
-        val options = listOf<CharSequence>("Send PM", "Copy text", "Copy userId", "Remove safari from message")
+        val options = listOf<CharSequence>(
+            "Send PM",
+            "Copy text",
+            "Copy userId",
+            "Remove safari from message"
+        )
         return builder
-                // show plaintext username as title
-                .setCustomTitle(layout)
-                .setItems(options.toTypedArray(), this)
-                .create()
+            // show plaintext username as title
+            .setCustomTitle(layout)
+            .setItems(options.toTypedArray(), this)
+            .create()
     }
 
     override fun onClick(dialog: DialogInterface?, which: Int) {
@@ -49,7 +54,8 @@ class ChatMessageDetailDialog(val context: Context) : DialogInterface.OnClickLis
             2 -> listener.get()?.copyText(text = message.userId)
             3 -> {
                 val safariModifier = SafariModifier()
-                listener.get()?.showText(StringUtilities.getHtml(safariModifier.modify(message).text))
+                listener.get()
+                    ?.showText(StringUtilities.getHtml(safariModifier.modify(message).text))
             }
         }
     }

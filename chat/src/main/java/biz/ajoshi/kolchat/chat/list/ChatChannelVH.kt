@@ -5,14 +5,14 @@ import android.view.View
 import biz.ajoshi.commonutils.StringUtilities
 import biz.ajoshi.kolchat.chat.chatMessageDateFormat
 import biz.ajoshi.kolchat.chat.chatMessageTimeFormat
+import biz.ajoshi.kolchat.chat.databinding.ChannelListItemBinding
 import biz.ajoshi.kolchat.persistence.chat.ChatChannel
-import kotlinx.android.synthetic.main.channel_list_item.view.*
 import java.util.*
 
 /**
  * Viewholder for an entry in the chat channel list for a public channel
  */
-open class ChatChannelVH(itemView: View, val listener: ChannelRowClickListener?) : androidx.recyclerview.widget.RecyclerView.ViewHolder(itemView) {
+open class ChatChannelVH(binding: ChannelListItemBinding, val listener: ChannelRowClickListener?) : androidx.recyclerview.widget.RecyclerView.ViewHolder(binding.root) {
 
     /**
      * Called when a channel is tapped on. Implementor gets the channel data and can do whatever it wants
@@ -25,8 +25,8 @@ open class ChatChannelVH(itemView: View, val listener: ChannelRowClickListener?)
 
     private lateinit var channelForThisRow: ChatChannel
 
-    private val nameView = itemView.name
-    private val dateView = itemView.last_message_time
+    private val nameView = binding.name
+    private val dateView = binding.lastMessageTime
 
     init {
         itemView.setOnClickListener { _ -> listener?.onChannelRowClicked(channelForThisRow) }
@@ -52,9 +52,9 @@ open class ChatChannelVH(itemView: View, val listener: ChannelRowClickListener?)
  * Viewholder for an entry in the chat channel list for a private message
  */
 // TODO use composition instead of inheritance?
-class ChatUserVH(itemView: View, listener: ChannelRowClickListener?) : ChatChannelVH(itemView = itemView, listener = listener) {
+class ChatUserVH(binding: ChannelListItemBinding, listener: ChannelRowClickListener?) : ChatChannelVH(binding = binding, listener = listener) {
     init {
         // this is a PM, so show the PM icon
-        itemView.pm_indicator?.visibility = View.VISIBLE
+        binding.pmIndicator.visibility = View.VISIBLE
     }
 }

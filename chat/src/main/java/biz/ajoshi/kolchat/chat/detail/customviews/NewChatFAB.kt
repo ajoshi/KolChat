@@ -10,20 +10,25 @@ import android.view.WindowManager
 import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
 import biz.ajoshi.kolchat.chat.R
-import kotlinx.android.synthetic.main.dialog_send_new_message.view.*
+import biz.ajoshi.kolchat.chat.databinding.DialogSendNewMessageBinding
 
 /**
  * Floating action button that spins up UI flow for starting up a new chat
  * Launches dialogs, etc. Activity/Fragment can still override click behavior if it wants
  */
-class NewChatFAB : com.google.android.material.floatingactionbutton.FloatingActionButton, View.OnClickListener {
+class NewChatFAB : com.google.android.material.floatingactionbutton.FloatingActionButton,
+    View.OnClickListener {
 
     var chatMessageSender: ChatMessageSender? = null
 
     constructor(context: Context) : this(context, null)
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
 
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    ) {
         initializeViews()
     }
 
@@ -44,15 +49,15 @@ class NewChatFAB : com.google.android.material.floatingactionbutton.FloatingActi
     fun showNewChatDialog() {
         context?.let {
             AlertDialog.Builder(it)
-                    .setTitle("Send new message")
-                    .setItems(R.array.new_message_options, { _, which ->
-                        when (which) {
+                .setTitle("Send new message")
+                .setItems(R.array.new_message_options, { _, which ->
+                    when (which) {
                         // This assumes a specific order in the resource xml
-                            0 -> postToUser()
-                            1 -> postToChannel()
-                        }
-                    })
-                    .show()
+                        0 -> postToUser()
+                        1 -> postToChannel()
+                    }
+                })
+                .show()
         }
     }
 
@@ -63,22 +68,30 @@ class NewChatFAB : com.google.android.material.floatingactionbutton.FloatingActi
     fun postToChannel() {
         context?.let {
             val li = LayoutInflater.from(context)
-            val view = li.inflate(R.layout.dialog_send_new_message, rootView as ViewGroup, false)
-            view.dialog_recipient_name.hint = context.getString(R.string.aj_chat_new_chat_message_hint_channel)
+            val dialogBinding =
+                DialogSendNewMessageBinding.inflate(li, rootView as ViewGroup, false)
+            dialogBinding.dialogRecipientName.hint =
+                context.getString(R.string.aj_chat_new_chat_message_hint_channel)
             val dialog = AlertDialog.Builder(it)
-                    .setView(view)
-                    .setTitle(R.string.aj_chat_new_chat_message_title_channel)
-                    .setPositiveButton(R.string.aj_chat_submit_post, DialogInterface.OnClickListener { dialog: DialogInterface?, _ ->
+                .setView(dialogBinding.root)
+                .setTitle(R.string.aj_chat_new_chat_message_title_channel)
+                .setPositiveButton(
+                    R.string.aj_chat_submit_post,
+                    DialogInterface.OnClickListener { dialog: DialogInterface?, _ ->
                         if (dialog is AlertDialog) {
-                            val recipient = "" + view.dialog_recipient_name.text
-                            val message = "" + view.dialog_text_input.text
+                            val recipient = "" + dialogBinding.dialogRecipientName.text
+                            val message = "" + dialogBinding.dialogTextInput.text
                             if (recipient.isNotEmpty() && message.isNotEmpty()) {
-                                chatMessageSender?.sendChatMessage(message = message, isPrivate = false, id = recipient)
+                                chatMessageSender?.sendChatMessage(
+                                    message = message,
+                                    isPrivate = false,
+                                    id = recipient
+                                )
                             }
                         }
                     })
-                    .setNegativeButton(R.string.aj_chat_cancel, null)
-                    .create()
+                .setNegativeButton(R.string.aj_chat_cancel, null)
+                .create()
             dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE)
             dialog.show()
         }
@@ -90,18 +103,26 @@ class NewChatFAB : com.google.android.material.floatingactionbutton.FloatingActi
     fun postToUser() {
         context?.let {
             val dialog = AlertDialog.Builder(it)
-                    .setView(R.layout.dialog_send_new_message)
-                    .setTitle(R.string.aj_chat_new_chat_message_title_user)
-                    .setPositiveButton(R.string.aj_chat_submit_post, DialogInterface.OnClickListener { dialog: DialogInterface?, _ ->
+                .setView(R.layout.dialog_send_new_message)
+                .setTitle(R.string.aj_chat_new_chat_message_title_user)
+                .setPositiveButton(
+                    R.string.aj_chat_submit_post,
+                    DialogInterface.OnClickListener { dialog: DialogInterface?, _ ->
                         if (dialog is AlertDialog) {
-                            val recipient = "" + dialog.findViewById<EditText>(R.id.dialog_recipient_name)?.text
-                            val message = "" + dialog.findViewById<EditText>(R.id.dialog_text_input)?.text
+                            val recipient =
+                                "" + dialog.findViewById<EditText>(R.id.dialog_recipient_name)?.text
+                            val message =
+                                "" + dialog.findViewById<EditText>(R.id.dialog_text_input)?.text
                             if (recipient.isNotEmpty() && message.isNotEmpty()) {
-                                chatMessageSender?.sendChatMessage(message = message, isPrivate = true, id = recipient)
+                                chatMessageSender?.sendChatMessage(
+                                    message = message,
+                                    isPrivate = true,
+                                    id = recipient
+                                )
                             }
                         }
                     })
-                    .setNegativeButton(R.string.aj_chat_cancel, null).create()
+                .setNegativeButton(R.string.aj_chat_cancel, null).create()
             dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE)
             dialog.show()
         }

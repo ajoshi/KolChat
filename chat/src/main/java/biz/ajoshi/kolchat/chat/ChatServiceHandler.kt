@@ -59,7 +59,7 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
 
     var inverseAgeOfMessage = 0
 
-    override fun handleMessage(msg: Message?) {
+    override fun handleMessage(msg: Message) {
         try {
             if (ChatSingleton.chatManager == null || // chatmgr is null so we have no userinfo to use for login
                     !ChatSingleton.chatManager!!.network.isLoggedIn) { // we're not logged in (but have the ability)
@@ -69,12 +69,12 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
                     // we couldn't log in so... stopChatService the service?
                     // TODO maybe notify user that error occurred here?
                     Logg.i("ChatServiceHandler", "Not logged in. Handler exiting")
-                    service.stopChatService(msg?.arg1 ?: -1)
+                    service.stopChatService(msg.arg1 ?: -1)
                     return
                 }
             }
 
-            if (msg?.obj != null) {
+            if (msg.obj != null) {
                 // if we had a message to send then send it
                 // periodic chat read message has no object
                 val serviceMessage = (msg.obj as ChatServiceMessage)
@@ -139,7 +139,7 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
             } else {
                 Logg.i("ChatServiceHandler", "No msg, reading chat + scheduling read")
                 // else check for new commands and reschedule to check in a bit
-                if (msg != null && msg.arg2 == inverseAgeOfMessage) {
+                if (msg.arg2 == inverseAgeOfMessage) {
                     if (isItRo) {
                         // ups the poll time to once every 3 minutes until RO is over
                         sendMessageDelayed(obtainLoopMessage(msg.arg1), RO_POLL_INTERVAL)
@@ -226,21 +226,21 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
     /**
      * gets the default message for our looper. Takes in the startid of the service
      */
-    fun obtainLoopMessage(id: Int): Message? {
+    fun obtainLoopMessage(id: Int): Message {
         // arg1 holds the service startid
         // arg2 holds the poll interval we want the polling to have so it can be changed at will
         // obj is used to hold an integer that tells us how old this message really is. Big numbers are newer
         val msg = obtainMessage()
-        msg?.arg1 = id
-        msg?.arg2 = inverseAgeOfMessage
+        msg.arg1 = id
+        msg.arg2 = inverseAgeOfMessage
         return msg
     }
 
-    private fun cloneMessage(oldMessage: Message?): Message? {
+    private fun cloneMessage(oldMessage: Message): Message {
         val msg = obtainMessage()
-        msg?.arg1 = oldMessage?.arg1
-        msg?.arg2 = oldMessage?.arg2
-        msg?.obj = oldMessage?.obj
+        msg.arg1 = oldMessage.arg1
+        msg.arg2 = oldMessage.arg2
+        msg.obj = oldMessage.obj
         return msg
     }
 

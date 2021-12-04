@@ -3,6 +3,7 @@ package biz.ajoshi.kolchat.chat.list
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import biz.ajoshi.kolchat.chat.R
+import biz.ajoshi.kolchat.chat.databinding.ChannelListItemBinding
 import biz.ajoshi.kolchat.persistence.chat.ChatChannel
 
 /**
@@ -30,7 +31,7 @@ class ChatChannelAdapter : androidx.recyclerview.widget.RecyclerView.Adapter<Cha
     private var clickListener: ChannelClickListener? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatChannelVH {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.channel_list_item, parent, false)
+        val view = ChannelListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         val rowClickListener = object : ChatChannelVH.ChannelRowClickListener {
             override fun onChannelRowClicked(channel: ChatChannel) {
                 clickListener?.onChannelClicked(channel)

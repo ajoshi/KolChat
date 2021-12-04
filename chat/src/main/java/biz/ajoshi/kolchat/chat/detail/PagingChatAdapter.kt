@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import biz.ajoshi.kolchat.chat.R
+import biz.ajoshi.kolchat.chat.databinding.ChatMessageBinding
 import biz.ajoshi.kolchat.persistence.chat.ChatMessage
 
 /**
@@ -16,14 +17,14 @@ class PagingChatAdapter(val layoutMgr: androidx.recyclerview.widget.LinearLayout
     private var started = false
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatMessageVH {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.chat_message, parent, false)
-        return ChatMessageVH(view, listener)
+        val chatMessageBinding = ChatMessageBinding.inflate(LayoutInflater.from(parent.context),  parent, false)
+        return ChatMessageVH(chatMessageBinding, listener)
     }
 
     override fun onBindViewHolder(holder: ChatMessageVH, position: Int) {
-        val concert = getItem(position)
-        if (concert != null) {
-            holder.bind(concert)
+        val item = getItem(position)
+        if (item != null) {
+            holder.bind(item)
         } else {
             // Null defines a placeholder item - PagedListAdapter automatically
             // invalidates this row when the actual object is loaded from the

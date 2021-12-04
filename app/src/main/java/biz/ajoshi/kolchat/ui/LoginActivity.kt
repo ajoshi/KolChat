@@ -2,11 +2,9 @@ package biz.ajoshi.kolchat.ui
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
-import android.annotation.TargetApi
 import android.content.Context
 import android.content.Intent
 import android.os.AsyncTask
-import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.View
@@ -21,15 +19,17 @@ import biz.ajoshi.kolchat.accounts.AccountLoader
 import biz.ajoshi.kolchat.accounts.KolAccount
 import biz.ajoshi.kolchat.accounts.KolAccountManager
 import biz.ajoshi.kolchat.chat.ChatSingleton
+import biz.ajoshi.kolchat.databinding.ActivityLoginBinding
 import biz.ajoshi.kolnetwork.model.NetworkStatus
-import kotlinx.android.synthetic.main.activity_login.*
 import java.lang.ref.WeakReference
 
 /**
  * A login screen that offers login via username/password. Different activity so it's easier to have a different
  * actionbar UI for the rest of the app (where we have an account)
  */
-class LoginActivity : AppCompatActivity(), androidx.loader.app.LoaderManager.LoaderCallbacks<List<KolAccount>>, UserLoginTask.LoginFieldContainer {
+class LoginActivity : AppCompatActivity(),
+    androidx.loader.app.LoaderManager.LoaderCallbacks<List<KolAccount>>,
+    UserLoginTask.LoginFieldContainer {
 
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
@@ -41,38 +41,46 @@ class LoginActivity : AppCompatActivity(), androidx.loader.app.LoaderManager.Loa
     // Loader id for list of users
     private val USERID_LOADER_ID = 0
 
+    lateinit var binding: ActivityLoginBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_login)
+
+        binding = ActivityLoginBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
+
         val acctMgr = KolAccountManager(this)
         val currentAcct = acctMgr.getCurrentAccount()
         currentAcct?.let {
-            attemptLogin(userNameText = it.username,
-                    passwordText = it.password,
-                    weakReference = WeakReference(this@LoginActivity))
+            attemptLogin(
+                userNameText = it.username,
+                passwordText = it.password,
+                weakReference = WeakReference(this@LoginActivity)
+            )
             return
         }
         // Set up the login form.
         populateAutoComplete()
-        password.setOnEditorActionListener(TextView.OnEditorActionListener { _, id, _ ->
+        binding.password.setOnEditorActionListener(TextView.OnEditorActionListener { _, id, _ ->
             if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
                 attemptLogin()
                 return@OnEditorActionListener true
             }
             false
         })
-        email_sign_in_button.setOnClickListener { attemptLogin() }
+        binding.emailLoginForm.setOnClickListener { attemptLogin() }
     }
 
     private fun populateAutoComplete() {
         supportLoaderManager.initLoader(USERID_LOADER_ID, null, this)
-        username.setOnClickListener { v: View ->
+        binding.username.setOnClickListener { v: View ->
             if (v is AutoCompleteTextView) {
                 v.showDropDown()
             }
         }
         // set up an item click listener for the dropdown
-        username.setOnItemClickListener { _, textview, position, _ ->
+        binding.username.setOnItemClickListener { _, textview, position, _ ->
             val tempAcctList = accountList
             // text in the view that was tapped. This only works because the dropdown is a simple textview
             val clickerUsername = (textview as AppCompatTextView).text;
@@ -95,27 +103,27 @@ class LoginActivity : AppCompatActivity(), androidx.loader.app.LoaderManager.Loa
         }
 
         // Reset errors.
-        username.error = null
-        password.error = null
+        binding.username.error = null
+        binding.password.error = null
 
         // Store values at the time of the login attempt.
-        val usernameStr = username.text.toString()
-        val passwordStr = password.text.toString()
+        val usernameStr = binding.username.text.toString()
+        val passwordStr = binding.password.text.toString()
 
         var cancel = false
         var focusView: View? = null
 
         // Check for a valid password, if the user entered one.
         if (!TextUtils.isEmpty(passwordStr) && !isPasswordValid(passwordStr)) {
-            password.error = getString(R.string.error_invalid_password)
-            focusView = password
+            binding.password.error = getString(R.string.error_invalid_password)
+            focusView = binding.password
             cancel = true
         }
 
         // Check for a valid email address.
         if (TextUtils.isEmpty(usernameStr)) {
-            username.error = getString(R.string.error_field_required)
-            focusView = username
+            binding.username.error = getString(R.string.error_field_required)
+            focusView = binding.username
             cancel = true
         }
 
@@ -126,14 +134,22 @@ class LoginActivity : AppCompatActivity(), androidx.loader.app.LoaderManager.Loa
         } else {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
-            attemptLogin(userNameText = usernameStr, passwordText = passwordStr, weakReference = WeakReference(this))
+            attemptLogin(
+                userNameText = usernameStr,
+                passwordText = passwordStr,
+                weakReference = WeakReference(this)
+            )
         }
     }
 
     /**
      * Attempts to log in with the given credentials
      */
-    private fun attemptLogin(userNameText: String, passwordText: String, weakReference: WeakReference<UserLoginTask.LoginFieldContainer>) {
+    private fun attemptLogin(
+        userNameText: String,
+        passwordText: String,
+        weakReference: WeakReference<UserLoginTask.LoginFieldContainer>
+    ) {
         showProgress(true)
         mAuthTask = UserLoginTask(userNameText, passwordText, weakReference)
         mAuthTask!!.execute(null as Void?)
@@ -147,45 +163,39 @@ class LoginActivity : AppCompatActivity(), androidx.loader.app.LoaderManager.Loa
     /**
      * Shows the progress UI and hides the login form.
      */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
     private fun showProgress(show: Boolean) {
-        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
-        // for very easy animations. If available, use these APIs to fade-in
-        // the progress spinner.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-            val shortAnimTime = resources.getInteger(android.R.integer.config_shortAnimTime).toLong()
 
-            login_form.visibility = if (show) View.GONE else View.VISIBLE
-            login_form.animate()
-                    .setDuration(shortAnimTime)
-                    .alpha((if (show) 0 else 1).toFloat())
-                    .setListener(object : AnimatorListenerAdapter() {
-                        override fun onAnimationEnd(animation: Animator) {
-                            login_form.visibility = if (show) View.GONE else View.VISIBLE
-                        }
-                    })
+        val shortAnimTime = resources.getInteger(android.R.integer.config_shortAnimTime).toLong()
 
-            login_progress.visibility = if (show) View.VISIBLE else View.GONE
-            login_progress.animate()
-                    .setDuration(shortAnimTime)
-                    .alpha((if (show) 1 else 0).toFloat())
-                    .setListener(object : AnimatorListenerAdapter() {
-                        override fun onAnimationEnd(animation: Animator) {
-                            login_progress.visibility = if (show) View.VISIBLE else View.GONE
-                        }
-                    })
-        } else {
-            // The ViewPropertyAnimator APIs are not available, so simply show
-            // and hide the relevant UI components.
-            login_progress.visibility = if (show) View.VISIBLE else View.GONE
-            login_form.visibility = if (show) View.GONE else View.VISIBLE
-        }
+        binding.loginForm.visibility = if (show) View.GONE else View.VISIBLE
+        binding.loginForm.animate()
+            .setDuration(shortAnimTime)
+            .alpha((if (show) 0 else 1).toFloat())
+            .setListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator) {
+                    binding.loginForm.visibility = if (show) View.GONE else View.VISIBLE
+                }
+            })
+
+        binding.loginProgress.visibility = if (show) View.VISIBLE else View.GONE
+        binding.loginProgress.animate()
+            .setDuration(shortAnimTime)
+            .alpha((if (show) 1 else 0).toFloat())
+            .setListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator) {
+                    binding.loginProgress.visibility = if (show) View.VISIBLE else View.GONE
+                }
+            })
+
     }
 
     /**********************************************************************************
      * LOADER CALLBACKS START
      **********************************************************************************/
-    override fun onLoadFinished(loader: androidx.loader.content.Loader<List<KolAccount>>, data: List<KolAccount>?) {
+    override fun onLoadFinished(
+        loader: androidx.loader.content.Loader<List<KolAccount>>,
+        data: List<KolAccount>?
+    ) {
         // save the account list for later
         accountList = data
         // now go through the list (shouldn't be too big) and make list of usernames
@@ -202,7 +212,10 @@ class LoginActivity : AppCompatActivity(), androidx.loader.app.LoaderManager.Loa
     override fun onLoaderReset(loader: androidx.loader.content.Loader<List<KolAccount>>) {
     }
 
-    override fun onCreateLoader(id: Int, args: Bundle?): androidx.loader.content.Loader<List<KolAccount>> {
+    override fun onCreateLoader(
+        id: Int,
+        args: Bundle?
+    ): androidx.loader.content.Loader<List<KolAccount>> {
         return AccountLoader(this)
     }
 
@@ -224,14 +237,14 @@ class LoginActivity : AppCompatActivity(), androidx.loader.app.LoaderManager.Loa
             finish()
         } else {
             // failed login, so highlight the password field in the UI
-            password.setText(passwordText)
+            binding.password.setText(passwordText)
             if (networkStatus == NetworkStatus.ROLLOVER) {
                 // login will fail when server is down. Show error and hope for the best
-                password.error = getString(R.string.error_ro_in_progress)
+                binding.password.error = getString(R.string.error_ro_in_progress)
             } else {
-                password.error = getString(R.string.error_incorrect_password)
+                binding.password.error = getString(R.string.error_incorrect_password)
             }
-            password.requestFocus()
+            binding.password.requestFocus()
             showProgress(false)
         }
     }
@@ -241,13 +254,15 @@ class LoginActivity : AppCompatActivity(), androidx.loader.app.LoaderManager.Loa
         showProgress(false)
     }
 
-    private fun addUsernamesToAutocomplete(emailAddressCollection: List<String>?) {
+    private fun addUsernamesToAutocomplete(emailAddressCollection: List<String>) {
         //Create adapter to tell the AutoCompleteTextView what to show in its dropdown list.
-        val adapter = ArrayAdapter(this@LoginActivity,
-                android.R.layout.simple_dropdown_item_1line, emailAddressCollection)
+        val adapter = ArrayAdapter(
+            this@LoginActivity,
+            android.R.layout.simple_dropdown_item_1line, emailAddressCollection
+        )
 
         // set the new values
-        username.setAdapter(adapter)
+        binding.username.setAdapter(adapter)
         adapter.setNotifyOnChange(true)
     }
 }
@@ -256,7 +271,11 @@ class LoginActivity : AppCompatActivity(), androidx.loader.app.LoaderManager.Loa
  * Represents an asynchronous login/registration task used to authenticate
  * the user.
  */
-class UserLoginTask constructor(private val userName: String, private val password: String, private val uiWeakRef: WeakReference<LoginFieldContainer>) : AsyncTask<Void, Void, NetworkStatus>() {
+class UserLoginTask constructor(
+    private val userName: String,
+    private val password: String,
+    private val uiWeakRef: WeakReference<LoginFieldContainer>
+) : AsyncTask<Void, Void, NetworkStatus>() {
 
     /**
      * Defines the requirements for the UI component that displays updates for this login task
@@ -286,7 +305,12 @@ class UserLoginTask constructor(private val userName: String, private val passwo
     override fun doInBackground(vararg params: Void): NetworkStatus {
         val activity = uiWeakRef.get()
         activity?.let {
-            return ChatSingleton.login(username = userName, password = password, silent = true, context = activity.getApplicationContext())
+            return ChatSingleton.login(
+                username = userName,
+                password = password,
+                silent = true,
+                context = activity.getApplicationContext()
+            )
         }
         return NetworkStatus.UNKNOWN
     }
@@ -295,7 +319,11 @@ class UserLoginTask constructor(private val userName: String, private val passwo
         // maybe use rx to notify the activity instead?
         val activity = uiWeakRef.get()
         activity?.let {
-            activity.onLogin(networkStatus = status, userNameText = userName, passwordText = password)
+            activity.onLogin(
+                networkStatus = status,
+                userNameText = userName,
+                passwordText = password
+            )
         }
     }
 

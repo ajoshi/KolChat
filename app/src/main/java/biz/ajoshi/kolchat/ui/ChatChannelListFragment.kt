@@ -9,15 +9,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import biz.ajoshi.commonutils.StringUtilities
-import biz.ajoshi.kolchat.R
 import biz.ajoshi.kolchat.chat.ACTION_CHAT_COMMAND_FAILED
 import biz.ajoshi.kolchat.chat.ChatSingleton
 import biz.ajoshi.kolchat.chat.EXTRA_FAILED_CHAT_MESSAGE
-import biz.ajoshi.kolchat.chat.list.ChatChannelList
 import biz.ajoshi.kolchat.chat.detail.customviews.NewChatFAB
+import biz.ajoshi.kolchat.chat.list.ChatChannelList
+import biz.ajoshi.kolchat.databinding.ChannelListBinding
 import com.google.android.material.snackbar.Snackbar.LENGTH_LONG
-import kotlinx.android.synthetic.main.channel_list.*
-
 
 /**
  * Shows a list of all active chats/groups
@@ -34,18 +32,19 @@ class ChatChannelListFragment : BaseFragment(), NewChatFAB.ChatMessageSender {
     // list of the channels
     var channelList: ChatChannelList? = null
 
+    lateinit var binding: ChannelListBinding
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.channel_list, container, false)
+        binding = ChannelListBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
-        val newMessageFab = button_compose_new_chat
-        newMessageFab?.chatMessageSender = this
-        channelList = channel_list
+        binding.buttonComposeNewChat.chatMessageSender = this
         // TODO set this in args somehow (this is currently created by nav fragment so I can't set args dynamically)
-        channelList?.setUserId(ChatSingleton.network?.currentUser?.player?.id!!)
+        binding.channelList.setUserId(ChatSingleton.network?.currentUser?.player?.id!!)
         // right now just send it all to the activity. We might want to intercept it later on, but probably not
-        channelList?.setChatchannelInteractionListener(activity as ChatChannelList.ChatChannelInteractionListener)
+        binding.channelList.setChatchannelInteractionListener(activity as ChatChannelList.ChatChannelInteractionListener)
         super.onActivityCreated(savedInstanceState)
     }
 
@@ -79,7 +78,7 @@ class ChatChannelListFragment : BaseFragment(), NewChatFAB.ChatMessageSender {
     inner class FailedMessageReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             val message = intent.getStringExtra(EXTRA_FAILED_CHAT_MESSAGE)
-            if (!message.isEmpty()) {
+            if (message?.isNotEmpty() == true) {
                 view?.let {
                     com.google.android.material.snackbar.Snackbar.make(it, StringUtilities.getHtml(message), LENGTH_LONG).show()
                 }
@@ -106,6 +105,5 @@ class ChatChannelListFragment : BaseFragment(), NewChatFAB.ChatMessageSender {
             }
         }
     }
-
 }
 

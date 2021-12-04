@@ -10,6 +10,7 @@ import biz.ajoshi.commonutils.StringUtilities
 import biz.ajoshi.kolchat.chat.R
 import biz.ajoshi.kolchat.chat.chatMessageDateTimeFormat
 import biz.ajoshi.kolchat.chat.chatMessageTimeFormat
+import biz.ajoshi.kolchat.chat.databinding.ChatMessageBinding
 import biz.ajoshi.kolchat.persistence.chat.ChatMessage
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.drawee.generic.GenericDraweeHierarchyBuilder
@@ -17,13 +18,12 @@ import com.facebook.drawee.span.DraweeSpan
 import com.facebook.drawee.span.DraweeSpanStringBuilder
 import com.facebook.drawee.span.SimpleDraweeSpanTextView
 import com.facebook.imagepipeline.request.ImageRequestBuilder
-import kotlinx.android.synthetic.main.chat_message.view.*
 import java.util.*
 
 /**
  * Created by ajoshi on 7/22/17.
  */
-class ChatMessageVH(itemView: View, val listener: MessageClickListener) : androidx.recyclerview.widget.RecyclerView.ViewHolder(itemView) {
+class ChatMessageVH(binding: ChatMessageBinding, val listener: MessageClickListener) : androidx.recyclerview.widget.RecyclerView.ViewHolder(binding.root) {
     /**
      * Called when a chat message is long pressed. Implementor gets the message data and can do whatever it wants
      */
@@ -34,9 +34,9 @@ class ChatMessageVH(itemView: View, val listener: MessageClickListener) : androi
     private val date = Date()
     private lateinit var chatmessage: ChatMessage
 
-    private val userNameTv: TextView? = itemView.user_name
-    private val chatMessageTv: SimpleDraweeSpanTextView? = itemView.text
-    private val timeStampTv: TextView? = itemView.timestamp
+    private val userNameTv: TextView? = binding.userName
+    private val chatMessageTv: SimpleDraweeSpanTextView? = binding.text
+    private val timeStampTv: TextView? = binding.timestamp
 
     init {
         val longClickListener = View.OnLongClickListener() {
