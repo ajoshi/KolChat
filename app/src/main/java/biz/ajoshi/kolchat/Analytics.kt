@@ -1,6 +1,5 @@
 package biz.ajoshi.kolchat
 
-import com.crashlytics.android.answers.Answers
 
 /**
  * Analytics constants for Crashlytics live here. This ensures we don't have typos messing up our data
@@ -35,11 +34,11 @@ object Analytics {
     /**
      * Returns a valid Answers object if the user has allowed it, else null
      */
-    fun getAnswers(): Answers? {
-        return if (shouldTrackEvents) {
-            Answers.getInstance()
-        } else {
-            null
-        }
-    }
+//    fun getAnswers(): Answers? {
+//        return if (shouldTrackEvents) {
+//            Answers.getInstance()
+//        } else {
+//            null
+//        }
+//    }
 }

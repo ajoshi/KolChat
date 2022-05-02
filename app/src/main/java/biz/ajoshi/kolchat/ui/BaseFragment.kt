@@ -5,7 +5,6 @@ import biz.ajoshi.kolchat.*
 import biz.ajoshi.kolchat.chat.ChatBackgroundService
 import biz.ajoshi.kolchat.chat.ChatManager
 import biz.ajoshi.kolchat.chat.EXTRA_CHAT_MESSAGE_TO_SEND
-import com.crashlytics.android.answers.CustomEvent
 
 /**
  * Defines the behavior of a base fragment. Lets us get titles, etc in a predictable manner
@@ -20,11 +19,11 @@ abstract class BaseFragment : androidx.fragment.app.Fragment() {
      */
     fun makePost(post: CharSequence?, isPrivate: Boolean, id: String): Boolean {
         // log to analytics as well
-        Analytics.getAnswers()?.logCustom(
-            CustomEvent(EVENT_NAME_CHAT_MESSAGE_SENT)
-                .putCustomAttribute(EVENT_ATTRIBUTE_RECIPIENT, if (isPrivate) "PM" else id)
-                .putCustomAttribute(EVENT_ATTRIBUTE_MESSAGE_LENGTH, post?.length)
-        )
+//        Analytics.getAnswers()?.logCustom(
+//            CustomEvent(EVENT_NAME_CHAT_MESSAGE_SENT)
+//                .putCustomAttribute(EVENT_ATTRIBUTE_RECIPIENT, if (isPrivate) "PM" else id)
+//                .putCustomAttribute(EVENT_ATTRIBUTE_MESSAGE_LENGTH, post?.length)
+//        )
         return sendChatCommand(ChatManager.getChatString(post, id, isPrivate))
     }
 

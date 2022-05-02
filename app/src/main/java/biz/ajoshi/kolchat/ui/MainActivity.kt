@@ -26,8 +26,6 @@ import biz.ajoshi.kolchat.chat.list.ChatChannelList
 import biz.ajoshi.kolchat.persistence.chat.ChatChannel
 import biz.ajoshi.kolchat.persistence.chat.ChatMessage
 import biz.ajoshi.kolnetwork.model.User
-import com.crashlytics.android.Crashlytics
-import com.crashlytics.android.answers.CustomEvent
 import com.google.android.material.snackbar.Snackbar
 
 const val action_navigate_to_chat_detail =
@@ -55,7 +53,7 @@ class MainActivity : AppCompatActivity(), ChatChannelList.ChatChannelInteraction
                     .getBoolean(KEY_PREF_SEND_USERNAME, true)
             ) {
                 // dont' log username unconditionally, but if the user has allowed it, then set it
-                Crashlytics.setUserIdentifier(getCurrentUser()?.name)
+//                Crashlytics.setUserIdentifier(getCurrentUser()?.name)
             }
             // we're logged in
             val serviceIntent = Intent(this, ChatBackgroundService::class.java)
@@ -157,18 +155,18 @@ class MainActivity : AppCompatActivity(), ChatChannelList.ChatChannelInteraction
      */
     private fun logLaunchEvent(source: String) {
         if (Analytics.shouldTrackEvents) {
-            val customEvent = CustomEvent(EVENT_NAME_APP_LAUNCH)
-                .putCustomAttribute(EVENT_ATTRIBUTE_SOURCE, source)
-            val preferenceManager = PreferenceManager.getDefaultSharedPreferences(this)
-            customEvent.putCustomAttribute(
-                EVENT_ATTRIBUTE_IS_POLLING_ENABLED,
-                preferenceManager.getBoolean(KEY_PREF_ENABLE_POLL, true).toString()
-            )
-            customEvent.putCustomAttribute(
-                EVENT_ATTRIBUTE_IS_FAST_POLLING_ENABLED,
-                preferenceManager.getBoolean(KEY_PREF_SUPER_FAST_POLL, false).toString()
-            )
-            Analytics.getAnswers()?.logCustom(customEvent)
+//            val customEvent = CustomEvent(EVENT_NAME_APP_LAUNCH)
+//                .putCustomAttribute(EVENT_ATTRIBUTE_SOURCE, source)
+//            val preferenceManager = PreferenceManager.getDefaultSharedPreferences(this)
+//            customEvent.putCustomAttribute(
+//                EVENT_ATTRIBUTE_IS_POLLING_ENABLED,
+//                preferenceManager.getBoolean(KEY_PREF_ENABLE_POLL, true).toString()
+//            )
+//            customEvent.putCustomAttribute(
+//                EVENT_ATTRIBUTE_IS_FAST_POLLING_ENABLED,
+//                preferenceManager.getBoolean(KEY_PREF_SUPER_FAST_POLL, false).toString()
+//            )
+//            Analytics.getAnswers()?.logCustom(customEvent)
         }
     }
 

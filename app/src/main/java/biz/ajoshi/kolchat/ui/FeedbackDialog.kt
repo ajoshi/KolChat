@@ -8,7 +8,6 @@ import androidx.appcompat.app.AlertDialog
 import biz.ajoshi.commonutils.Logg
 import biz.ajoshi.kolchat.R
 import biz.ajoshi.kolchat.UserSentLogsEvent
-import com.crashlytics.android.Crashlytics
 
 /**
  * Lets us create a dialog for feedback. It will need to be made prettier soon so it's in its own class
@@ -23,7 +22,7 @@ class FeedbackDialog(val context: Context, val rootView: View) {
                     if (dialog is AlertDialog) {
                         val feedback = "" + dialog.findViewById<EditText>(R.id.feedback_text)?.text
                         Logg.i(feedback)
-                        Crashlytics.logException(UserSentLogsEvent("User sent logs " + System.currentTimeMillis()))
+//                        Crashlytics.logException(UserSentLogsEvent("User sent logs " + System.currentTimeMillis()))
                         com.google.android.material.snackbar.Snackbar.make(
                             rootView,
                             "Logs sent!",

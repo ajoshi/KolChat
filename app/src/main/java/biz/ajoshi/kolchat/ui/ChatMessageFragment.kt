@@ -19,7 +19,8 @@ import biz.ajoshi.kolchat.chat.detail.customviews.QuickCommand
 import biz.ajoshi.kolchat.chat.detail.customviews.QuickCommandView
 import biz.ajoshi.kolchat.databinding.ChatDetailBinding
 import biz.ajoshi.kolchat.persistence.chat.ChatMessage
-import com.crashlytics.android.answers.ContentViewEvent
+import kotlinx.coroutines.*
+import java.util.concurrent.Flow
 
 
 /**
@@ -146,15 +147,15 @@ class ChatMessageFragment : BaseFragment(), QuickCommandView.CommandClickListene
                 //add this new message to the bottom (will scroll down if we're at the bottom of the list)
                     binding.messagesList.addMessages(message)
             })
-        Analytics.getAnswers()?.logContentView(
-            ContentViewEvent()
-                .putContentName("Channel detail opened")
-                .putContentId(if (isPrivate) "PM" else name)
-                .putCustomAttribute(
-                    EVENT_ATTRIBUTE_TIME_TAKEN,
-                    (chatLoadEndTimestamp - chatLoadStartTimestamp)
-                )
-        )
+//        Analytics.getAnswers()?.logContentView(
+//            ContentViewEvent()
+//                .putContentName("Channel detail opened")
+//                .putContentId(if (isPrivate) "PM" else name)
+//                .putCustomAttribute(
+//                    EVENT_ATTRIBUTE_TIME_TAKEN,
+//                    (chatLoadEndTimestamp - chatLoadStartTimestamp)
+//                )
+//        )
     }
 
     override fun onCommandClicked(command: QuickCommand) {
