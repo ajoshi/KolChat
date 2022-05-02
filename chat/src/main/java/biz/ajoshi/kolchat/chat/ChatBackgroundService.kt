@@ -156,7 +156,7 @@ class ChatBackgroundService : Service(), ChatServiceHandler.ChatService {
         val stopServiceIntent = Intent(ctx, ChatBackgroundService::class.java)
         stopServiceIntent.putExtra(EXTRA_STOP, true)
         val stopPIntent =
-            PendingIntent.getService(ctx, 1, stopServiceIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+            PendingIntent.getService(ctx, 1, stopServiceIntent, PendingIntent.FLAG_UPDATE_CURRENT + PendingIntent.FLAG_IMMUTABLE)
 
         // intent meant for main activity. will launch the app
         val launchMainActivityIntent = getMainActivityIntent()
@@ -164,7 +164,7 @@ class ChatBackgroundService : Service(), ChatServiceHandler.ChatService {
             ctx,
             1,
             launchMainActivityIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT
+            PendingIntent.FLAG_UPDATE_CURRENT+ PendingIntent.FLAG_IMMUTABLE
         )
 
         val notificationBuilder =
