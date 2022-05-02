@@ -283,7 +283,7 @@ class ChatServiceHandler(looper: Looper, val service: ChatService) : Handler(loo
             ctx,
             1,
             launchMainActivityIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT
+            PendingIntent.FLAG_UPDATE_CURRENT + PendingIntent.FLAG_MUTABLE
         )
 
         // TODO use messagingstyle notificationcompat to group multiple message notifications. right now just replace to avoid spam
