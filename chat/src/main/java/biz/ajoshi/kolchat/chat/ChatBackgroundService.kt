@@ -108,8 +108,7 @@ class ChatBackgroundService : Service(), ChatServiceHandler.ChatService {
         val interval = intent?.extras?.getLong(EXTRA_POLL_INTERVAL_IN_MS, DEFAULT_POLL_INTERVAL)
         val chatMessageToSend = intent?.extras?.getString(EXTRA_CHAT_MESSAGE_TO_SEND, null)
         intent?.extras?.getParcelable<ComponentName>(EXTRA_MAIN_ACTIVITY_COMPONENTNAME)?.let {
-            mainActivityComponentName =
-                intent.extras?.getParcelable(EXTRA_MAIN_ACTIVITY_COMPONENTNAME)
+            mainActivityComponentName = it
         }
         if (mainActivityComponentName == null) {
             Logg.e("No componentname was passed in for ChatBGService- no activity launchable on tap")
@@ -151,12 +150,14 @@ class ChatBackgroundService : Service(), ChatServiceHandler.ChatService {
     /**
      * Make the persistent notification
      */
-    fun makePersistentNotification(ctx: Context): Notification {
+    private fun makePersistentNotification(ctx: Context): Notification {
         // intent meant for this service. will be used to stopChatService/start
         val stopServiceIntent = Intent(ctx, ChatBackgroundService::class.java)
+        val intentFlag = PendingIntent.FLAG_IMMUTABLE
+
         stopServiceIntent.putExtra(EXTRA_STOP, true)
         val stopPIntent =
-            PendingIntent.getService(ctx, 1, stopServiceIntent, PendingIntent.FLAG_UPDATE_CURRENT + PendingIntent.FLAG_IMMUTABLE)
+            PendingIntent.getService(ctx, 1, stopServiceIntent, intentFlag)
 
         // intent meant for main activity. will launch the app
         val launchMainActivityIntent = getMainActivityIntent()
@@ -164,7 +165,7 @@ class ChatBackgroundService : Service(), ChatServiceHandler.ChatService {
             ctx,
             1,
             launchMainActivityIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT+ PendingIntent.FLAG_IMMUTABLE
+            intentFlag
         )
 
         val notificationBuilder =
