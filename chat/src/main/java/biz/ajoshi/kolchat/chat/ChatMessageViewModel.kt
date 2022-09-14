@@ -3,10 +3,11 @@ package biz.ajoshi.kolchat.chat
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import androidx.paging.LivePagedListBuilder
-import androidx.paging.PagedList
+import androidx.paging.*
 import biz.ajoshi.kolchat.chat.arch.ChatRepository
 import biz.ajoshi.kolchat.persistence.chat.ChatMessage
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
 
 /**
  * Created by ajoshi on 7/22/17.
@@ -21,15 +22,20 @@ class ChatMessageViewModel(application: Application) : AndroidViewModel(applicat
     fun getLastChatObservable(
         channelId: String,
         userId: String
-    ): LiveData<PagedList<ChatMessage>>? {
-        val results =
-            ChatRepository().getLastChatStreamForChannel(channelId = channelId, userId = userId)
-        results?.let {
-            val temp: LiveData<PagedList<ChatMessage>> =
-                LivePagedListBuilder<Int, ChatMessage>(it, 50).build()
-            return temp
-        }
-        return null
+    ): LiveData<PagingData<ChatMessage>> {
+        return Pager(config = PagingConfig(pageSize = 50, prefetchDistance = 10),
+            pagingSourceFactory = { ChatRepository().getLastChatStreamForChannel(channelId = channelId, userId = userId) }
+        ).liveData.cachedIn(this)
+    }
+
+    fun getLastChatObservable(
+        channelId: String,
+        userId: String,
+        scope: CoroutineScope
+    ): Flow<PagingData<ChatMessage>> {
+        return Pager(config = PagingConfig(pageSize = 50, prefetchDistance = 10),
+            pagingSourceFactory = { ChatRepository().getLastChatStreamForChannel(channelId = channelId, userId = userId) }
+        ).flow.cachedIn(scope)
     }
 
     /**

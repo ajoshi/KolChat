@@ -8,19 +8,19 @@ import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.Navigation.findNavController
-import biz.ajoshi.kolchat.Analytics
-import biz.ajoshi.kolchat.EVENT_ATTRIBUTE_TIME_TAKEN
+import androidx.recyclerview.widget.RecyclerView
+import biz.ajoshi.commonutils.Logg
 import biz.ajoshi.kolchat.R
 import biz.ajoshi.kolchat.chat.ChatMessageViewModel
 import biz.ajoshi.kolchat.chat.detail.ChatDetailList
 import biz.ajoshi.kolchat.chat.detail.ChatMessageVH
 import biz.ajoshi.kolchat.chat.detail.PagingChatAdapter
+import biz.ajoshi.kolchat.chat.detail.PagingChatDataObserver
 import biz.ajoshi.kolchat.chat.detail.customviews.QuickCommand
 import biz.ajoshi.kolchat.chat.detail.customviews.QuickCommandView
 import biz.ajoshi.kolchat.databinding.ChatDetailBinding
 import biz.ajoshi.kolchat.persistence.chat.ChatMessage
 import kotlinx.coroutines.*
-import java.util.concurrent.Flow
 
 
 /**
@@ -36,7 +36,9 @@ class ChatMessageFragment : BaseFragment(), QuickCommandView.CommandClickListene
     private var isComposerDisabled = true
     private lateinit var currentUserId: String
     private var shouldUseAndroidxPaging: Boolean = false
+    val job = Job()
 
+    var adapter : PagingChatAdapter? = null
     lateinit var binding: ChatDetailBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,7 +58,7 @@ class ChatMessageFragment : BaseFragment(), QuickCommandView.CommandClickListene
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = ChatDetailBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -117,20 +119,31 @@ class ChatMessageFragment : BaseFragment(), QuickCommandView.CommandClickListene
         val vm: ChatMessageViewModel =
             ViewModelProviders.of(this).get(ChatMessageViewModel::class.java)
 
-        val adapter = PagingChatAdapter(
+        adapter = PagingChatAdapter(
             binding.messagesList.chatAdapter.layoutMgr,
             object : ChatMessageVH.MessageClickListener {
                 override fun onMessageLongClicked(message: ChatMessage) {
                     (activity as ChatDetailList.MessageClickListener).onMessageLongClicked(message)
                 }
             })
-        vm.getLastChatObservable(id, currentUserId)?.observe(this, Observer { pagedList ->
-            adapter.submitList(pagedList)
-            adapter.scrollToBottomOnceAndThenThreshold()
-        })
+
+        CoroutineScope(Dispatchers.IO + job).launch {
+            vm.getLastChatObservable(id, currentUserId, this)
+                .collect {
+                    withContext(Dispatchers.Main + job) {
+                        adapter?.submitData(lifecycle = lifecycle, pagingData = it)
+                    }
+                }
+        }
         binding.messagesList.adapter = adapter
 
         // how do we log perf metrics in this? can we?
+    }
+
+    override fun onDestroy(){
+        job.cancel()
+        adapter?.cleanup()
+        super.onDestroy()
     }
 
     /*

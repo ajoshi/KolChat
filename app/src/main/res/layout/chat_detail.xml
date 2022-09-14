@@ -6,7 +6,7 @@
     <biz.ajoshi.kolchat.chat.detail.ChatDetailList
         android:id="@+id/messagesList"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:scrollbars="vertical"
         android:layout_above="@+id/quick_commands" />
     <biz.ajoshi.kolchat.chat.detail.customviews.QuickCommandView

@@ -44,6 +44,8 @@ class ChatDetailList : androidx.recyclerview.widget.RecyclerView {
             }
         })
         adapter = chatAdapter
+        layoutMgr.reverseLayout = true
+        layoutMgr.stackFromEnd = false
         layoutManager = layoutMgr
         // scroll when the keyboard comes up
         addOnLayoutChangeListener { _, _, _, _, bottom, _, _, _, oldBottom ->

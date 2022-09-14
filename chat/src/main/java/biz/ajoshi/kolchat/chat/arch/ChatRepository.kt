@@ -2,6 +2,8 @@ package biz.ajoshi.kolchat.chat.arch
 
 import androidx.lifecycle.LiveData
 import androidx.paging.DataSource
+import androidx.paging.PagingSource
+import androidx.paging.PagingState
 import biz.ajoshi.kolchat.persistence.KolDB
 import biz.ajoshi.kolchat.persistence.chat.ChatMessage
 
@@ -13,8 +15,18 @@ class ChatRepository {
     fun getLastChatStreamForChannel(
         channelId: String,
         userId: String
-    ): DataSource.Factory<Int, ChatMessage>? {
+    ): PagingSource<Int, ChatMessage> {
         return KolDB.getDb()?.MessageDao()?.getLastMessageLivedataForChannel(channelId, userId)
+            ?: (object : PagingSource<Int, ChatMessage>() {
+                override fun getRefreshKey(state: PagingState<Int, ChatMessage>): Int? {
+                    return null
+                }
+
+                override suspend fun load(params: LoadParams<Int>): LoadResult<Int, ChatMessage> {
+                    return LoadResult.Error(IllegalAccessError("fuck idk"))
+                }
+
+            })
     }
 
     fun getChatStreamForChannel(
