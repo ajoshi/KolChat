@@ -8,20 +8,16 @@ import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.Navigation.findNavController
-import androidx.recyclerview.widget.RecyclerView
-import biz.ajoshi.commonutils.Logg
 import biz.ajoshi.kolchat.R
 import biz.ajoshi.kolchat.chat.ChatMessageViewModel
 import biz.ajoshi.kolchat.chat.detail.ChatDetailList
 import biz.ajoshi.kolchat.chat.detail.ChatMessageVH
 import biz.ajoshi.kolchat.chat.detail.PagingChatAdapter
-import biz.ajoshi.kolchat.chat.detail.PagingChatDataObserver
 import biz.ajoshi.kolchat.chat.detail.customviews.QuickCommand
 import biz.ajoshi.kolchat.chat.detail.customviews.QuickCommandView
 import biz.ajoshi.kolchat.databinding.ChatDetailBinding
 import biz.ajoshi.kolchat.persistence.chat.ChatMessage
 import kotlinx.coroutines.*
-
 
 /**
  * Fragment displaying a conversation in a channel or with a user. Uses the arch components instead of rxjava
@@ -38,7 +34,7 @@ class ChatMessageFragment : BaseFragment(), QuickCommandView.CommandClickListene
     private var shouldUseAndroidxPaging: Boolean = false
     val job = Job()
 
-    var adapter : PagingChatAdapter? = null
+    var adapter: PagingChatAdapter? = null
     lateinit var binding: ChatDetailBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -140,7 +136,7 @@ class ChatMessageFragment : BaseFragment(), QuickCommandView.CommandClickListene
         // how do we log perf metrics in this? can we?
     }
 
-    override fun onDestroy(){
+    override fun onDestroy() {
         job.cancel()
         adapter?.cleanup()
         super.onDestroy()

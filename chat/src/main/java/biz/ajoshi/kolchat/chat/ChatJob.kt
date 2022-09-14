@@ -112,7 +112,7 @@ class ChatJob : Job() {
 
         override fun stopChatService(id: Int) {
             // can we do more?
-            shouldReschedule = false;
+            shouldReschedule = false
         }
 
         override fun getContext(): Context {

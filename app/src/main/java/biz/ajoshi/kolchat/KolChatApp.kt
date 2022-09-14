@@ -3,7 +3,6 @@ package biz.ajoshi.kolchat
 import android.app.Application
 import android.os.StrictMode
 import androidx.preference.PreferenceManager
-import biz.ajoshi.commonutils.Logg
 import biz.ajoshi.kolchat.chat.ChatJob
 import biz.ajoshi.kolchat.persistence.KolDB
 import com.facebook.drawee.backends.pipeline.Fresco

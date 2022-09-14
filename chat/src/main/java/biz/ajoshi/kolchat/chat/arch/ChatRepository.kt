@@ -1,7 +1,6 @@
 package biz.ajoshi.kolchat.chat.arch
 
 import androidx.lifecycle.LiveData
-import androidx.paging.DataSource
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import biz.ajoshi.kolchat.persistence.KolDB
@@ -25,7 +24,6 @@ class ChatRepository {
                 override suspend fun load(params: LoadParams<Int>): LoadResult<Int, ChatMessage> {
                     return LoadResult.Error(IllegalAccessError("fuck idk"))
                 }
-
             })
     }
 

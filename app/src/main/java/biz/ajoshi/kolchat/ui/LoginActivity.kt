@@ -83,7 +83,7 @@ class LoginActivity : AppCompatActivity(),
         binding.username.setOnItemClickListener { _, textview, position, _ ->
             val tempAcctList = accountList
             // text in the view that was tapped. This only works because the dropdown is a simple textview
-            val clickerUsername = (textview as AppCompatTextView).text;
+            val clickerUsername = (textview as AppCompatTextView).text
             val account = tempAcctList?.find { acct -> acct.username == clickerUsername }
             account?.let {
                 attemptLogin(account.username, account.password, WeakReference(this@LoginActivity))

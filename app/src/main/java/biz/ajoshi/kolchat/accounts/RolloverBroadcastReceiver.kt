@@ -51,7 +51,7 @@ class RolloverBroadcastReceiver : BroadcastReceiver() {
             androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(it)
                 .unregisterReceiver(
                     this
-                );
+                )
         }
         view = null
         // maybe we shouldn't dismiss?
@@ -67,11 +67,11 @@ class RolloverBroadcastReceiver : BroadcastReceiver() {
             androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(it)
                 .registerReceiver(
                     this, IntentFilter(ACTION_CHAT_ROLLOVER)
-                );
+                )
             androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(it)
                 .registerReceiver(
                     this, IntentFilter(ACTION_CHAT_ROLLOVER_OVER)
-                );
+                )
         }
         view = snackbarRootView
     }

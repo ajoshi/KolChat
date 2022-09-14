@@ -1,14 +1,11 @@
 package biz.ajoshi.kolchat.chat.detail
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
-import biz.ajoshi.commonutils.Logg
 import biz.ajoshi.kolchat.chat.databinding.ChatMessageBinding
 import biz.ajoshi.kolchat.persistence.chat.ChatMessage
-
 
 
 /**
@@ -22,7 +19,7 @@ class PagingChatAdapter(
 ) :
     PagingDataAdapter<ChatMessage, ChatMessageVH>(DIFF_CALLBACK) {
     private var started = false
-    private val observer = PagingChatDataObserverI(this)
+    private val observer = PagingChatDataObserverImpl(this)
 
     init {
         registerAdapterDataObserver(observer)
@@ -40,7 +37,7 @@ class PagingChatAdapter(
             holder.bind(item)
         } else {
             /// as far as I can tell, this is what is shown when no data is loaded.
-        // ie. Paging placeholder default behavior is an empty row
+            // ie. Paging placeholder default behavior is an empty row
 
             // Null defines a placeholder item - PagedListAdapter automatically
             // invalidates this row when the actual object is loaded from the
@@ -104,5 +101,12 @@ class PagingChatAdapter(
                         &&
                         oldMessage.timeStamp == newMessage.timeStamp
         }
+    }
+}
+
+internal class PagingChatDataObserverImpl(adapter: PagingChatAdapter?) :
+    PagingChatDataObserver(adapter) {
+    override fun doOnChange() {
+        adapter?.scrollToBottomOnceAndThenThreshold()
     }
 }

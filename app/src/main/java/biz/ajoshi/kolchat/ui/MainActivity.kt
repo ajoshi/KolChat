@@ -41,7 +41,7 @@ class MainActivity : AppCompatActivity(), ChatChannelList.ChatChannelInteraction
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // for the first ever launch, set default values for the preferences
-        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false)
 
         // Change the theme if needed. Must be done before setContentView
         val themer = Themer()

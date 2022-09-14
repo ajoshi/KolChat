@@ -40,7 +40,7 @@ class ChatMessageVH(binding: ChatMessageBinding, val listener: MessageClickListe
     private val timeStampTv: TextView? = binding.timestamp
 
     init {
-        val longClickListener = View.OnLongClickListener() {
+        val longClickListener = View.OnLongClickListener {
             listener.onMessageLongClicked(chatmessage)
             true
         }

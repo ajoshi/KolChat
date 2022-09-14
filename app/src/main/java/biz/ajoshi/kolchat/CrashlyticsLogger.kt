@@ -6,7 +6,7 @@ import biz.ajoshi.commonutils.Logg
 /**
  * Logger that will log these to Crashlytics. Central so we can turn it off easily (GDPR?)
  */
-class CrashlyticsLogger() : Logg.CustomLogger {
+class CrashlyticsLogger : Logg.CustomLogger {
     override fun logException(tag: String?, throwable: Throwable?) {
 //        Crashlytics.log(Log.ERROR, tag, "Exception occurred")
 //        Crashlytics.logException(throwable)

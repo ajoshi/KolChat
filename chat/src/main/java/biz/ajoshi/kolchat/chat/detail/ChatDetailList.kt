@@ -16,8 +16,8 @@ import io.reactivex.schedulers.Schedulers
  * Apps using LiveData should handle this themselves
  */
 class ChatDetailList : androidx.recyclerview.widget.RecyclerView {
-    public lateinit var chatAdapter: ChatAdapter
-    public var initialChatLoadSubscriber: Disposable? = null
+    lateinit var chatAdapter: ChatAdapter
+    var initialChatLoadSubscriber: Disposable? = null
     private var clickListener: MessageClickListener? = null
     private var lastTimeSeen: Long? = 0
     private lateinit var channelId: String
@@ -72,7 +72,7 @@ class ChatDetailList : androidx.recyclerview.widget.RecyclerView {
                 ?.ChannelDao()
                 ?.getChannel(channelId, currentUserId)
             // get the channel object for this channel
-        }?.subscribeOn(Schedulers.io())
+        }.subscribeOn(Schedulers.io())
             // get the messages for this channel
             ?.map { singleChannel ->
                 // Or should I be using a normal (non-Single) Channel object?

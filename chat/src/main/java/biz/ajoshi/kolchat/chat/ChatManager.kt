@@ -94,9 +94,9 @@ class ChatManager(
             // this was a chat command
             if (output.contains(chatCmdRedirectPrefix)) {
                 val redirectUrl =
-                    StringUtilities.getBetweenTwoStrings(output, chatCmdRedirectPrefix, "');)");
+                    StringUtilities.getBetweenTwoStrings(output, chatCmdRedirectPrefix, "');)")
                 // this chat command was a redirect, so go to the actual php page (oh god), but ignore that one's response
-                network.getUrl(redirectUrl);
+                network.getUrl(redirectUrl)
             }
             val systemMessageUser =
                 ServerChatChannel(name = SYSTEM_USER_NAME, id = SYSTEM_USER_ID, isPrivate = true)

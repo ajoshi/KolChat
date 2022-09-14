@@ -102,7 +102,7 @@ class ChatChannelListFragment : BaseFragment(), NewChatFAB.ChatMessageSender {
                 androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(it)
                     .unregisterReceiver(
                         this
-                    );
+                    )
             }
         }
 
@@ -114,7 +114,7 @@ class ChatChannelListFragment : BaseFragment(), NewChatFAB.ChatMessageSender {
                 androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(it)
                     .registerReceiver(
                         this, IntentFilter(ACTION_CHAT_COMMAND_FAILED)
-                    );
+                    )
             }
         }
     }

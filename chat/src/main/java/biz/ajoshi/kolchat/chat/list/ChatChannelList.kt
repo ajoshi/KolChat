@@ -48,7 +48,7 @@ class ChatChannelList : androidx.recyclerview.widget.RecyclerView, ChannelClickL
     /**
      * We want people to delete channels by swiping on them. We do not want them to reorder them yet
      */
-    inner class ChannelSwipeCallback() : SimpleCallback(0, LEFT) {
+    inner class ChannelSwipeCallback : SimpleCallback(0, LEFT) {
         override fun onMove(
             recyclerView: androidx.recyclerview.widget.RecyclerView,
             viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder,
