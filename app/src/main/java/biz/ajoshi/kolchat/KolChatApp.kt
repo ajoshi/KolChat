@@ -21,7 +21,7 @@ class KolChatApp : Application() {
         // set the custom logger to log to Crashlytics if the user has allowed it.
         val shouldSendLogs = preferenceManager.getBoolean(KEY_PREF_SEND_LOGS, true)
         if (shouldSendLogs) {
-            Logg.setCustomLogger(CrashlyticsLogger())
+//            Logg.setCustomLogger(CrashlyticsLogger())
         }
         Analytics.shouldTrackEvents = preferenceManager.getBoolean(KEY_PREF_TRACK_EVENTs, true)
         KolDB.createDb(this)
